@@ -1,0 +1,73 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { entryHref, entrySlugFromId } from "@/utilities/content";
+import { getCollection, render } from "astro:content";
+
+export async function getStaticPaths() {
+  const projects = (await getCollection("projects")).sort(
+    (a, b) => b.data.order - a.data.order || b.data.year - a.data.year,
+  );
+
+  return projects.map((entry, index) => ({
+    params: { slug: entrySlugFromId(entry.id) },
+    props: {
+      entry,
+      prevEntry: index + 1 < projects.length ? projects[index + 1] : null,
+      nextEntry: index > 0 ? projects[index - 1] : null,
+    },
+  }));
+}
+
+const { entry, prevEntry, nextEntry } = Astro.props;
+const { Content } = await render(entry);
+
+const prevPage = prevEntry
+  ? { label: "Previous item", title: prevEntry.data.title, url: entryHref("projects", prevEntry.id) }
+  : null;
+
+const nextPage = nextEntry
+  ? { label: "Next item", title: nextEntry.data.title, url: entryHref("projects", nextEntry.id) }
+  : null;
+---
+
+<BaseLayout
+  title={`${entry.data.title} | Gallery`}
+  description={entry.data.description}
+  prevPage={prevPage}
+  nextPage={nextPage}
+>
+  <article class="article-page">
+    <a href="/projects" class="article-back">← Back</a>
+    <header class="article-header">
+      <p class="section-label">topic</p>
+      <h1>{entry.data.title}</h1>
+      <div class="article-meta">
+        <span>{entry.data.year}</span>
+        <span>|</span>
+        <span>{entry.data.stack.join(" | ")}</span>
+      </div>
+      <div class="article-meta">
+        <span>topic: project overview</span>
+        <span>|</span>
+        <span>subtopic: implementation notes</span>
+      </div>
+      {entry.data.description && <p class="lead">{entry.data.description}</p>}
+      <div class="flex flex-wrap gap-3" style="margin-top: 1.25rem;">
+        {entry.data.liveUrl && (
+          <a class="execute-button" href={entry.data.liveUrl} target="_blank" rel="noreferrer noopener">
+            Open Live Site
+          </a>
+        )}
+        {entry.data.repoUrl && (
+          <a class="execute-button secondary" href={entry.data.repoUrl} target="_blank" rel="noreferrer noopener">
+            Open Source Code
+          </a>
+        )}
+      </div>
+    </header>
+
+    <div class="prose max-w-none">
+      <Content />
+    </div>
+  </article>
+</BaseLayout>

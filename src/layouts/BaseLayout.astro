@@ -1,0 +1,1163 @@
+---
+import "@/styles/global.css";
+import "katex/dist/katex.min.css";
+import { ClientRouter } from "astro:transitions";
+
+interface AdjacentPage {
+  title: string;
+  url: string;
+  label: string;
+}
+
+interface Props {
+  title?: string;
+  description?: string;
+  prevPage?: AdjacentPage | null;
+  nextPage?: AdjacentPage | null;
+}
+
+const {
+  title = "Personal Website",
+  description = "Personal website built with Astro content collections.",
+  prevPage,
+  nextPage,
+} = Astro.props;
+
+const navigation = [
+  { href: "/", label: "overview" },
+  { href: "/projects", label: "gallery" },
+  { href: "/tech", label: "journal" },
+  { href: "/movies", label: "thoughts" },
+  { href: "/contact", label: "contact" },
+];
+
+const currentPath = Astro.url.pathname;
+const initialTheme = "day";
+const normalizedPath = currentPath === "/" ? "/overview" : currentPath.replace(/\/$/, "") || "/";
+const breadcrumbPath = `~/projects/self-portfolio${normalizedPath}`;
+
+const siteOwner = import.meta.env.PUBLIC_SITE_OWNER ?? "your_name";
+const githubUrl = import.meta.env.PUBLIC_GITHUB_URL ?? "#";
+const linkedinUrl = import.meta.env.PUBLIC_LINKEDIN_URL ?? "#";
+
+function isActivePath(href: string) {
+  return href === "/" ? currentPath === "/" : currentPath.startsWith(href);
+}
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <ClientRouter />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <!-- Anti-FOUC: apply correct theme before first paint -->
+    <script is:inline>
+      try {
+        if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+          document.documentElement.setAttribute("data-theme", "night");
+        } else {
+          document.documentElement.setAttribute("data-theme", "day");
+        }
+      } catch (e) {}
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Space+Grotesk:wght@300..700&display=swap"
+      rel="stylesheet"
+    />
+    <script type="speculationrules">
+      {"prefetch":[{"source":"document","eagerness":"moderate"}]}
+    </script>
+  </head>
+  <body data-theme={initialTheme} data-ui-hidden="false" transition:animate="none">
+    <canvas class="maze-canvas" data-maze-canvas aria-hidden="true" transition:persist transition:name="maze-background"></canvas>
+    <div class="bg-grid" aria-hidden="true" transition:persist></div>
+    <button
+      class="ui-visibility-toggle"
+      type="button"
+      data-ui-toggle
+      aria-label="Hide front UI"
+      aria-pressed="false"
+      style="position:fixed;top:0.85rem;right:0.95rem;z-index:6;min-height:38px;min-width:72px;padding:0 0.62rem;border:1px solid var(--border);border-radius:999px;background:color-mix(in srgb,var(--bg-elevated) 84%,transparent);color:var(--text-secondary);display:inline-flex;align-items:center;justify-content:center;gap:0.35rem;backdrop-filter:blur(6px);"
+    >
+      <span class="ui-toggle-icons" aria-hidden="true">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true" focusable="false">
+          <rect x="1.2" y="1.2" width="10.6" height="10.6" rx="1.2" stroke="currentColor" stroke-width="1" />
+          <path d="M3.2 9.5H9.8" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" />
+        </svg>
+        <span class="ui-toggle-sep"></span>
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true" focusable="false">
+          <path d="M1.5 5V1.5H5" stroke="currentColor" stroke-width="1" stroke-linecap="round" />
+          <path d="M8 1.5H11.5V5" stroke="currentColor" stroke-width="1" stroke-linecap="round" />
+          <path d="M11.5 8V11.5H8" stroke="currentColor" stroke-width="1" stroke-linecap="round" />
+          <path d="M5 11.5H1.5V8" stroke="currentColor" stroke-width="1" stroke-linecap="round" />
+        </svg>
+      </span>
+      <span class="sr-only" data-ui-toggle-label>hide_ui</span>
+    </button>
+    <div class="site-shell" transition:animate="none">
+      <header class="site-header">
+        <div class="header-left">
+          <div class="header-top">
+            <a class="brand" href="/">Brian::portfolio</a>
+            <div class="brand-socials">
+              <a
+                class="brand-social-link"
+                href="https://github.com/runake25"
+                target="_blank"
+                rel="noreferrer noopener"
+                aria-label="GitHub profile"
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.49.5.092.682-.217.682-.482 0-.237-.009-.866-.013-1.7-2.782.603-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.742 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
+                </svg>
+              </a>
+              <a
+                class="brand-social-link"
+                href={linkedinUrl}
+                target="_blank"
+                rel="noreferrer noopener"
+                aria-label="LinkedIn profile"
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                </svg>
+              </a>
+            </div>
+            <button class="mode-toggle" type="button" data-theme-toggle aria-label="Toggle day and night theme">
+              <span class="mode-icon mode-icon-sun" aria-hidden="true"></span>
+              <span class="mode-icon mode-icon-moon" aria-hidden="true"></span>
+              <span class="sr-only" data-theme-label>{initialTheme}</span>
+            </button>
+          </div>
+          <p class="breadcrumb">{breadcrumbPath}</p>
+        </div>
+      </header>
+
+      <nav class="site-nav" aria-label="Main navigation">
+        {
+          navigation.map((item) => (
+            <a class="nav-link" data-active={isActivePath(item.href)} href={item.href}>
+              {item.label}
+            </a>
+          ))
+        }
+      </nav>
+
+      <main class="page-content">
+        <slot />
+
+        {
+          (prevPage || nextPage) && (
+            <nav class="entry-footer-nav" aria-label="Entry navigation">
+              {prevPage && (
+                <a href={prevPage.url}>
+                  <p class="section-label">{prevPage.label}</p>
+                  <p>{prevPage.title}</p>
+                </a>
+              )}
+              {nextPage && (
+                <a href={nextPage.url}>
+                  <p class="section-label">{nextPage.label}</p>
+                  <p>{nextPage.title}</p>
+                </a>
+              )}
+            </nav>
+          )
+        }
+      </main>
+
+      <footer class="site-footer" aria-live="polite">
+        <span class="footer-left">system_status: <span class="health-value"><span class="status-marker" aria-hidden="true"></span><span data-system-online>online</span></span></span>
+        <div class="footer-right">
+          <span>local_time: <span data-local-time>--:--:--</span></span>
+          <span class="footer-sep" aria-hidden="true">::</span>
+          <span>rendered_data: <span data-render-size>--</span></span>
+        </div>
+      </footer>
+    </div>
+
+    <script is:inline>
+      (() => {
+        const existingRuntime = window.__portfolioRuntime;
+        const appState =
+          existingRuntime ||
+          {
+            hasManualThemeOverride: false,
+            telemetryIntervalId: 0,
+            themeToggleHandler: null,
+            uiToggleHandler: null,
+            systemThemeQuery: window.matchMedia("(prefers-color-scheme: dark)"),
+            reducedMotionQuery: window.matchMedia("(prefers-reduced-motion: reduce)"),
+            systemThemeHandlerBound: false,
+            reducedMotionHandlerBound: false,
+            resizeHandlerBound: false,
+            pageLoadHandlerBound: false,
+            beforeSwapHandlerBound: false,
+            mazeEngine: null,
+            mazeInitPromise: null,
+            activeTheme: null,
+            isUiHidden: false,
+            ui: null,
+          };
+
+        window.__portfolioRuntime = appState;
+
+        if (!existingRuntime) {
+          try {
+            appState.isUiHidden = window.localStorage.getItem("portfolio-ui-hidden") === "1";
+          } catch {
+            appState.isUiHidden = false;
+          }
+        } else if (typeof appState.isUiHidden !== "boolean") {
+          appState.isUiHidden = false;
+        }
+
+        const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+        const getUiNodes = () => ({
+          timeNode: document.querySelector("[data-local-time]"),
+          systemOnlineNode: document.querySelector("[data-system-online]"),
+          renderSizeNode: document.querySelector("[data-render-size]"),
+          themeToggle: document.querySelector("[data-theme-toggle]"),
+          themeLabelNode: document.querySelector("[data-theme-label]"),
+          uiToggle: document.querySelector("[data-ui-toggle]"),
+          uiToggleLabelNode: document.querySelector("[data-ui-toggle-label]"),
+        });
+
+        const getCurrentTheme = () => (document.body.getAttribute("data-theme") === "day" ? "day" : "night");
+
+        const fallbackHash = (input) => {
+          let hash = 2166136261;
+          for (let index = 0; index < input.length; index += 1) {
+            hash ^= input.charCodeAt(index);
+            hash = Math.imul(hash, 16777619);
+          }
+          const normalized = hash >>> 0;
+          return normalized === 0 ? 1 : normalized;
+        };
+
+const deriveSeedFromFingerprint = async (source) => {
+          try {
+            if (window.crypto?.subtle && typeof TextEncoder !== "undefined") {
+              const encoded = new TextEncoder().encode(source);
+              const digest = await window.crypto.subtle.digest("SHA-256", encoded);
+              const view = new DataView(digest);
+              const seed = view.getUint32(0) ^ view.getUint32(4) ^ view.getUint32(8) ^ view.getUint32(12);
+              return seed === 0 ? 1 : seed;
+            }
+          } catch {
+            return fallbackHash(source);
+          }
+
+          return fallbackHash(source);
+        };
+
+        const createPrng = (seed) => {
+          let state = seed >>> 0;
+          return () => {
+            state = (state + 0x6d2b79f5) >>> 0;
+            let value = state;
+            value = Math.imul(value ^ (value >>> 15), value | 1);
+            value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
+            return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
+          };
+        };
+
+        const nextSeed = (seed) => {
+          const advanced = (seed + 0x9e3779b9) >>> 0;
+          return advanced === 0 ? 1 : advanced;
+        };
+
+        const buildMaze = (columns, rows, random) => {
+          const totalCells = columns * rows;
+          const cells = Array.from({ length: totalCells }, () => ({
+            walls: [true, true, true, true],
+          }));
+
+          const parent = Array.from({ length: totalCells }, (_, index) => index);
+          const rank = new Array(totalCells).fill(0);
+
+          const find = (index) => {
+            if (parent[index] !== index) {
+              parent[index] = find(parent[index]);
+            }
+            return parent[index];
+          };
+
+          const union = (first, second) => {
+            const firstRoot = find(first);
+            const secondRoot = find(second);
+
+            if (firstRoot === secondRoot) {
+              return false;
+            }
+
+            if (rank[firstRoot] < rank[secondRoot]) {
+              parent[firstRoot] = secondRoot;
+            } else if (rank[firstRoot] > rank[secondRoot]) {
+              parent[secondRoot] = firstRoot;
+            } else {
+              parent[secondRoot] = firstRoot;
+              rank[firstRoot] += 1;
+            }
+
+            return true;
+          };
+
+          const edges = [];
+
+          for (let row = 0; row < rows; row += 1) {
+            for (let col = 0; col < columns; col += 1) {
+              const index = row * columns + col;
+
+              if (col < columns - 1) {
+                edges.push({ a: index, b: index + 1, wallA: 1, wallB: 3 });
+              }
+
+              if (row < rows - 1) {
+                edges.push({ a: index, b: index + columns, wallA: 2, wallB: 0 });
+              }
+            }
+          }
+
+          for (let index = edges.length - 1; index > 0; index -= 1) {
+            const swapIndex = Math.floor(random() * (index + 1));
+            [edges[index], edges[swapIndex]] = [edges[swapIndex], edges[index]];
+          }
+
+          for (const edge of edges) {
+            if (!union(edge.a, edge.b)) {
+              continue;
+            }
+
+            cells[edge.a].walls[edge.wallA] = false;
+            cells[edge.b].walls[edge.wallB] = false;
+          }
+
+          return cells;
+        };
+
+        const getAccessibleNeighbors = (cells, columns, rows, index) => {
+          const row = Math.floor(index / columns);
+          const col = index % columns;
+          const walls = cells[index].walls;
+          const neighbors = [];
+
+          if (!walls[0] && row > 0) {
+            neighbors.push(index - columns);
+          }
+          if (!walls[1] && col < columns - 1) {
+            neighbors.push(index + 1);
+          }
+          if (!walls[2] && row < rows - 1) {
+            neighbors.push(index + columns);
+          }
+          if (!walls[3] && col > 0) {
+            neighbors.push(index - 1);
+          }
+
+          return neighbors;
+        };
+
+        const traceMazeExplorationToExit = (cells, columns, rows) => {
+          // A* pathfinding with Manhattan distance heuristic
+          const target = columns * rows - 1;
+
+          const h = (index) => {
+            const row = Math.floor(index / columns);
+            const col = index % columns;
+            const targetRow = Math.floor(target / columns);
+            const targetCol = target % columns;
+            return Math.abs(col - targetCol) + Math.abs(row - targetRow);
+          };
+
+          const gScore = new Array(cells.length).fill(Infinity);
+          gScore[0] = 0;
+
+          const fScore = new Array(cells.length).fill(Infinity);
+          fScore[0] = h(0);
+
+          const cameFrom = new Array(cells.length).fill(-1);
+
+          // Min-heap open set keyed by fScore
+          const openSet = [0];
+          const inOpen = new Uint8Array(cells.length);
+          inOpen[0] = 1;
+
+          const heapPush = (heap, node) => {
+            heap.push(node);
+            let i = heap.length - 1;
+            while (i > 0) {
+              const parent = (i - 1) >> 1;
+              if (fScore[heap[parent]] <= fScore[heap[i]]) break;
+              [heap[parent], heap[i]] = [heap[i], heap[parent]];
+              i = parent;
+            }
+          };
+
+          const heapPop = (heap) => {
+            const top = heap[0];
+            const last = heap.pop();
+            if (heap.length > 0) {
+              heap[0] = last;
+              let i = 0;
+              while (true) {
+                const l = 2 * i + 1;
+                const r = 2 * i + 2;
+                let smallest = i;
+                if (l < heap.length && fScore[heap[l]] < fScore[heap[smallest]]) smallest = l;
+                if (r < heap.length && fScore[heap[r]] < fScore[heap[smallest]]) smallest = r;
+                if (smallest === i) break;
+                [heap[smallest], heap[i]] = [heap[i], heap[smallest]];
+                i = smallest;
+              }
+            }
+            return top;
+          };
+
+          while (openSet.length > 0) {
+            const current = heapPop(openSet);
+            inOpen[current] = 0;
+
+            if (current === target) {
+              // Reconstruct path
+              const path = [];
+              let node = target;
+              while (node !== -1) {
+                path.push(node);
+                node = cameFrom[node];
+              }
+              return path.reverse();
+            }
+
+            for (const neighbor of getAccessibleNeighbors(cells, columns, rows, current)) {
+              const tentativeG = gScore[current] + 1;
+              if (tentativeG < gScore[neighbor]) {
+                cameFrom[neighbor] = current;
+                gScore[neighbor] = tentativeG;
+                fScore[neighbor] = tentativeG + h(neighbor);
+                if (!inOpen[neighbor]) {
+                  inOpen[neighbor] = 1;
+                  heapPush(openSet, neighbor);
+                }
+              }
+            }
+          }
+
+          return [0]; // fallback: no path found
+        };
+
+        const createMazeState = (seed) => {
+          const viewportWidth = Math.max(window.innerWidth, 1);
+          const viewportHeight = Math.max(window.innerHeight, 1);
+          const random = createPrng(seed);
+
+          const baseCell = clamp(Math.round(Math.min(viewportWidth, viewportHeight) / 12), 24, 56);
+          const columns = clamp(Math.floor((viewportWidth - 80) / baseCell), 8, 26);
+          const rows = clamp(Math.floor((viewportHeight - 80) / baseCell), 6, 18);
+
+          const cellSize = Math.max(18, Math.min((viewportWidth - 80) / columns, (viewportHeight - 80) / rows));
+          const mazeWidth = columns * cellSize;
+          const mazeHeight = rows * cellSize;
+          const offsetX = (viewportWidth - mazeWidth) / 2;
+          const offsetY = (viewportHeight - mazeHeight) / 2;
+
+          const cells = buildMaze(columns, rows, random);
+          const targetIndex = columns * rows - 1;
+          cells[0].walls[3] = false;
+          cells[targetIndex].walls[1] = false;
+
+          const pathIndexes = traceMazeExplorationToExit(cells, columns, rows);
+          const pathPoints = pathIndexes.map((index) => {
+            const row = Math.floor(index / columns);
+            const col = index % columns;
+            return {
+              x: offsetX + (col + 0.5) * cellSize,
+              y: offsetY + (row + 0.5) * cellSize,
+            };
+          });
+
+          const exitPoint = {
+            x: offsetX + mazeWidth + cellSize * 0.36,
+            y: offsetY + (rows - 0.5) * cellSize,
+          };
+          pathPoints.push(exitPoint);
+
+          const segmentLengths = [];
+          const segmentDirections = [];
+          let totalLength = 0;
+
+          for (let index = 1; index < pathPoints.length; index += 1) {
+            const dx = pathPoints[index].x - pathPoints[index - 1].x;
+            const dy = pathPoints[index].y - pathPoints[index - 1].y;
+            const length = Math.hypot(dx, dy);
+            segmentLengths.push(length);
+            segmentDirections.push(
+              length === 0
+                ? { x: 0, y: 0 }
+                : {
+                    x: dx / length,
+                    y: dy / length,
+                  },
+            );
+            totalLength += length;
+          }
+
+          return {
+            columns,
+            rows,
+            cellSize,
+            offsetX,
+            offsetY,
+            mazeWidth,
+            mazeHeight,
+            cells,
+            pathPoints,
+            segmentLengths,
+            segmentDirections,
+            totalLength,
+            targetIndex,
+            ballRadius: clamp(cellSize * 0.15, 4, 8),
+          };
+        };
+
+        const getMazePalette = () => {
+          const theme = getCurrentTheme();
+          if (theme === "day") {
+            return {
+              wall: "rgba(10, 10, 10, 0.16)",
+              ballBase: "196, 20, 20",
+            };
+          }
+
+          return {
+            wall: "rgba(255, 255, 255, 0.14)",
+            ballBase: "255, 210, 0",
+          };
+        };
+
+        const resizeMazeCanvas = () => {
+          const engine = appState.mazeEngine;
+          if (!engine?.canvas || !engine.context) {
+            return;
+          }
+
+          engine.dpr = clamp(window.devicePixelRatio || 1, 1, 2);
+          const width = Math.max(window.innerWidth, 1);
+          const height = Math.max(window.innerHeight, 1);
+
+          engine.canvas.width = Math.floor(width * engine.dpr);
+          engine.canvas.height = Math.floor(height * engine.dpr);
+          engine.canvas.style.width = `${width}px`;
+          engine.canvas.style.height = `${height}px`;
+          engine.context.setTransform(engine.dpr, 0, 0, engine.dpr, 0, 0);
+        };
+
+        const getBallPosition = (distance) => {
+          const mazeState = appState.mazeEngine?.state;
+          if (!mazeState || mazeState.pathPoints.length === 0) {
+            return null;
+          }
+          if (mazeState.pathPoints.length === 1 || mazeState.totalLength === 0) {
+            return mazeState.pathPoints[0];
+          }
+
+          let remaining = distance;
+          for (let index = 1; index < mazeState.pathPoints.length; index += 1) {
+            const segment = mazeState.segmentLengths[index - 1];
+            if (remaining <= segment) {
+              const from = mazeState.pathPoints[index - 1];
+              const to = mazeState.pathPoints[index];
+              const t = segment === 0 ? 0 : remaining / segment;
+              return {
+                x: from.x + (to.x - from.x) * t,
+                y: from.y + (to.y - from.y) * t,
+              };
+            }
+            remaining -= segment;
+          }
+
+          return mazeState.pathPoints[mazeState.pathPoints.length - 1];
+        };
+
+        const getSegmentIndexAtDistance = (mazeState, distance) => {
+          if (!mazeState || mazeState.segmentLengths.length === 0) {
+            return 0;
+          }
+
+          let remaining = distance;
+          for (let index = 0; index < mazeState.segmentLengths.length; index += 1) {
+            if (remaining <= mazeState.segmentLengths[index]) {
+              return index;
+            }
+            remaining -= mazeState.segmentLengths[index];
+          }
+
+          return mazeState.segmentLengths.length - 1;
+        };
+
+        const isTurnAtSegment = (mazeState, segmentIndex) => {
+          if (!mazeState || segmentIndex <= 0 || segmentIndex >= mazeState.segmentDirections.length) {
+            return false;
+          }
+
+          const previous = mazeState.segmentDirections[segmentIndex - 1];
+          const current = mazeState.segmentDirections[segmentIndex];
+          const dot = previous.x * current.x + previous.y * current.y;
+          return dot < 0.98;
+        };
+
+        let cachedShellEl = null;
+        let cachedShellRect = null;
+
+        const drawMaze = () => {
+          const engine = appState.mazeEngine;
+          if (!engine?.context || !engine.state) {
+            return;
+          }
+
+          const mazeState = engine.state;
+          const palette = getMazePalette();
+          const width = Math.max(window.innerWidth, 1);
+          const height = Math.max(window.innerHeight, 1);
+
+          engine.context.clearRect(0, 0, width, height);
+          engine.context.strokeStyle = palette.wall;
+          engine.context.lineWidth = 1.45;
+          engine.context.lineJoin = "round";
+          engine.context.lineCap = "round";
+
+          for (let row = 0; row < mazeState.rows; row += 1) {
+            for (let col = 0; col < mazeState.columns; col += 1) {
+              const index = row * mazeState.columns + col;
+              const walls = mazeState.cells[index].walls;
+              const x = mazeState.offsetX + col * mazeState.cellSize;
+              const y = mazeState.offsetY + row * mazeState.cellSize;
+              const size = mazeState.cellSize;
+
+              if (walls[0]) {
+                engine.context.beginPath();
+                engine.context.moveTo(x, y);
+                engine.context.lineTo(x + size, y);
+                engine.context.stroke();
+              }
+              if (walls[1]) {
+                engine.context.beginPath();
+                engine.context.moveTo(x + size, y);
+                engine.context.lineTo(x + size, y + size);
+                engine.context.stroke();
+              }
+              if (walls[2]) {
+                engine.context.beginPath();
+                engine.context.moveTo(x, y + size);
+                engine.context.lineTo(x + size, y + size);
+                engine.context.stroke();
+              }
+              if (walls[3]) {
+                engine.context.beginPath();
+                engine.context.moveTo(x, y);
+                engine.context.lineTo(x, y + size);
+                engine.context.stroke();
+              }
+            }
+          }
+
+          const position = getBallPosition(engine.distance);
+          if (!position) {
+            return;
+          }
+
+          const pulse = 0.5 + 0.5 * Math.sin(performance.now() * 0.0018);
+          let behindOverviewUi = false;
+
+          const uiHidden = document.body.getAttribute("data-ui-hidden") === "true";
+
+          if (!uiHidden && window.location.pathname === "/") {
+            if (!cachedShellEl) cachedShellEl = document.querySelector(".site-shell");
+            if (!cachedShellRect && cachedShellEl instanceof HTMLElement) cachedShellRect = cachedShellEl.getBoundingClientRect();
+            if (cachedShellRect) {
+              behindOverviewUi =
+                position.x >= cachedShellRect.left &&
+                position.x <= cachedShellRect.right &&
+                position.y >= cachedShellRect.top &&
+                position.y <= cachedShellRect.bottom;
+            }
+          }
+
+          const emissionAlpha = (0.32 + 0.5 * pulse) * (behindOverviewUi ? 0.34 : 1);
+          const emissionBlur =
+            mazeState.ballRadius * (1.6 + 1.35 * pulse) * (behindOverviewUi ? 2.8 : 1);
+          const coreAlpha = behindOverviewUi ? 0.24 : 1;
+
+          engine.context.save();
+          engine.context.shadowColor = `rgba(${palette.ballBase}, ${emissionAlpha.toFixed(3)})`;
+          engine.context.shadowBlur = emissionBlur;
+          engine.context.beginPath();
+          engine.context.fillStyle = `rgba(${palette.ballBase}, ${coreAlpha.toFixed(3)})`;
+          engine.context.arc(position.x, position.y, mazeState.ballRadius, 0, Math.PI * 2);
+          engine.context.fill();
+          engine.context.restore();
+        };
+
+        const rebuildMaze = () => {
+          const engine = appState.mazeEngine;
+          if (!engine?.context) {
+            return;
+          }
+
+          resizeMazeCanvas();
+          engine.state = createMazeState(engine.seed);
+          engine.distance = 0;
+          engine.lastTimestamp = 0;
+          engine.lastSegmentIndex = 0;
+          engine.minSpeed = Math.max(16, engine.state.cellSize * 0.78);
+          engine.speed = engine.minSpeed;
+          engine.cruiseSpeed = Math.max(34, engine.state.cellSize * 2);
+          engine.accelRate = Math.max(40, engine.state.cellSize * 1.55);
+          engine.decelRate = Math.max(50, engine.state.cellSize * 1.9);
+          engine.impactUntil = 0;
+          drawMaze();
+        };
+
+        const animateMaze = (timestamp) => {
+          const engine = appState.mazeEngine;
+          if (!engine?.state || !engine.context) {
+            if (engine) {
+              engine.animationId = window.requestAnimationFrame(animateMaze);
+            }
+            return;
+          }
+
+          if (appState.reducedMotionQuery.matches) {
+            drawMaze();
+            engine.animationId = 0;
+            return;
+          }
+
+          if (!engine.lastTimestamp) {
+            engine.lastTimestamp = timestamp;
+          }
+
+          const deltaSeconds = Math.min((timestamp - engine.lastTimestamp) / 1000, 0.05);
+          engine.lastTimestamp = timestamp;
+
+          const targetSpeed = timestamp < engine.impactUntil ? engine.minSpeed : engine.cruiseSpeed;
+
+          if (engine.speed < targetSpeed) {
+            engine.speed = Math.min(targetSpeed, engine.speed + engine.accelRate * deltaSeconds);
+          } else if (engine.speed > targetSpeed) {
+            engine.speed = Math.max(targetSpeed, engine.speed - engine.decelRate * deltaSeconds);
+          }
+
+          const nextDistance = engine.distance + engine.speed * deltaSeconds;
+          const clampedDistance = Math.min(nextDistance, engine.state.totalLength);
+          const segmentIndex = getSegmentIndexAtDistance(engine.state, clampedDistance);
+
+          if (segmentIndex !== engine.lastSegmentIndex) {
+            if (isTurnAtSegment(engine.state, segmentIndex)) {
+              engine.impactUntil = timestamp + 96;
+              const turnSpeedFloor = Math.max(engine.minSpeed * 1.3, engine.cruiseSpeed * 0.58);
+              engine.speed = Math.min(engine.speed, turnSpeedFloor);
+            }
+            engine.lastSegmentIndex = segmentIndex;
+          }
+
+          engine.distance = nextDistance;
+
+          if (engine.state.totalLength > 0 && engine.distance >= engine.state.totalLength) {
+            engine.seed = nextSeed(engine.seed);
+            rebuildMaze();
+          }
+
+          drawMaze();
+          engine.animationId = window.requestAnimationFrame(animateMaze);
+        };
+
+        const startMazeLoop = () => {
+          const engine = appState.mazeEngine;
+          if (!engine?.context) {
+            return;
+          }
+
+          if (engine.animationId) {
+            window.cancelAnimationFrame(engine.animationId);
+            engine.animationId = 0;
+          }
+
+          if (!engine.state) {
+            rebuildMaze();
+          } else {
+            drawMaze();
+          }
+
+          engine.lastTimestamp = 0;
+
+          if (!appState.reducedMotionQuery.matches) {
+            engine.animationId = window.requestAnimationFrame(animateMaze);
+          }
+        };
+
+        const attachMazeCanvas = () => {
+          const mazeCanvas = document.querySelector("[data-maze-canvas]");
+          if (!(mazeCanvas instanceof HTMLCanvasElement)) {
+            return false;
+          }
+
+          const mazeContext = mazeCanvas.getContext("2d");
+          if (!mazeContext) {
+            return false;
+          }
+
+          if (!appState.mazeEngine) {
+            appState.mazeEngine = {
+              canvas: mazeCanvas,
+              context: mazeContext,
+              seed: 1,
+              seedInitialized: false,
+              state: null,
+              animationId: 0,
+              lastTimestamp: 0,
+              distance: 0,
+              speed: 0,
+              minSpeed: 0,
+              cruiseSpeed: 0,
+              accelRate: 0,
+              decelRate: 0,
+              impactUntil: 0,
+              lastSegmentIndex: 0,
+              dpr: 1,
+            };
+            return true;
+          }
+
+          if (appState.mazeEngine.canvas !== mazeCanvas || appState.mazeEngine.context !== mazeContext) {
+            appState.mazeEngine.canvas = mazeCanvas;
+            appState.mazeEngine.context = mazeContext;
+            resizeMazeCanvas();
+            drawMaze();
+          }
+
+          return true;
+        };
+
+        const initializeMazeBackground = async () => {
+          const attached = attachMazeCanvas();
+          if (!attached || !appState.mazeEngine) {
+            return;
+          }
+
+          if (appState.mazeEngine.seedInitialized) {
+            if (!appState.reducedMotionQuery.matches && appState.mazeEngine.animationId === 0) {
+              appState.mazeEngine.animationId = window.requestAnimationFrame(animateMaze);
+            }
+            drawMaze();
+            return;
+          }
+
+          if (appState.mazeInitPromise) {
+            await appState.mazeInitPromise;
+            return;
+          }
+
+          appState.mazeInitPromise = (async () => {
+            const fingerprint = [
+              navigator.userAgent || "unknown",
+              window.screen.width,
+              window.screen.height,
+              Intl.DateTimeFormat().resolvedOptions().timeZone,
+            ].join("|");
+            const derivedSeed = await deriveSeedFromFingerprint(fingerprint);
+
+            if (!appState.mazeEngine) {
+              return;
+            }
+
+            appState.mazeEngine.seed = derivedSeed;
+            appState.mazeEngine.seedInitialized = true;
+            rebuildMaze();
+            startMazeLoop();
+          })();
+
+          try {
+            await appState.mazeInitPromise;
+          } finally {
+            appState.mazeInitPromise = null;
+          }
+        };
+
+        const setThemeLabel = (theme) => {
+          if (appState.ui?.themeLabelNode) {
+            appState.ui.themeLabelNode.textContent = theme;
+          }
+          if (appState.ui?.themeToggle instanceof HTMLButtonElement) {
+            appState.ui.themeToggle.setAttribute("aria-pressed", theme === "night" ? "true" : "false");
+          }
+        };
+
+        const applyTheme = (theme) => {
+          appState.activeTheme = theme;
+          document.body.setAttribute("data-theme", theme);
+          setThemeLabel(theme);
+          drawMaze();
+        };
+
+        const syncThemeToSystem = () => {
+          if (appState.hasManualThemeOverride) {
+            if (typeof appState.activeTheme === "string") {
+              applyTheme(appState.activeTheme);
+            }
+            return;
+          }
+
+          const nextTheme = appState.systemThemeQuery.matches ? "night" : "day";
+          applyTheme(nextTheme);
+        };
+
+        const toggleTheme = () => {
+          const currentTheme = getCurrentTheme();
+          const nextTheme = currentTheme === "day" ? "night" : "day";
+          appState.hasManualThemeOverride = true;
+          applyTheme(nextTheme);
+        };
+
+        const setUiVisibility = (hidden) => {
+          appState.isUiHidden = hidden;
+          document.body.setAttribute("data-ui-hidden", hidden ? "true" : "false");
+
+          if (appState.ui?.uiToggle instanceof HTMLButtonElement) {
+            appState.ui.uiToggle.setAttribute("aria-pressed", hidden ? "true" : "false");
+            appState.ui.uiToggle.setAttribute("aria-label", hidden ? "Show front UI" : "Hide front UI");
+          }
+
+          if (appState.ui?.uiToggleLabelNode) {
+            appState.ui.uiToggleLabelNode.textContent = hidden ? "show_ui" : "hide_ui";
+          }
+
+          try {
+            window.localStorage.setItem("portfolio-ui-hidden", hidden ? "1" : "0");
+          } catch {
+            // Ignore localStorage failures in restricted contexts.
+          }
+
+          drawMaze();
+        };
+
+        const toggleUiVisibility = () => {
+          setUiVisibility(!appState.isUiHidden);
+        };
+
+        const updateTelemetry = () => {
+          syncThemeToSystem();
+
+          if (appState.ui?.timeNode) {
+            appState.ui.timeNode.textContent = new Date().toLocaleTimeString("en-US", {
+              hour12: false,
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+            });
+          }
+        };
+
+        const bindPageUi = () => {
+          const previousToggle = appState.ui?.themeToggle;
+          if (previousToggle instanceof HTMLButtonElement && typeof appState.themeToggleHandler === "function") {
+            previousToggle.removeEventListener("click", appState.themeToggleHandler);
+          }
+
+          const previousUiToggle = appState.ui?.uiToggle;
+          if (previousUiToggle instanceof HTMLButtonElement && typeof appState.uiToggleHandler === "function") {
+            previousUiToggle.removeEventListener("click", appState.uiToggleHandler);
+          }
+
+          appState.ui = getUiNodes();
+
+          if (appState.ui.systemOnlineNode) {
+            appState.ui.systemOnlineNode.textContent = "online";
+          }
+
+          if (appState.ui.renderSizeNode && typeof TextEncoder !== "undefined") {
+            const renderBytes = new TextEncoder().encode(document.documentElement.outerHTML).length;
+            appState.ui.renderSizeNode.textContent = `${(renderBytes / 1024).toFixed(1)}kb`;
+          }
+
+          if (typeof appState.themeToggleHandler !== "function") {
+            appState.themeToggleHandler = () => toggleTheme();
+          }
+
+          if (typeof appState.uiToggleHandler !== "function") {
+            appState.uiToggleHandler = () => toggleUiVisibility();
+          }
+
+          if (appState.ui.themeToggle instanceof HTMLButtonElement) {
+            appState.ui.themeToggle.addEventListener("click", appState.themeToggleHandler);
+          }
+
+          if (appState.ui.uiToggle instanceof HTMLButtonElement) {
+            appState.ui.uiToggle.addEventListener("click", appState.uiToggleHandler);
+          }
+
+          if (typeof appState.activeTheme === "string") {
+            document.body.setAttribute("data-theme", appState.activeTheme);
+          }
+
+          setUiVisibility(Boolean(appState.isUiHidden));
+
+          setThemeLabel(typeof appState.activeTheme === "string" ? appState.activeTheme : getCurrentTheme());
+          updateTelemetry();
+
+          if (appState.telemetryIntervalId) {
+            clearInterval(appState.telemetryIntervalId);
+          }
+          appState.telemetryIntervalId = window.setInterval(updateTelemetry, 1000);
+        };
+
+        const bindGlobalListeners = () => {
+          if (!appState.systemThemeHandlerBound && typeof appState.systemThemeQuery.addEventListener === "function") {
+            appState.systemThemeQuery.addEventListener("change", syncThemeToSystem);
+            appState.systemThemeHandlerBound = true;
+          }
+
+          if (!appState.reducedMotionHandlerBound && typeof appState.reducedMotionQuery.addEventListener === "function") {
+            appState.reducedMotionQuery.addEventListener("change", () => {
+              const engine = appState.mazeEngine;
+              if (!engine) {
+                return;
+              }
+
+              if (appState.reducedMotionQuery.matches) {
+                if (engine.animationId) {
+                  window.cancelAnimationFrame(engine.animationId);
+                  engine.animationId = 0;
+                }
+                drawMaze();
+                return;
+              }
+
+              startMazeLoop();
+            });
+            appState.reducedMotionHandlerBound = true;
+          }
+
+          if (!appState.resizeHandlerBound) {
+            window.addEventListener("resize", () => {
+              cachedShellRect = null; // invalidate on resize
+              if (!appState.mazeEngine?.seedInitialized) {
+                return;
+              }
+
+              rebuildMaze();
+
+              if (!appState.reducedMotionQuery.matches && appState.mazeEngine.animationId === 0) {
+                appState.mazeEngine.animationId = window.requestAnimationFrame(animateMaze);
+              }
+            });
+            appState.resizeHandlerBound = true;
+          }
+
+          if (!appState.beforeSwapHandlerBound) {
+            document.addEventListener("astro:before-swap", (e) => {
+              // Copy current theme + ui-hidden to incoming body so there's never a wrong-theme frame
+              const theme = document.body.getAttribute("data-theme");
+              if (theme) e.newDocument.body.setAttribute("data-theme", theme);
+              const uiHidden = document.body.getAttribute("data-ui-hidden");
+              if (uiHidden) e.newDocument.body.setAttribute("data-ui-hidden", uiHidden);
+            });
+            appState.beforeSwapHandlerBound = true;
+          }
+
+          if (!appState.pageLoadHandlerBound) {
+            document.addEventListener("astro:page-load", () => {
+              bindPageUi();
+              syncThemeToSystem();
+              void initializeMazeBackground();
+            });
+            appState.pageLoadHandlerBound = true;
+          }
+        };
+
+        bindGlobalListeners();
+        bindPageUi();
+        syncThemeToSystem();
+        void initializeMazeBackground();
+      })();
+    </script>
+
+    <script is:inline>
+      (() => {
+        // Kenny-style cursor: small dot + lagging ring
+        let dot = document.querySelector('.cursor-dot');
+        let ring = document.querySelector('.cursor-ring');
+
+        if (!dot) {
+          dot = document.createElement('div');
+          dot.className = 'cursor-dot';
+          document.body.appendChild(dot);
+        }
+        if (!ring) {
+          ring = document.createElement('div');
+          ring.className = 'cursor-ring';
+          document.body.appendChild(ring);
+        }
+
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let ringX = mouseX;
+        let ringY = mouseY;
+        let rafId = null;
+
+        const lerp = (a, b, t) => a + (b - a) * t;
+
+        const tick = () => {
+          ringX = lerp(ringX, mouseX, 0.12);
+          ringY = lerp(ringY, mouseY, 0.12);
+
+          dot.style.transform = `translate(calc(-50% + ${mouseX}px), calc(-50% + ${mouseY}px))`;
+          ring.style.transform = `translate(calc(-50% + ${ringX}px), calc(-50% + ${ringY}px))`;
+
+          rafId = requestAnimationFrame(tick);
+        };
+
+        const onMouseMove = (e) => {
+          mouseX = e.clientX;
+          mouseY = e.clientY;
+          document.body.classList.remove('cursor-hidden');
+        };
+
+        const onMouseLeave = () => document.body.classList.add('cursor-hidden');
+        const onMouseEnter = () => document.body.classList.remove('cursor-hidden');
+
+        const updateInteractive = (e) => {
+          const target = e.target;
+          const isInteractive = target && target.closest('a, button, [role="button"], [tabindex]');
+          document.body.classList.toggle('cursor-on-interactive', !!isInteractive);
+        };
+
+        document.addEventListener('mousemove', onMouseMove, { passive: true });
+        document.addEventListener('mousemove', updateInteractive, { passive: true });
+        document.addEventListener('mouseleave', onMouseLeave);
+        document.addEventListener('mouseenter', onMouseEnter);
+
+        if (!rafId) tick();
+
+        // Re-attach elements on Astro page transitions
+        document.addEventListener('astro:page-load', () => {
+          if (!document.querySelector('.cursor-dot')) {
+            document.body.appendChild(dot);
+          }
+          if (!document.querySelector('.cursor-ring')) {
+            document.body.appendChild(ring);
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>

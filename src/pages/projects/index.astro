@@ -1,0 +1,46 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { entryHref } from "@/utilities/content";
+import { getCollection } from "astro:content";
+
+const projects = (await getCollection("projects")).sort(
+  (a, b) => b.data.order - a.data.order || b.data.year - a.data.year,
+);
+---
+
+<BaseLayout title="Gallery | Your Name" description="A gallery of selected projects.">
+  <section class="space-y-8">
+    <p class="section-label">topic</p>
+    <h1 class="text-3xl font-bold tracking-tight sm:text-4xl" style="color:var(--text-primary)">Gallery</h1>
+    <p class="max-w-3xl text-sm" style="color:var(--text-secondary)">
+      A collection of things I find interesting and worth sharing. I hope you find them interesting as well.
+    </p>
+
+    {
+      projects.length === 0 ? (
+        <p class="text-zinc-400">No projects yet. Add your first gallery item in src/content/projects.</p>
+      ) : (
+        <div class="grid gap-4 md:grid-cols-2">
+          {projects.map((project) => (
+            <article class="card-link space-y-4">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <p class="section-label">topic</p>
+                <span class="tag-chip">subtopic</span>
+              </div>
+
+              <h2 class="text-xl font-bold" style="color:var(--text-primary)">{project.data.title}</h2>
+              <p class="text-sm" style="color:var(--text-secondary)">{project.data.description}</p>
+              <p class="text-xs" style="color:var(--text-faint)">{project.data.year} | {project.data.stack.join(" | ")}</p>
+
+              <div class="flex flex-wrap gap-2">
+                <a class="execute-button" href={entryHref("projects", project.id)}>
+                  Open Project
+                </a>
+              </div>
+            </article>
+          ))}
+        </div>
+      )
+    }
+  </section>
+</BaseLayout>

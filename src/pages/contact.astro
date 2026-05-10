@@ -1,0 +1,23 @@
+---
+import { ContactForm } from "@/components/ui/ContactForm";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+
+const ntfyTopic = import.meta.env.PUBLIC_NTFY_TOPIC ?? "";
+const contactEmail = import.meta.env.PUBLIC_CONTACT_EMAIL ?? "";
+const web3FormsKey = import.meta.env.PUBLIC_WEB3FORMS_KEY ?? "";
+---
+
+<BaseLayout
+  title="Contact | Your Name"
+  description="Contact options for collaboration, consulting, and conversation."
+>
+  <section class="space-y-8">
+    <p class="section-label">05_Contact</p>
+    <h1 class="text-3xl font-bold tracking-tight sm:text-4xl" style="color:var(--text-primary)">Establish connection</h1>
+    <p class="max-w-3xl text-sm" style="color:var(--text-secondary)">
+      Send a message directly. I'll receive it as a notification and follow up as soon as I can.
+    </p>
+
+    <ContactForm client:load ntfyTopic={ntfyTopic} contactEmail={contactEmail} web3FormsKey={web3FormsKey} />
+  </section>
+</BaseLayout>

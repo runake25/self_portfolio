@@ -1,0 +1,74 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { entryHref, entrySlugFromId } from "@/utilities/content";
+import { getCollection, render } from "astro:content";
+
+export async function getStaticPaths() {
+  const reviews = (await getCollection("movies")).sort(
+    (a, b) => b.data.watchedDate.valueOf() - a.data.watchedDate.valueOf(),
+  );
+
+  return reviews.map((entry, index) => ({
+    params: { slug: entrySlugFromId(entry.id) },
+    props: {
+      entry,
+      prevEntry: index + 1 < reviews.length ? reviews[index + 1] : null,
+      nextEntry: index > 0 ? reviews[index - 1] : null,
+    },
+  }));
+}
+
+const { entry, prevEntry, nextEntry } = Astro.props;
+const { Content } = await render(entry);
+
+const dateFormatter = new Intl.DateTimeFormat("en-US", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
+
+const prevPage = prevEntry
+  ? { label: "Older thought", title: prevEntry.data.title, url: entryHref("movies", prevEntry.id) }
+  : null;
+
+const nextPage = nextEntry
+  ? { label: "Newer thought", title: nextEntry.data.title, url: entryHref("movies", nextEntry.id) }
+  : null;
+---
+
+<BaseLayout
+  title={`${entry.data.title} | Thoughts`}
+  description={entry.data.description}
+  prevPage={prevPage}
+  nextPage={nextPage}
+>
+  <article class="article-page">
+    <a href="/movies" class="article-back">← Back</a>
+    <header class="article-header">
+      <p class="section-label">topic</p>
+      <h1>{entry.data.title}</h1>
+      <div class="article-meta">
+        <span>subtopic: reflection</span>
+        <span>•</span>
+        <span>Watched {dateFormatter.format(entry.data.watchedDate)}</span>
+        {entry.data.releasedYear && (
+          <>
+            <span>•</span>
+            <span>Released {entry.data.releasedYear}</span>
+          </>
+        )}
+        {typeof entry.data.rating === "number" && (
+          <>
+            <span>•</span>
+            <span>Rating {entry.data.rating}/5</span>
+          </>
+        )}
+      </div>
+      {entry.data.description && <p class="lead">{entry.data.description}</p>}
+    </header>
+
+    <div class="prose max-w-none">
+      <Content />
+    </div>
+  </article>
+</BaseLayout>

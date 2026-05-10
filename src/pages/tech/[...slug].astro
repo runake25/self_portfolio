@@ -1,0 +1,68 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { entryHref, entrySlugFromId } from "@/utilities/content";
+import { getCollection, render } from "astro:content";
+
+export async function getStaticPaths() {
+  const posts = (await getCollection("tech", ({ data }) => !data.draft)).sort(
+    (a, b) => b.data.publishedDate.valueOf() - a.data.publishedDate.valueOf(),
+  );
+
+  return posts.map((entry, index) => ({
+    params: { slug: entrySlugFromId(entry.id) },
+    props: {
+      entry,
+      prevEntry: index + 1 < posts.length ? posts[index + 1] : null,
+      nextEntry: index > 0 ? posts[index - 1] : null,
+    },
+  }));
+}
+
+const { entry, prevEntry, nextEntry } = Astro.props;
+const { Content } = await render(entry);
+
+const dateFormatter = new Intl.DateTimeFormat("en-US", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
+
+const prevPage = prevEntry
+  ? { label: "Older note", title: prevEntry.data.title, url: entryHref("tech", prevEntry.id) }
+  : null;
+
+const nextPage = nextEntry
+  ? { label: "Newer note", title: nextEntry.data.title, url: entryHref("tech", nextEntry.id) }
+  : null;
+---
+
+<BaseLayout
+  title={`${entry.data.title} | Journal`}
+  description={entry.data.description}
+  prevPage={prevPage}
+  nextPage={nextPage}
+>
+  <article class="article-page">
+    <a href="/tech" class="article-back">← Back</a>
+    <header class="article-header">
+      <p class="section-label">topic</p>
+      <h1>{entry.data.title}</h1>
+      <div class="article-meta">
+        <span>subtopic: journal entry</span>
+        <span>•</span>
+        <span>{dateFormatter.format(entry.data.publishedDate)}</span>
+        {entry.data.tags && entry.data.tags.length > 0 && (
+          <>
+            <span>•</span>
+            <span>{entry.data.tags.join(" · ")}</span>
+          </>
+        )}
+      </div>
+      {entry.data.description && <p class="lead">{entry.data.description}</p>}
+    </header>
+
+    <div class="prose max-w-none">
+      <Content />
+    </div>
+  </article>
+</BaseLayout>

@@ -1,0 +1,44 @@
+---
+import CollectionCard from "@/components/content/CollectionCard.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { entryHref } from "@/utilities/content";
+import { getCollection } from "astro:content";
+
+const dateFormatter = new Intl.DateTimeFormat("en-US", {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+});
+
+const reviews = (await getCollection("movies")).sort(
+  (a, b) => b.data.watchedDate.valueOf() - a.data.watchedDate.valueOf(),
+);
+---
+
+<BaseLayout title="Thoughts | Your Name" description="Thoughts and reflections.">
+  <section class="space-y-8">
+    <p class="section-label">topic</p>
+    <h1 class="text-3xl font-bold tracking-tight sm:text-4xl" style="color:var(--text-primary)">Thoughts</h1>
+    <p class="max-w-3xl text-sm" style="color:var(--text-secondary)">
+      Use this page for reflective writing and perspective-based posts.
+    </p>
+
+    {
+      reviews.length === 0 ? (
+        <p class="text-zinc-400">No entries yet. Add your first note in src/content/movies.</p>
+      ) : (
+        <div class="grid gap-4">
+          {reviews.map((review) => (
+            <CollectionCard
+              href={entryHref("movies", review.id)}
+              title={review.data.title}
+              description={review.data.description}
+              meta={`subtopic: ${dateFormatter.format(review.data.watchedDate)}${review.data.rating ? ` | ${review.data.rating}/5` : ""}`}
+              tags={review.data.tags}
+            />
+          ))}
+        </div>
+      )
+    }
+  </section>
+</BaseLayout>

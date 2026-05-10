@@ -1,0 +1,51 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+	title="Your Name | Personal Website"
+	description="Overview, projects, tech notes, and movie writing in one content-first Astro site."
+>
+	<section class="space-y-8">
+		<p class="section-label">topic</p>
+		<h1 class="text-3xl font-bold tracking-tight sm:text-4xl" style="color:var(--text-primary)">Overview</h1>
+		<p class="max-w-3xl text-sm leading-relaxed" style="color:var(--text-secondary)">
+			This page is a short self-introduction. Use it to explain who you are, what you work on,
+			and what visitors should explore next.
+		</p>
+
+		<div class="dashboard-grid">
+			<article class="card-link dashboard-span-8 space-y-4">
+				<p class="section-label">subtopic</p>
+				<h2 class="text-xl font-bold" style="color:var(--text-primary)">About me</h2>
+				<p class="text-sm" style="color:var(--text-secondary)">
+					Placeholder: add a concise intro, your focus area, and what kind of work you want to be known for.
+				</p>
+				<ul class="dense-list">
+					<li>
+						<span>topic</span>
+						<span>who i am</span>
+					</li>
+					<li>
+						<span>subtopic</span>
+						<span>what i build</span>
+					</li>
+					<li>
+						<span>subtopic</span>
+						<span>how to contact me</span>
+					</li>
+				</ul>
+			</article>
+
+			<article class="card-link dashboard-span-4 space-y-4">
+				<p class="section-label">subtopic</p>
+				<h2 class="text-xl font-bold" style="color:var(--text-primary)">Explore</h2>
+				<div class="flex flex-wrap gap-3">
+					<a class="execute-button" href="/projects">Open Gallery</a>
+					<a class="execute-button secondary" href="/tech">Open Journal</a>
+					<a class="execute-button secondary" href="/movies">Open Thoughts</a>
+				</div>
+			</article>
+		</div>
+	</section>
+</BaseLayout>

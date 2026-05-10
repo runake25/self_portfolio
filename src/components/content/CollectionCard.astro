@@ -1,0 +1,29 @@
+---
+interface Props {
+  href: string;
+  title: string;
+  description?: string;
+  meta?: string;
+  tags?: string[];
+}
+
+const { href, title, description, meta, tags = [] } = Astro.props;
+---
+
+<article class="card-link h-full">
+  <a href={href} class="block h-full space-y-4">
+    <div class="flex items-center justify-between gap-3">
+      {meta && <p class="section-label">topic: {meta}</p>}
+      <span class="card-arrow">subtopic -> open</span>
+    </div>
+    <h2 class="text-xl font-bold" style="color:var(--text-primary)">{title}</h2>
+    {description && <p class="text-sm" style="color:var(--text-secondary)">{description}</p>}
+    {
+      tags.length > 0 && (
+        <div class="flex flex-wrap gap-2">
+          {tags.map((tag) => <span class="tag-chip">{tag}</span>)}
+        </div>
+      )
+    }
+  </a>
+</article>
