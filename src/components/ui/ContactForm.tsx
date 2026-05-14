@@ -145,7 +145,7 @@ export const ContactForm = ({ ntfyTopic, contactEmail, web3FormsKey }: Props) =>
               type="text"
               value={identity}
               onChange={(e) => { setIdentity(e.target.value); setEmailError(""); }}
-              placeholder="name or email, so I can reach back"
+              placeholder="name or email, nice to meet you!"
               disabled={step !== "input"}
               required
               autoComplete="name"

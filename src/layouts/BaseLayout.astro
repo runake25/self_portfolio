@@ -14,6 +14,7 @@ interface Props {
   description?: string;
   prevPage?: AdjacentPage | null;
   nextPage?: AdjacentPage | null;
+  noSketch?: boolean;
 }
 
 const {
@@ -21,6 +22,7 @@ const {
   description = "Personal website built with Astro content collections.",
   prevPage,
   nextPage,
+  noSketch = false,
 } = Astro.props;
 
 const navigation = [
@@ -103,10 +105,20 @@ function isActivePath(href: string) {
       <span class="sr-only" data-ui-toggle-label>hide_ui</span>
     </button>
     <div class="site-shell" transition:animate="none">
+      {!noSketch && (
+        <div aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;z-index:1;overflow:hidden;">
+          <img
+            src="/sketch.png"
+            alt=""
+            class="sketch-bg"
+            style="position:absolute;bottom:0;right:-2rem;height:90%;width:auto;object-fit:contain;object-position:bottom right;user-select:none;"
+          />
+        </div>
+      )}
       <header class="site-header">
         <div class="header-left">
           <div class="header-top">
-            <a class="brand" href="/">Brian::portfolio</a>
+            <a class="brand" href="/">Brian::sharespace</a>
             <div class="brand-socials">
               <a
                 class="brand-social-link"
@@ -151,11 +163,12 @@ function isActivePath(href: string) {
         }
       </nav>
 
-      <main class="page-content">
-        <slot />
+      <main class="page-content" style="position:relative;">
+        <div style="position:relative;z-index:2;">
+          <slot />
+        </div>
 
-        {
-          (prevPage || nextPage) && (
+        {(prevPage || nextPage) && (
             <nav class="entry-footer-nav" aria-label="Entry navigation">
               {prevPage && (
                 <a href={prevPage.url}>

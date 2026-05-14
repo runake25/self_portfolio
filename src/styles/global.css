@@ -57,6 +57,17 @@ body {
   mix-blend-mode: normal;
 }
 
+/* ── Sketch background ── */
+.sketch-bg {
+  opacity: 0.45;
+}
+@media (prefers-color-scheme: dark) {
+  .sketch-bg {
+    opacity: 0.45;
+    filter: invert(1);
+  }
+}
+
 /* Prevent Astro ClientRouter fallback loading dim */
 :root[data-astro-transition-fallback] {
   opacity: 1 !important;
@@ -649,6 +660,11 @@ body[data-theme="day"] .mode-toggle .mode-icon-moon {
 .page-content {
   padding: 1.1rem 1.2rem;
   overflow: auto;
+  scrollbar-width: none;
+}
+
+.page-content::-webkit-scrollbar {
+  display: none;
 }
 
 .section-label {
