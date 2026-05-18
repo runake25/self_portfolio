@@ -4,16 +4,16 @@ import { entryHref, entrySlugFromId } from "@/utilities/content";
 import { getCollection, render } from "astro:content";
 
 export async function getStaticPaths() {
-  const reviews = (await getCollection("movies")).sort(
-    (a, b) => b.data.watchedDate.valueOf() - a.data.watchedDate.valueOf(),
+  const entries = (await getCollection("music")).sort(
+    (a, b) => b.data.listenedDate.valueOf() - a.data.listenedDate.valueOf(),
   );
 
-  return reviews.map((entry, index) => ({
+  return entries.map((entry, index) => ({
     params: { slug: entrySlugFromId(entry.id) },
     props: {
       entry,
-      prevEntry: index + 1 < reviews.length ? reviews[index + 1] : null,
-      nextEntry: index > 0 ? reviews[index - 1] : null,
+      prevEntry: index + 1 < entries.length ? entries[index + 1] : null,
+      nextEntry: index > 0 ? entries[index - 1] : null,
     },
   }));
 }
@@ -28,34 +28,30 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
 });
 
 const prevPage = prevEntry
-  ? { label: "Older thought", title: prevEntry.data.title, url: entryHref("movies", prevEntry.id) }
+  ? { label: "Older entry", title: prevEntry.data.title, url: entryHref("music", prevEntry.id) }
   : null;
 
 const nextPage = nextEntry
-  ? { label: "Newer thought", title: nextEntry.data.title, url: entryHref("movies", nextEntry.id) }
+  ? { label: "Newer entry", title: nextEntry.data.title, url: entryHref("music", nextEntry.id) }
   : null;
 ---
 
 <BaseLayout
-  title={`${entry.data.title} | Thoughts`}
+  title={`${entry.data.title} | Music`}
   description={entry.data.description}
   prevPage={prevPage}
   nextPage={nextPage}
   noSketch={true}
 >
   <article class="article-page">
-    <a href="/movies" class="article-back">← Back</a>
+    <a href="/music" class="article-back">← Back</a>
     <header class="article-header">
-      <p class="section-label">Movies</p>
+      <p class="section-label">Music</p>
       <h1>{entry.data.title}</h1>
       <div class="article-meta">
-        <span>Watched {dateFormatter.format(entry.data.watchedDate)}</span>
-        {entry.data.releasedYear && (
-          <>
-            <span>•</span>
-            <span>Released {entry.data.releasedYear}</span>
-          </>
-        )}
+        {entry.data.artist && <span>{entry.data.artist}</span>}
+        {entry.data.artist && <span>•</span>}
+        <span>Listened {dateFormatter.format(entry.data.listenedDate)}</span>
         {typeof entry.data.rating === "number" && (
           <>
             <span>•</span>

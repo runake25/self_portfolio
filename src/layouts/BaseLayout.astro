@@ -1,7 +1,9 @@
 ---
 import "@/styles/global.css";
 import "katex/dist/katex.min.css";
+import { Image } from "astro:assets";
 import { ClientRouter } from "astro:transitions";
+import sketchImg from "@/assets/sketch.png";
 
 interface AdjacentPage {
   title: string;
@@ -28,8 +30,8 @@ const {
 const navigation = [
   { href: "/", label: "overview" },
   { href: "/projects", label: "gallery" },
-  { href: "/tech", label: "journal" },
-  { href: "/movies", label: "thoughts" },
+  { href: "/journal", label: "journal" },
+  { href: "/thoughts", label: "thoughts" },
   { href: "/contact", label: "contact" },
 ];
 
@@ -107,10 +109,13 @@ function isActivePath(href: string) {
     <div class="site-shell" transition:animate="none">
       {!noSketch && (
         <div aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;z-index:1;overflow:hidden;">
-          <img
-            src="/sketch.png"
+          <Image
+            src={sketchImg}
             alt=""
             class="sketch-bg"
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
             style="position:absolute;bottom:0;right:-2rem;height:90%;width:auto;object-fit:contain;object-position:bottom right;user-select:none;"
           />
         </div>

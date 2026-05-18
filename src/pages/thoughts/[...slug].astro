@@ -4,7 +4,7 @@ import { entryHref, entrySlugFromId } from "@/utilities/content";
 import { getCollection, render } from "astro:content";
 
 export async function getStaticPaths() {
-  const posts = (await getCollection("tech", ({ data }) => !data.draft)).sort(
+  const posts = (await getCollection("thoughts", ({ data }) => !data.draft)).sort(
     (a, b) => b.data.publishedDate.valueOf() - a.data.publishedDate.valueOf(),
   );
 
@@ -28,29 +28,27 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
 });
 
 const prevPage = prevEntry
-  ? { label: "Older note", title: prevEntry.data.title, url: entryHref("tech", prevEntry.id) }
+  ? { label: "Older thought", title: prevEntry.data.title, url: entryHref("thoughts", prevEntry.id) }
   : null;
 
 const nextPage = nextEntry
-  ? { label: "Newer note", title: nextEntry.data.title, url: entryHref("tech", nextEntry.id) }
+  ? { label: "Newer thought", title: nextEntry.data.title, url: entryHref("thoughts", nextEntry.id) }
   : null;
 ---
 
 <BaseLayout
-  title={`${entry.data.title} | Journal`}
+  title={`${entry.data.title} | Thoughts`}
   description={entry.data.description}
   prevPage={prevPage}
   nextPage={nextPage}
   noSketch={true}
 >
   <article class="article-page">
-    <a href="/tech" class="article-back">← Back</a>
+    <a href="/thoughts" class="article-back">← Back</a>
     <header class="article-header">
-      <p class="section-label">topic</p>
+      <p class="section-label">Thoughts</p>
       <h1>{entry.data.title}</h1>
       <div class="article-meta">
-        <span>subtopic: journal entry</span>
-        <span>•</span>
         <span>{dateFormatter.format(entry.data.publishedDate)}</span>
         {entry.data.tags && entry.data.tags.length > 0 && (
           <>

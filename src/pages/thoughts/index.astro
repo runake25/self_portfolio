@@ -10,30 +10,30 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
   day: "numeric",
 });
 
-const posts = (await getCollection("tech", ({ data }) => !data.draft)).sort(
+const posts = (await getCollection("thoughts", ({ data }) => !data.draft)).sort(
   (a, b) => b.data.publishedDate.valueOf() - a.data.publishedDate.valueOf(),
 );
 ---
 
-<BaseLayout title="Journal | Your Name" description="Journal entries and notes.">
+<BaseLayout title="Thoughts | Brian" description="Reflections and writing.">
   <section class="space-y-8">
-    <p class="section-label">topic</p>
-    <h1 class="text-3xl font-bold tracking-tight sm:text-4xl" style="color:var(--text-primary)">Journal</h1>
+    <p class="section-label">Brian</p>
+    <h1 class="text-3xl font-bold tracking-tight sm:text-4xl" style="color:var(--text-primary)">Thoughts</h1>
     <p class="max-w-3xl text-sm" style="color:var(--text-secondary)">
-      Use this page for writing logs, updates, and process notes.
+      Reflections, opinions, and things I think about.
     </p>
 
     {
       posts.length === 0 ? (
-        <p class="text-zinc-400">No entries yet. Add your first note in src/content/tech.</p>
+        <p style="color:var(--text-faint)">No entries yet. Add your first note in src/content/thoughts.</p>
       ) : (
         <div class="grid gap-4">
           {posts.map((post) => (
             <CollectionCard
-              href={entryHref("tech", post.id)}
+              href={entryHref("thoughts", post.id)}
               title={post.data.title}
               description={post.data.description}
-              meta={`subtopic: ${dateFormatter.format(post.data.publishedDate)}`}
+              meta={dateFormatter.format(post.data.publishedDate)}
               tags={post.data.tags}
             />
           ))}

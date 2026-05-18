@@ -42,8 +42,46 @@ const movies = defineCollection({
   }),
 });
 
+const thoughts = defineCollection({
+  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/thoughts" }),
+  schema: z.object({
+    title: z.string(),
+    publishedDate: z.date(),
+    description: z.string().optional(),
+    tags: z.array(z.string()).optional(),
+    draft: z.boolean().default(false),
+  }),
+});
+
+const music = defineCollection({
+  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/music" }),
+  schema: z.object({
+    title: z.string(),
+    listenedDate: z.date(),
+    description: z.string().optional(),
+    artist: z.string().optional(),
+    rating: z.number().min(0).max(5).optional(),
+    tags: z.array(z.string()).optional(),
+  }),
+});
+
+const places = defineCollection({
+  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/places" }),
+  schema: z.object({
+    title: z.string(),
+    visitedDate: z.date(),
+    description: z.string().optional(),
+    location: z.string().optional(),
+    rating: z.number().min(0).max(5).optional(),
+    tags: z.array(z.string()).optional(),
+  }),
+});
+
 export const collections = {
   projects,
   tech,
   movies,
+  thoughts,
+  music,
+  places,
 };

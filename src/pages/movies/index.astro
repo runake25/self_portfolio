@@ -15,12 +15,12 @@ const reviews = (await getCollection("movies")).sort(
 );
 ---
 
-<BaseLayout title="Thoughts | Your Name" description="Thoughts and reflections.">
+<BaseLayout title="Movies | Brian" description="Movies I've watched.">
   <section class="space-y-8">
-    <p class="section-label">topic</p>
-    <h1 class="text-3xl font-bold tracking-tight sm:text-4xl" style="color:var(--text-primary)">Thoughts</h1>
+    <p class="section-label">Explore</p>
+    <h1 class="text-3xl font-bold tracking-tight sm:text-4xl" style="color:var(--text-primary)">Movies</h1>
     <p class="max-w-3xl text-sm" style="color:var(--text-secondary)">
-      Use this page for reflective writing and perspective-based posts.
+      Films that left a mark.
     </p>
 
     {
@@ -33,7 +33,7 @@ const reviews = (await getCollection("movies")).sort(
               href={entryHref("movies", review.id)}
               title={review.data.title}
               description={review.data.description}
-              meta={`subtopic: ${dateFormatter.format(review.data.watchedDate)}${review.data.rating ? ` | ${review.data.rating}/5` : ""}`}
+              meta={`${dateFormatter.format(review.data.watchedDate)}${review.data.rating ? ` | ${review.data.rating}/5` : ""}`}
               tags={review.data.tags}
             />
           ))}

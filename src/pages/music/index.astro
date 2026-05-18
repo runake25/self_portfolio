@@ -1,0 +1,44 @@
+---
+import CollectionCard from "@/components/content/CollectionCard.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { entryHref } from "@/utilities/content";
+import { getCollection } from "astro:content";
+
+const dateFormatter = new Intl.DateTimeFormat("en-US", {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+});
+
+const entries = (await getCollection("music")).sort(
+  (a, b) => b.data.listenedDate.valueOf() - a.data.listenedDate.valueOf(),
+);
+---
+
+<BaseLayout title="Music | Brian" description="Music I love.">
+  <section class="space-y-8">
+    <p class="section-label">Explore</p>
+    <h1 class="text-3xl font-bold tracking-tight sm:text-4xl" style="color:var(--text-primary)">Music</h1>
+    <p class="max-w-3xl text-sm" style="color:var(--text-secondary)">
+      Albums and artists that stuck with me.
+    </p>
+
+    {
+      entries.length === 0 ? (
+        <p style="color:var(--text-faint)">No entries yet. Add your first note in src/content/music.</p>
+      ) : (
+        <div class="grid gap-4">
+          {entries.map((entry) => (
+            <CollectionCard
+              href={entryHref("music", entry.id)}
+              title={entry.data.title}
+              description={entry.data.description}
+              meta={`${entry.data.artist ? entry.data.artist + " · " : ""}${dateFormatter.format(entry.data.listenedDate)}${typeof entry.data.rating === "number" ? ` | ${entry.data.rating}/5` : ""}`}
+              tags={entry.data.tags}
+            />
+          ))}
+        </div>
+      )
+    }
+  </section>
+</BaseLayout>
