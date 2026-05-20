@@ -39,9 +39,8 @@ const nextPage = nextEntry
 <BaseLayout
   title={`${entry.data.title} | Thoughts`}
   description={entry.data.description}
-  prevPage={prevPage}
-  nextPage={nextPage}
   noSketch={true}
+  bgPoster={entry.data.capture ? entry.data.capture.src : entry.data.poster}
 >
   <article class="article-page">
     <a href="/movies" class="article-back">← Back</a>

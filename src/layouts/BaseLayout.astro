@@ -17,6 +17,7 @@ interface Props {
   prevPage?: AdjacentPage | null;
   nextPage?: AdjacentPage | null;
   noSketch?: boolean;
+  bgPoster?: string;
 }
 
 const {
@@ -25,6 +26,7 @@ const {
   prevPage,
   nextPage,
   noSketch = false,
+  bgPoster,
 } = Astro.props;
 
 const navigation = [
@@ -107,17 +109,28 @@ function isActivePath(href: string) {
       <span class="sr-only" data-ui-toggle-label>hide_ui</span>
     </button>
     <div class="site-shell" transition:animate="none">
-      {!noSketch && (
+      {(!noSketch || bgPoster) && (
         <div aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;z-index:1;overflow:hidden;">
-          <Image
-            src={sketchImg}
-            alt=""
-            class="sketch-bg"
-            loading="eager"
-            fetchpriority="high"
-            decoding="async"
-            style="position:absolute;bottom:0;right:-2rem;height:90%;width:auto;object-fit:contain;object-position:bottom right;user-select:none;"
-          />
+          {!noSketch && (
+            <Image
+              src={sketchImg}
+              alt=""
+              class="sketch-bg"
+              loading="eager"
+              fetchpriority="high"
+              decoding="async"
+              style="position:absolute;bottom:0;right:-2rem;height:90%;width:auto;object-fit:contain;object-position:bottom right;user-select:none;"
+            />
+          )}
+          {bgPoster && (
+            <img
+              src={bgPoster}
+              alt=""
+              loading="eager"
+              decoding="async"
+              style="position:absolute;top:0;right:0;height:100%;width:auto;object-fit:contain;object-position:right top;opacity:0.42;-webkit-mask-image:linear-gradient(to right,transparent 0%,rgba(0,0,0,0.45) 25%,black 55%),linear-gradient(to bottom,black 0%,black 50%,transparent 67%);-webkit-mask-composite:source-in;mask-image:linear-gradient(to right,transparent 0%,rgba(0,0,0,0.45) 25%,black 55%),linear-gradient(to bottom,black 0%,black 50%,transparent 67%);mask-composite:intersect;user-select:none;"
+            />
+          )}
         </div>
       )}
       <header class="site-header">

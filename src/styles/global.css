@@ -184,9 +184,9 @@ html[data-theme="day"] {
   --surface-hover: rgba(0, 0, 0, 0.075);
   --border: rgba(18, 18, 18, 0.2);
   --grid: rgba(30, 30, 30, 0.06);
-  --text-primary: #0d0d0d;
-  --text-secondary: #434343;
-  --text-faint: #6c6c6c;
+  --text-primary: #050505;
+  --text-secondary: #2a2a2a;
+  --text-faint: #505050;
   --accent: #0a0a0a;
   --accent-strong: #0a0a0a;
   --success: #1a8f68;
@@ -244,7 +244,7 @@ a {
   display: grid;
   grid-template-rows: auto auto 1fr auto;
   min-height: min(90vh, 920px);
-  transition: background-color var(--ease-soft), border-color var(--ease-soft), box-shadow var(--ease-soft);
+  transition: background-color var(--ease-soft), border-color var(--ease-soft), box-shadow var(--ease-soft), opacity 320ms cubic-bezier(0.22, 0.61, 0.36, 1), visibility 320ms cubic-bezier(0.22, 0.61, 0.36, 1), transform 320ms cubic-bezier(0.22, 0.61, 0.36, 1);
   position: relative;
   overflow: hidden;
   isolation: isolate;
@@ -252,7 +252,10 @@ a {
 }
 
 body[data-ui-hidden="true"] .site-shell {
-  display: none;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: scale(0.985);
 }
 
 body[data-ui-hidden="true"] .maze-canvas {
@@ -1258,6 +1261,42 @@ html {
   max-width: 660px;
   margin: 0 auto;
   padding-bottom: 3rem;
+  position: relative;
+  isolation: isolate;
+}
+
+.movie-detail-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1.4rem;
+  align-items: start;
+}
+
+.movie-detail-header-text {
+  min-width: 0;
+}
+
+.movie-detail-poster-display {
+  width: 160px;
+  flex-shrink: 0;
+  cursor: default;
+  pointer-events: none;
+}
+
+.movie-detail-poster-display:hover {
+  transform: none;
+  border-color: var(--border);
+  box-shadow: none;
+}
+
+@media (max-width: 480px) {
+  .movie-detail-header {
+    grid-template-columns: 1fr;
+  }
+
+  .movie-detail-poster-display {
+    width: 120px;
+  }
 }
 
 .article-back {

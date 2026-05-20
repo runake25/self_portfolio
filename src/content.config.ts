@@ -32,17 +32,19 @@ const tech = defineCollection({
 
 const movies = defineCollection({
   loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/movies" }),
-  schema: z.object({
-    title: z.string(),
-    watchedDate: z.date(),
-    description: z.string().optional(),
-    releasedYear: z.number().optional(),
-    director: z.string().optional(),
-    poster: z.string().optional(),
-    genre: z.array(z.string()).optional(),
-    rating: z.number().min(0).max(5).optional(),
-    tags: z.array(z.string()).optional(),
-  }),
+  schema: ({ image }) =>
+    z.object({
+      title: z.string(),
+      watchedDate: z.date(),
+      description: z.string().optional(),
+      releasedYear: z.number().optional(),
+      director: z.string().optional(),
+      poster: z.string().optional(),
+      capture: image().optional(),
+      genre: z.array(z.string()).optional(),
+      rating: z.number().min(0).max(5).optional(),
+      tags: z.array(z.string()).optional(),
+    }),
 });
 
 const thoughts = defineCollection({
