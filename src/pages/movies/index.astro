@@ -1,44 +1,42 @@
 ---
-import CollectionCard from "@/components/content/CollectionCard.astro";
+import MoviePosterCard from "@/components/content/MoviePosterCard.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { entryHref } from "@/utilities/content";
 import { getCollection } from "astro:content";
 
-const dateFormatter = new Intl.DateTimeFormat("en-US", {
-  year: "numeric",
-  month: "short",
-  day: "numeric",
-});
-
-const reviews = (await getCollection("movies")).sort(
+const movies = (await getCollection("movies")).sort(
   (a, b) => b.data.watchedDate.valueOf() - a.data.watchedDate.valueOf(),
 );
 ---
 
-<BaseLayout title="Movies | Brian" description="Movies I've watched.">
-  <section class="space-y-8">
-    <p class="section-label">Explore</p>
-    <h1 class="text-3xl font-bold tracking-tight sm:text-4xl" style="color:var(--text-primary)">Movies</h1>
-    <p class="max-w-3xl text-sm" style="color:var(--text-secondary)">
-      Films that left a mark.
-    </p>
+<BaseLayout title="Movies | Brian" description="Films that left a mark.">
+  <section class="space-y-6">
+    <p class="section-label">Explore · Movies</p>
+    <div>
+      <h1 class="text-3xl font-bold tracking-tight" style="color:var(--text-primary)">Movies</h1>
+      <p class="mt-1 text-sm" style="color:var(--text-secondary)">
+        Films that left a mark. {movies.length > 0 && <span style="color:var(--text-faint)">— {movies.length} entries</span>}
+      </p>
+    </div>
 
-    {
-      reviews.length === 0 ? (
-        <p class="text-zinc-400">No entries yet. Add your first note in src/content/movies.</p>
-      ) : (
-        <div class="grid gap-4">
-          {reviews.map((review) => (
-            <CollectionCard
-              href={entryHref("movies", review.id)}
-              title={review.data.title}
-              description={review.data.description}
-              meta={`${dateFormatter.format(review.data.watchedDate)}${review.data.rating ? ` | ${review.data.rating}/5` : ""}`}
-              tags={review.data.tags}
-            />
-          ))}
-        </div>
-      )
-    }
+    {movies.length === 0 ? (
+      <p style="font-family:var(--font-mono); font-size:0.8rem; color:var(--text-faint)">
+        No entries yet — add your first film in <code>src/content/movies/</code>
+      </p>
+    ) : (
+      <div class="movie-grid">
+        {movies.map((movie, i) => (
+          <MoviePosterCard
+            href={entryHref("movies", movie.id)}
+            title={movie.data.title}
+            poster={movie.data.poster}
+            director={movie.data.director}
+            releasedYear={movie.data.releasedYear}
+            genre={movie.data.genre}
+            priority={i === 0}
+          />
+        ))}
+      </div>
+    )}
   </section>
 </BaseLayout>

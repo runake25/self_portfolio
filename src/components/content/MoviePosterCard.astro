@@ -1,0 +1,50 @@
+---
+import { Image } from "astro:assets";
+
+interface Props {
+  href: string;
+  title: string;
+  poster?: string;
+  director?: string;
+  releasedYear?: number;
+  genre?: string[];
+  priority?: boolean;
+}
+
+const { href, title, poster, director, releasedYear, genre = [], priority = false } = Astro.props;
+---
+
+<a href={href} class="movie-poster-card">
+  {poster ? (
+    <Image
+      class="movie-poster-img"
+      src={poster}
+      alt={`${title} poster`}
+      width={500}
+      height={750}
+      loading={priority ? "eager" : "lazy"}
+      fetchpriority={priority ? "high" : "auto"}
+      decoding={priority ? "sync" : "async"}
+    />
+  ) : (
+    <div class="movie-poster-placeholder">
+      <span class="movie-poster-placeholder-icon">▶</span>
+    </div>
+  )}
+
+  <div class="movie-poster-overlay">
+    <p class="movie-poster-title">{title}</p>
+    <div class="movie-poster-meta">
+      {releasedYear && <span>{releasedYear}</span>}
+      {releasedYear && director && <span class="movie-meta-sep">·</span>}
+      {director && <span>{director}</span>}
+    </div>
+    {genre.length > 0 && (
+      <div class="movie-poster-genre">
+        {genre.map((g) => <span class="movie-genre-tag">{g}</span>)}
+      </div>
+    )}
+  </div>
+</a>
+  </div>
+</a>

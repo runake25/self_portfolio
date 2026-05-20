@@ -11,6 +11,9 @@ import remarkMath from "remark-math";
 export default defineConfig({
     site: process.env.SITE_URL ?? "https://example.pages.dev",
     output: "static",
+    image: {
+        domains: ["image.tmdb.org"],
+    },
     integrations: [
         react(),
         mdx({
