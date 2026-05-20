@@ -11,43 +11,153 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
 		<h1 class="text-3xl font-bold tracking-tight sm:text-4xl" style="color:var(--text-primary)">About me</h1>
 		<p class="max-w-3xl text-sm leading-relaxed" style="color:var(--text-secondary)">
 			Born 2002. Learning best practices. <br>
-			I like being challenged, and reason through it
+			I like seeing how others think. <br>
+			I enjoy using Python, and I dedicate myself to learn anything that makes me better at it.
 		</p>
 		
 
 		<div class="dashboard-grid">
-			<article class="card-link dashboard-span-8 space-y-4">
-				<p class="section-label">Project</p>
-				<h2 class="text-xl font-bold" style="color:var(--text-primary)">Experience</h2>
-				<p class="text-sm" style="color:var(--text-secondary)">
-					I enjoy using Python, and I dedicate myself to learn anything that makes me better at it. <p>
-					
-				</p>
-				<ul class="dense-list">
-					<li>
-						<span>topic</span>
-						<span>who i am</span>
-					</li>
-					<li>
-						<span>subtopic</span>
-						<span>what i build</span>
-					</li>
-					<li>
-						<span>subtopic</span>
-						<span>how to contact me</span>
-					</li>
-				</ul>
-			</article>
+			<article class="card-link dashboard-span-8 space-y-4" style="border-top:2px solid #60a5fa">
+				<div class="space-y-1">
+					<p class="section-label">Overview</p>
+					<h2 class="text-xl font-bold" style="color:var(--text-primary)">Experience</h2>
+				</div>
 
-			<article class="card-link dashboard-span-4 space-y-4">
-				<p class="section-label">Explore</p>
-				<h2 class="text-xl font-bold" style="color:var(--text-primary)">Favourites</h2>
-				<div class="flex flex-col gap-2 pt-2">
-					<a class="execute-button secondary" style="display:block;text-align:left;" href="/movies">▶ Movies</a>
-					<a class="execute-button secondary" style="display:block;text-align:left;" href="/music">♪ Music</a>
-					<a class="execute-button secondary" style="display:block;text-align:left;" href="/places">◎ Places</a>
+				<div class="xp-columns">
+					<!-- Work timeline -->
+					<div>
+						<p class="xp-col-label">Work</p>
+						<div class="xp-timeline">
+							<div class="xp-entry">
+								<div class="xp-dot xp-dot--active"></div>
+								<span class="xp-role">Data Engineer</span>
+								<span class="xp-company">Premialab</span>
+								<span class="xp-date">Dec 2025 — Present</span>
+								<span class="xp-summary">Building pipelines and engines that keep the numbers honest.</span>
+								<div class="xp-tags">
+									<span class="tag-chip">Python</span>
+									<span class="tag-chip">SQL</span>
+									<span class="tag-chip">Pandas</span>
+								</div>
+							</div>
+							<div class="xp-entry">
+								<div class="xp-dot"></div>
+								<span class="xp-role">AI Developer Intern</span>
+								<span class="xp-company">Health Authority</span>
+								<span class="xp-date">Aug 2025 — Oct 2025</span>
+								<span class="xp-summary">Exploring how LLMs can make healthcare workflows less painful.</span>
+								<div class="xp-tags">
+									<span class="tag-chip">Python</span>
+									<span class="tag-chip">LangChain</span>
+								</div>
+							</div>
+							<div class="xp-entry">
+								<div class="xp-dot"></div>
+								<span class="xp-role">Associate SWE</span>
+								<span class="xp-company">Accenture</span>
+								<span class="xp-date">Jun 2024 — Dec 2024</span>
+								<span class="xp-summary">Client work across a few industries — mostly backend, a bit of everything.</span>
+								<div class="xp-tags">
+									<span class="tag-chip">Nodejs</span>
+									<span class="tag-chip">React Native</span>
+								</div>
+							</div>
+							<div class="xp-entry">
+								<div class="xp-dot"></div>
+								<span class="xp-role">Software Engineer Intern</span>
+								<span class="xp-company">ICAC</span>
+								<span class="xp-date">Jun 2023 — Aug 2023</span>
+								<span class="xp-summary">Short stint building internal tools. Learned a lot about patience.</span>
+								<div class="xp-tags">
+									<span class="tag-chip">Python</span>
+									<span class="tag-chip">Java</span>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Education -->
+					<div>
+						<p class="xp-col-label">Education & Activities</p>
+						<div class="xp-timeline">
+							<div class="xp-entry">
+								<div class="xp-dot"></div>
+								<span class="xp-role">BSc (Hons) in Computer Science</span>
+								<span class="xp-company">Hong Kong Polytechnic University</span>
+								<span class="xp-date">Sep 2022 — Jan 2026</span>
+							</div>
+							<div class="xp-entry">
+								<div class="xp-dot"></div>
+								<span class="xp-role">Code for Good <span style="color:var(--text-faint);font-weight:400">— 1st place</span></span>
+								<span class="xp-company">J.P. Morgan</span>
+						
+							</div>
+							<div class="xp-entry">
+								<div class="xp-dot"></div>
+								<span class="xp-role">Student Ambassador</span>
+								<span class="xp-company">Amazon Web Services</span>
+					
+							</div>
+							<div class="xp-entry">
+								<div class="xp-dot"></div>
+								<span class="xp-role">Research Assistant</span>
+								<span class="xp-company">Hong Kong Polytechnic University</span>
+							</div>
+						</div>
+					</div>
 				</div>
 			</article>
+
+			<div class="dashboard-span-4" style="display:flex;flex-direction:column;gap:0.8rem;align-self:start">
+				<article class="card-link space-y-4" style="border-top:2px solid #fbbf24">
+					<div class="space-y-1">
+						<p class="section-label">Explore</p>
+						<h2 class="text-xl font-bold" style="color:var(--text-primary)">Favourites</h2>
+					</div>
+					<div class="explore-links">
+						<a class="explore-link" href="/movies">
+							<span>Movies</span>
+							<span class="explore-link-arrow">→</span>
+						</a>
+						<a class="explore-link" href="/music">
+							<span>Music</span>
+							<span class="explore-link-arrow">→</span>
+						</a>
+						<a class="explore-link" href="/places">
+							<span>Places</span>
+							<span class="explore-link-arrow">→</span>
+						</a>
+					</div>
+				</article>
+
+				<article class="card-link space-y-3" style="border-top:2px solid #34d399">
+					<div class="space-y-1">
+						<p class="section-label">Portfolio</p>
+						<h2 class="text-xl font-bold" style="color:var(--text-primary)">View Works</h2>
+					</div>
+					<p class="text-sm" style="color:var(--text-secondary)">
+						Projects, experiments, and things I've built.
+					</p>
+					<a class="explore-link" href="/projects">
+						<span>Browse gallery</span>
+						<span class="explore-link-arrow">→</span>
+					</a>
+				</article>
+
+				<article class="card-link space-y-3" style="border-top:2px solid #f472b6">
+					<div class="space-y-1">
+						<p class="section-label">Contact</p>
+						<h2 class="text-xl font-bold" style="color:var(--text-primary)">Say hello.</h2>
+					</div>
+					<p class="text-sm" style="color:var(--text-secondary)">
+						Open to conversations about work, ideas, or anything interesting.
+					</p>
+					<a class="explore-link" href="/contact">
+						<span>Send a message</span>
+						<span class="explore-link-arrow">→</span>
+					</a>
+				</article>
+			</div>
 		</div>
 	</section>
 </BaseLayout>

@@ -17,17 +17,27 @@ const entries = (await getCollection("music")).sort(
 
 <BaseLayout title="Music | Brian" description="Music I love.">
   <section class="space-y-8">
-    <p class="section-label">Explore</p>
-    <h1 class="text-3xl font-bold tracking-tight sm:text-4xl" style="color:var(--text-primary)">Music</h1>
-    <p class="max-w-3xl text-sm" style="color:var(--text-secondary)">
-      Albums and artists that stuck with me.
-    </p>
+    <p class="section-label">Explore · Music</p>
+    <div class="flex items-end justify-between gap-3 flex-wrap">
+      <div>
+        <h1 class="text-3xl font-bold tracking-tight" style="color:var(--text-primary)">Music</h1>
+        <p class="mt-1 text-sm" style="color:var(--text-secondary)">
+          Albums and artists that stuck with me.
+          {entries.length > 0 && <span style="color:var(--text-faint)">— {entries.length} entries</span>}
+        </p>
+      </div>
+      {entries.length > 1 && (
+        <button id="music-pick-btn" class="execute-button secondary pick-one-btn" type="button">
+          ◎ pick one
+        </button>
+      )}
+    </div>
 
     {
       entries.length === 0 ? (
         <p style="color:var(--text-faint)">No entries yet. Add your first note in src/content/music.</p>
       ) : (
-        <div class="grid gap-4">
+        <div id="music-list" class="grid gap-4">
           {entries.map((entry) => (
             <CollectionCard
               href={entryHref("music", entry.id)}
@@ -42,3 +52,68 @@ const entries = (await getCollection("music")).sort(
     }
   </section>
 </BaseLayout>
+
+<script is:inline>
+  (function () {
+    var btn = document.getElementById("music-pick-btn");
+    var list = document.getElementById("music-list");
+    if (!btn || !list) return;
+    var cards = Array.from(list.querySelectorAll("article.card-link"));
+    if (cards.length < 2) return;
+
+    var running = false;
+
+    function clearPicks() {
+      cards.forEach(function (c) {
+        c.classList.remove("pick-scanning", "pick-highlight");
+      });
+    }
+
+    window.addEventListener("pageshow", function (e) {
+      if (e.persisted) {
+        clearPicks();
+        btn.textContent = "◎ pick one";
+        btn.disabled = false;
+        running = false;
+      }
+    });
+
+    btn.addEventListener("click", function () {
+      if (running) return;
+      running = true;
+      btn.disabled = true;
+      btn.textContent = "scanning...";
+      clearPicks();
+
+      var total = cards.length;
+      var targetIndex = Math.floor(Math.random() * total);
+      var totalSteps = 3 * total + targetIndex + 1;
+      var step = 0;
+      var prevIdx = -1;
+
+      function scan() {
+        if (prevIdx >= 0) cards[prevIdx].classList.remove("pick-scanning");
+        var idx = step % total;
+        cards[idx].classList.add("pick-scanning");
+        prevIdx = idx;
+        step++;
+
+        if (step < totalSteps) {
+          var progress = step / totalSteps;
+          var delay = 45 + Math.pow(progress, 2.4) * 400;
+          setTimeout(scan, delay);
+        } else {
+          cards[prevIdx].classList.remove("pick-scanning");
+          var winner = cards[targetIndex];
+          winner.classList.add("pick-highlight");
+          winner.scrollIntoView({ behavior: "smooth", block: "nearest" });
+          btn.textContent = "◎ pick one";
+          btn.disabled = false;
+          running = false;
+        }
+      }
+
+      scan();
+    });
+  })();
+</script>

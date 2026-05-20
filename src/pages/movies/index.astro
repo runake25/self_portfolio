@@ -12,11 +12,18 @@ const movies = (await getCollection("movies")).sort(
 <BaseLayout title="Movies | Brian" description="Films that left a mark.">
   <section class="space-y-6">
     <p class="section-label">Explore · Movies</p>
-    <div>
-      <h1 class="text-3xl font-bold tracking-tight" style="color:var(--text-primary)">Movies</h1>
-      <p class="mt-1 text-sm" style="color:var(--text-secondary)">
-        Films that left a mark. {movies.length > 0 && <span style="color:var(--text-faint)">— {movies.length} entries</span>}
-      </p>
+    <div class="flex items-end justify-between gap-3 flex-wrap">
+      <div>
+        <h1 class="text-3xl font-bold tracking-tight" style="color:var(--text-primary)">Movies</h1>
+        <p class="mt-1 text-sm" style="color:var(--text-secondary)">
+          Do you have two hours to spare? {movies.length > 0 && <span style="color:var(--text-faint)">— {movies.length} entries</span>}
+        </p>
+      </div>
+      {movies.length > 1 && (
+        <button id="movie-pick-btn" class="execute-button secondary pick-one-btn" type="button">
+          ◎ pick one
+        </button>
+      )}
     </div>
 
     {movies.length === 0 ? (
@@ -24,7 +31,7 @@ const movies = (await getCollection("movies")).sort(
         No entries yet — add your first film in <code>src/content/movies/</code>
       </p>
     ) : (
-      <div class="movie-grid">
+      <div id="movie-grid" class="movie-grid">
         {movies.map((movie, i) => (
           <MoviePosterCard
             href={entryHref("movies", movie.id)}
@@ -33,10 +40,74 @@ const movies = (await getCollection("movies")).sort(
             director={movie.data.director}
             releasedYear={movie.data.releasedYear}
             genre={movie.data.genre}
-            priority={i === 0}
+            priority={i < 4}
           />
         ))}
       </div>
     )}
   </section>
 </BaseLayout>
+
+<script is:inline>
+  (function () {
+    var btn = document.getElementById("movie-pick-btn");
+    var grid = document.getElementById("movie-grid");
+    if (!btn || !grid) return;
+    var cards = Array.from(grid.querySelectorAll(".movie-poster-card"));
+    if (cards.length < 2) return;
+
+    var running = false;
+
+    function clearPicks() {
+      cards.forEach(function (c) {
+        c.classList.remove("pick-scanning", "pick-highlight");
+      });
+    }
+
+    window.addEventListener("pageshow", function (e) {
+      if (e.persisted) {
+        clearPicks();
+        btn.textContent = "◎ pick one";
+        btn.disabled = false;
+        running = false;
+      }
+    });
+
+    btn.addEventListener("click", function () {
+      if (running) return;
+      running = true;
+      btn.disabled = true;
+      btn.textContent = "scanning...";
+      clearPicks();
+
+      var total = cards.length;
+      var targetIndex = Math.floor(Math.random() * total);
+      var totalSteps = 3 * total + targetIndex + 1;
+      var step = 0;
+      var prevIdx = -1;
+
+      function scan() {
+        if (prevIdx >= 0) cards[prevIdx].classList.remove("pick-scanning");
+        var idx = step % total;
+        cards[idx].classList.add("pick-scanning");
+        prevIdx = idx;
+        step++;
+
+        if (step < totalSteps) {
+          var progress = step / totalSteps;
+          var delay = 45 + Math.pow(progress, 2.4) * 400;
+          setTimeout(scan, delay);
+        } else {
+          cards[prevIdx].classList.remove("pick-scanning");
+          cards[targetIndex].classList.add("pick-highlight");
+          cards[targetIndex].scrollIntoView({ behavior: "smooth", block: "nearest" });
+          btn.textContent = "◎ pick one";
+          btn.disabled = false;
+          running = false;
+        }
+      }
+
+      scan();
+    });
+  })();
+</script>
