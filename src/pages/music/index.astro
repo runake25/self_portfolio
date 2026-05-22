@@ -1,14 +1,8 @@
 ---
-import CollectionCard from "@/components/content/CollectionCard.astro";
+import MusicAlbumCard from "@/components/content/MusicAlbumCard.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import { entryHref } from "@/utilities/content";
+import { Image } from "astro:assets";
 import { getCollection } from "astro:content";
-
-const dateFormatter = new Intl.DateTimeFormat("en-US", {
-  year: "numeric",
-  month: "short",
-  day: "numeric",
-});
 
 const entries = (await getCollection("music")).sort(
   (a, b) => b.data.listenedDate.valueOf() - a.data.listenedDate.valueOf(),
@@ -33,87 +27,205 @@ const entries = (await getCollection("music")).sort(
       )}
     </div>
 
-    {
-      entries.length === 0 ? (
-        <p style="color:var(--text-faint)">No entries yet. Add your first note in src/content/music.</p>
-      ) : (
-        <div id="music-list" class="grid gap-4">
-          {entries.map((entry) => (
-            <CollectionCard
-              href={entryHref("music", entry.id)}
-              title={entry.data.title}
-              description={entry.data.description}
-              meta={`${entry.data.artist ? entry.data.artist + " · " : ""}${dateFormatter.format(entry.data.listenedDate)}${typeof entry.data.rating === "number" ? ` | ${entry.data.rating}/5` : ""}`}
-              tags={entry.data.tags}
-            />
-          ))}
-        </div>
-      )
-    }
+    {entries.length === 0 ? (
+      <p style="color:var(--text-faint)">No entries yet. Add your first album in src/content/music.</p>
+    ) : (
+      <div id="music-grid" class="music-grid">
+        {entries.map((entry, i) => (
+          <MusicAlbumCard
+            musicId={entry.id}
+            title={entry.data.title}
+            artist={entry.data.artist}
+            coverArt={entry.data.coverArt}
+            releaseYear={entry.data.releaseYear}
+            genre={entry.data.genre}
+            description={entry.data.description}
+            priority={true}
+          />
+        ))}
+      </div>
+    )}
   </section>
+
+  <!-- Shared backdrop -->
+  <div id="music-backdrop" class="music-backdrop" aria-hidden="true"></div>
+
+  <!-- One modal per album (hidden, populated at build time) -->
+  {entries.map((entry) => (
+    <div
+      id={`music-modal-${entry.id}`}
+      class="music-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-label={entry.data.title}
+      hidden
+    >
+      <button class="music-modal-close" aria-label="Close" type="button">✕</button>
+      <div class="music-modal-inner">
+        <div class="music-modal-art-wrap">
+          {entry.data.coverArt ? (
+            <Image
+              src={entry.data.coverArt}
+              alt={`${entry.data.title}${entry.data.artist ? ` by ${entry.data.artist}` : ""} album cover`}
+              width={500}
+              height={500}
+              loading="lazy"
+              decoding="async"
+              class="music-modal-art"
+            />
+          ) : (
+            <div class="music-modal-art-placeholder">♪</div>
+          )}
+        </div>
+        <div class="music-modal-info">
+          <h2 class="music-modal-title">{entry.data.title}</h2>
+          {entry.data.artist && (
+            <p class="music-modal-artist">{entry.data.artist}</p>
+          )}
+          <div class="music-modal-year-genre">
+            {entry.data.releaseYear && <span>{entry.data.releaseYear}</span>}
+            {entry.data.genre && entry.data.genre.length > 0 && (
+              <span class="music-modal-genres">
+                {entry.data.genre.map((g) => <span class="music-genre-tag">{g}</span>)}
+              </span>
+            )}
+          </div>
+          {entry.data.description && (
+            <p class="music-modal-description">{entry.data.description}</p>
+          )}
+          {entry.data.keyTracks && entry.data.keyTracks.length > 0 && (
+            <div class="music-modal-tracks">
+              <p class="music-modal-tracks-label">key tracks</p>
+              <ul>
+                {entry.data.keyTracks.map((track) => <li>{track}</li>)}
+              </ul>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  ))}
 </BaseLayout>
 
 <script is:inline>
   (function () {
-    var btn = document.getElementById("music-pick-btn");
-    var list = document.getElementById("music-list");
-    if (!btn || !list) return;
-    var cards = Array.from(list.querySelectorAll("article.card-link"));
-    if (cards.length < 2) return;
+    // ─── Pick One ────────────────────────────────────────────────
+    var pickBtn = document.getElementById("music-pick-btn");
+    var grid = document.getElementById("music-grid");
+    if (pickBtn && grid) {
+      var pickCards = Array.from(grid.querySelectorAll("button.music-album-card"));
+      if (pickCards.length >= 2) {
+        var running = false;
+        function clearPicks() {
+          pickCards.forEach(function (c) {
+            c.classList.remove("pick-scanning", "pick-highlight");
+          });
+        }
+        window.addEventListener("pageshow", function (e) {
+          if (e.persisted) {
+            clearPicks();
+            pickBtn.textContent = "◎ pick one";
+            pickBtn.disabled = false;
+            running = false;
+          }
+        });
+        pickBtn.addEventListener("click", function () {
+          if (running) return;
+          running = true;
+          pickBtn.disabled = true;
+          pickBtn.textContent = "scanning...";
+          clearPicks();
+          var total = pickCards.length;
+          var targetIndex = Math.floor(Math.random() * total);
+          var totalSteps = 4 * total + targetIndex + 1;
+          var step = 0;
+          var prevIdx = -1;
+          function scan() {
+            if (prevIdx >= 0) pickCards[prevIdx].classList.remove("pick-scanning");
+            var idx = step % total;
+            pickCards[idx].classList.add("pick-scanning");
+            prevIdx = idx;
+            step++;
+            if (step < totalSteps) {
+              var progress = step / totalSteps;
+              // starts fast (~35ms), decelerates sharply at end
+              var delay = 35 + Math.pow(progress, 2.8) * 480;
+              setTimeout(scan, delay);
+            } else {
+              pickCards[prevIdx].classList.remove("pick-scanning");
+              var winner = pickCards[targetIndex];
+              winner.classList.add("pick-highlight");
+              winner.scrollIntoView({ behavior: "smooth", block: "nearest" });
+              pickBtn.textContent = "◎ pick one";
+              pickBtn.disabled = false;
+              running = false;
+            }
+          }
+          scan();
+        });
 
-    var running = false;
-
-    function clearPicks() {
-      cards.forEach(function (c) {
-        c.classList.remove("pick-scanning", "pick-highlight");
-      });
+        // Clear pick highlight when clicking anywhere outside the winner
+        document.addEventListener("click", function (e) {
+          var highlighted = grid.querySelector(".pick-highlight");
+          if (!highlighted) return;
+          if (!highlighted.contains(e.target)) {
+            highlighted.classList.remove("pick-highlight");
+          }
+        });
+      }
     }
 
-    window.addEventListener("pageshow", function (e) {
-      if (e.persisted) {
-        clearPicks();
-        btn.textContent = "◎ pick one";
-        btn.disabled = false;
-        running = false;
-      }
+    // ─── Album modal ─────────────────────────────────────────────
+    var backdrop = document.getElementById("music-backdrop");
+    var activeModal = null;
+
+    function openModal(id) {
+      var modal = document.getElementById("music-modal-" + id);
+      if (!modal || !backdrop) return;
+      activeModal = modal;
+      modal.removeAttribute("hidden");
+      backdrop.removeAttribute("hidden");
+      document.body.style.overflow = "hidden";
+      // Double rAF ensures hidden→visible transition fires
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          backdrop.classList.add("is-active");
+          modal.classList.add("is-active");
+        });
+      });
+      var closeBtn = modal.querySelector(".music-modal-close");
+      if (closeBtn) closeBtn.focus();
+    }
+
+    function closeModal() {
+      if (!activeModal || !backdrop) return;
+      var toHide = activeModal;
+      activeModal = null;
+      toHide.classList.remove("is-active");
+      backdrop.classList.remove("is-active");
+      document.body.style.overflow = "";
+      setTimeout(function () {
+        toHide.setAttribute("hidden", "");
+        backdrop.setAttribute("hidden", "");
+      }, 280);
+    }
+
+    document.querySelectorAll("button.music-album-card[data-music-id]").forEach(function (card) {
+      card.addEventListener("click", function () {
+        openModal(card.dataset.musicId);
+      });
     });
 
-    btn.addEventListener("click", function () {
-      if (running) return;
-      running = true;
-      btn.disabled = true;
-      btn.textContent = "scanning...";
-      clearPicks();
+    if (backdrop) backdrop.addEventListener("click", closeModal);
 
-      var total = cards.length;
-      var targetIndex = Math.floor(Math.random() * total);
-      var totalSteps = 3 * total + targetIndex + 1;
-      var step = 0;
-      var prevIdx = -1;
+    document.querySelectorAll(".music-modal-close").forEach(function (btn) {
+      btn.addEventListener("click", closeModal);
+    });
 
-      function scan() {
-        if (prevIdx >= 0) cards[prevIdx].classList.remove("pick-scanning");
-        var idx = step % total;
-        cards[idx].classList.add("pick-scanning");
-        prevIdx = idx;
-        step++;
-
-        if (step < totalSteps) {
-          var progress = step / totalSteps;
-          var delay = 45 + Math.pow(progress, 2.4) * 400;
-          setTimeout(scan, delay);
-        } else {
-          cards[prevIdx].classList.remove("pick-scanning");
-          var winner = cards[targetIndex];
-          winner.classList.add("pick-highlight");
-          winner.scrollIntoView({ behavior: "smooth", block: "nearest" });
-          btn.textContent = "◎ pick one";
-          btn.disabled = false;
-          running = false;
-        }
-      }
-
-      scan();
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && activeModal) closeModal();
     });
   })();
 </script>
+
+

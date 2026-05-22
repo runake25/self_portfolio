@@ -24,7 +24,7 @@ const { href, title, poster, director, releasedYear, genre = [], priority = fals
       height={750}
       loading={priority ? "eager" : "lazy"}
       fetchpriority={priority ? "high" : "auto"}
-      decoding={priority ? "sync" : "async"}
+      decoding="async"
     />
   ) : (
     <div class="movie-poster-placeholder">

@@ -1,0 +1,60 @@
+---
+import type { ImageMetadata } from "astro";
+import { Image } from "astro:assets";
+
+interface Props {
+  musicId: string;
+  title: string;
+  artist?: string;
+  coverArt?: ImageMetadata;
+  releaseYear?: number;
+  genre?: string[];
+  description?: string;
+  priority?: boolean;
+}
+
+const {
+  musicId, title, artist, coverArt, releaseYear,
+  genre = [], description, priority = false
+} = Astro.props;
+
+const byline = [artist, releaseYear].filter(Boolean).join(" · ");
+---
+
+<button
+  type="button"
+  class="music-album-card"
+  data-music-id={musicId}
+  aria-haspopup="dialog"
+>
+  <div class="music-album-art-wrap">
+    {coverArt ? (
+      <Image
+        class="music-album-img"
+        src={coverArt}
+        alt={`${title}${artist ? ` by ${artist}` : ""} album cover`}
+        width={400}
+        height={400}
+        loading={priority ? "eager" : "lazy"}
+        fetchpriority={priority ? "high" : "auto"}
+        decoding="async"
+      />
+    ) : (
+      <div class="music-album-placeholder">
+        <span class="music-album-placeholder-icon">♪</span>
+      </div>
+    )}
+  </div>
+
+  <div class="music-album-body">
+    <p class="music-album-title">{title}</p>
+    {byline && <p class="music-album-byline">{byline}</p>}
+    {description && <p class="music-album-desc">{description}</p>}
+    {genre.length > 0 && (
+      <div class="music-album-genre">
+        {genre.slice(0, 2).map((g) => <span class="music-genre-tag">{g}</span>)}
+      </div>
+    )}
+  </div>
+</button>
+

@@ -12,7 +12,7 @@ export default defineConfig({
     site: process.env.SITE_URL ?? "https://example.pages.dev",
     output: "static",
     image: {
-        domains: ["image.tmdb.org"],
+        domains: ["image.tmdb.org", "coverartarchive.org"],
     },
     integrations: [
         react(),

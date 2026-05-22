@@ -40,7 +40,8 @@ const nextPage = nextEntry
   title={`${entry.data.title} | Thoughts`}
   description={entry.data.description}
   noSketch={true}
-  bgPoster={entry.data.capture ? entry.data.capture.src : entry.data.poster}
+  bgCapture={entry.data.capture}
+  bgPoster={entry.data.capture ? undefined : entry.data.poster}
 >
   <article class="article-page">
     <a href="/movies" class="article-back">← Back</a>
