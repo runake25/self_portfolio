@@ -1521,7 +1521,7 @@ body[data-theme="day"] .border-zinc-800 {
     top: 0;
     left: 0;
     right: 0;
-    height: env(safe-area-inset-top);
+    height: calc(env(safe-area-inset-top) + 3.5rem);
     background: linear-gradient(
       to bottom,
       var(--bg-elevated) 0%,
@@ -2253,8 +2253,8 @@ body[data-theme="day"] .music-album-card {
 
 .music-entry-art-wrap {
   flex-shrink: 0;
-  width: 160px;
-  height: 160px;
+  width: 200px;
+  height: 200px;
   border-radius: 8px;
   overflow: hidden;
   background: var(--surface);
@@ -2329,16 +2329,18 @@ body[data-theme="day"] .music-album-card {
   margin-top: 0.5rem;
 }
 
-/* Mobile: stack art above meta */
-@media (max-width: 520px) {
+/* Mobile: full-width art above meta */
+@media (max-width: 640px) {
   .music-entry-hero {
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.1rem;
   }
 
   .music-entry-art-wrap {
-    width: 130px;
-    height: 130px;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    border-radius: 10px;
   }
 
   .music-entry-title {
