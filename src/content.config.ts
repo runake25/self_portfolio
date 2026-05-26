@@ -62,14 +62,13 @@ const music = defineCollection({
   loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/music" }),
   schema: ({ image }) => z.object({
     title: z.string(),
-    listenedDate: z.date(),
+    entryDate: z.date(),
     description: z.string().optional(),
     artist: z.string().optional(),
     releaseYear: z.number().optional(),
     genre: z.array(z.string()).optional(),
     coverArt: image().optional(),
     keyTracks: z.array(z.string()).optional(),
-    rating: z.number().min(0).max(5).optional(),
     tags: z.array(z.string()).optional(),
   }),
 });

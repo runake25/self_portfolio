@@ -5,7 +5,7 @@ import { getCollection, render } from "astro:content";
 
 export async function getStaticPaths() {
   const entries = (await getCollection("music")).sort(
-    (a, b) => b.data.listenedDate.valueOf() - a.data.listenedDate.valueOf(),
+    (a, b) => b.data.entryDate.valueOf() - a.data.entryDate.valueOf(),
   );
 
   return entries.map((entry, index) => ({
@@ -51,13 +51,7 @@ const nextPage = nextEntry
       <div class="article-meta">
         {entry.data.artist && <span>{entry.data.artist}</span>}
         {entry.data.artist && <span>•</span>}
-        <span>Listened {dateFormatter.format(entry.data.listenedDate)}</span>
-        {typeof entry.data.rating === "number" && (
-          <>
-            <span>•</span>
-            <span>Rating {entry.data.rating}/5</span>
-          </>
-        )}
+        <span>Listened {dateFormatter.format(entry.data.entryDate)}</span>
       </div>
       {entry.data.description && <p class="lead">{entry.data.description}</p>}
     </header>

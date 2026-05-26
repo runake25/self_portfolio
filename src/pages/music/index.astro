@@ -2,11 +2,12 @@
 import MusicAlbumCard from "@/components/content/MusicAlbumCard.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { Image } from "astro:assets";
-import { getCollection } from "astro:content";
+import { getCollection, render } from "astro:content";
 
 const entries = (await getCollection("music")).sort(
-  (a, b) => b.data.listenedDate.valueOf() - a.data.listenedDate.valueOf(),
+    (a, b) => b.data.entryDate.valueOf() - a.data.entryDate.valueOf(),
 );
+const rendered = await Promise.all(entries.map((e) => render(e)));
 ---
 
 <BaseLayout title="Music | Brian" description="Music I love.">
@@ -51,7 +52,9 @@ const entries = (await getCollection("music")).sort(
   <div id="music-backdrop" class="music-backdrop" aria-hidden="true"></div>
 
   <!-- One modal per album (hidden, populated at build time) -->
-  {entries.map((entry) => (
+  {entries.map((entry, i) => {
+    const { Content } = rendered[i];
+    return (
     <div
       id={`music-modal-${entry.id}`}
       class="music-modal"
@@ -102,10 +105,15 @@ const entries = (await getCollection("music")).sort(
               </ul>
             </div>
           )}
+          <div class="music-modal-prose prose">
+            <Content />
+          </div>
         </div>
       </div>
     </div>
-  ))}
+    );
+  })}
+
 </BaseLayout>
 
 <script is:inline>
