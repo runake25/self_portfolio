@@ -49,6 +49,7 @@ body {
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation-duration: 0s;
+  animation: none !important;
 }
 
 ::view-transition-old(root),
@@ -1506,7 +1507,7 @@ body[data-theme="day"] .border-zinc-800 {
     width: 100%;
     height: auto;
     margin: 0;
-    min-height: 100vh;
+    min-height: 100svh;
     border-left: 0;
     border-right: 0;
   }
