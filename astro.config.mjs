@@ -7,22 +7,29 @@ import { defineConfig } from "astro/config";
 import rehypeKatex from "rehype-katex";
 import remarkMath from "remark-math";
 
+import cloudflare from "@astrojs/cloudflare";
+
 // https://astro.build/config
 export default defineConfig({
-    site: process.env.SITE_URL ?? "https://example.pages.dev",
-    output: "static",
-    image: {
-        domains: ["image.tmdb.org", "coverartarchive.org"],
-    },
-    integrations: [
-        react(),
-        mdx({
-            remarkPlugins: [remarkMath],
-            rehypePlugins: [rehypeKatex],
-        }),
-        sitemap(),
-    ],
-    vite: {
-        plugins: [tailwindcss()],
-    },
+  site: process.env.SITE_URL ?? "https://example.pages.dev",
+  output: "static",
+
+  image: {
+      domains: ["image.tmdb.org", "coverartarchive.org"],
+  },
+
+  integrations: [
+      react(),
+      mdx({
+          remarkPlugins: [remarkMath],
+          rehypePlugins: [rehypeKatex],
+      }),
+      sitemap(),
+  ],
+
+  vite: {
+      plugins: [tailwindcss()],
+  },
+
+  adapter: cloudflare(),
 });
