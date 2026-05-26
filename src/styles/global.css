@@ -49,7 +49,6 @@ body {
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation-duration: 0s;
-  animation: none !important;
 }
 
 ::view-transition-old(root),
@@ -1501,6 +1500,7 @@ body[data-theme="day"] .border-zinc-800 {
     overflow: visible; /* let content flow to html scroll container */
     height: auto;
     min-height: 100dvh;
+    padding-bottom: env(safe-area-inset-bottom);
   }
 
   .site-shell {
@@ -1512,12 +1512,12 @@ body[data-theme="day"] .border-zinc-800 {
     border-right: 0;
   }
 
-  .maze-canvas {
-    opacity: 0.65;
+  .site-header {
+    padding: calc(env(safe-area-inset-top) + 1rem) 0.9rem 0.8rem;
   }
 
-  .site-header {
-    padding: 1rem 0.9rem 0.8rem;
+  .maze-canvas {
+    opacity: 0.65;
   }
 
   .header-top {
