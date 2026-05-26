@@ -1521,13 +1521,8 @@ body[data-theme="day"] .border-zinc-800 {
     top: 0;
     left: 0;
     right: 0;
-    height: calc(env(safe-area-inset-top) + 3.5rem);
-    background: linear-gradient(
-      to bottom,
-      var(--bg-elevated) 0%,
-      var(--bg-elevated) env(safe-area-inset-top),
-      transparent 100%
-    );
+    height: env(safe-area-inset-top);
+    background: var(--bg-elevated);
     z-index: 5;
   }
 
@@ -1575,6 +1570,10 @@ body[data-theme="day"] .border-zinc-800 {
   .site-header {
     padding: 1rem 0.9rem 0.8rem;
     border-bottom: none;
+    position: sticky;
+    top: env(safe-area-inset-top);
+    z-index: 6;
+    background: var(--bg-elevated);
   }
 
   .shell-poster-bg {
@@ -2239,67 +2238,7 @@ body[data-theme="day"] .music-album-card {
 }
 
 @media (max-width: 940px) {
-  /* Full-screen overlay — covers header, bottom bar, notch, everything */
-  .music-modal {
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100%;
-    max-height: none;
-    border-radius: 0;
-    /* Modal shell doesn't scroll — only .music-modal-inner does */
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    /* Entry: slide up from below the viewport */
-    transform: translateY(100%);
-    transition: opacity 0.26s ease, transform 0.38s cubic-bezier(0.32, 0.72, 0, 1);
-  }
-  .music-modal.is-active {
-    transform: translateY(0);
-  }
-  /* Remove drag-handle pseudo-element */
-  .music-modal::before { display: none; }
-
-  /* Scrollable content region fills remaining height */
-  .music-modal-inner {
-    flex: 1;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    flex-direction: column;
-    padding: 1.1rem 1.1rem 1rem;
-    /* Below notch + room for the pinned close button */
-    padding-top: calc(env(safe-area-inset-top) + 3.5rem);
-    /* Above home bar */
-    padding-bottom: calc(env(safe-area-inset-bottom) + 1rem);
-    gap: 1rem;
-  }
-
-  /* Art: prominent at top of scroll area */
-  .music-modal-art-wrap {
-    width: 120px;
-    height: 120px;
-  }
-
-  .music-modal-info {
-    padding-right: 0;
-    gap: 0.35rem;
-  }
-
-  .music-modal-title      { font-size: 1rem;   line-height: 1.25; }
-  .music-modal-artist     { font-size: 0.82rem; }
-  .music-modal-year-genre { font-size: 0.68rem; }
-  .music-modal-description { font-size: 0.82rem; line-height: 1.6; }
-  .music-modal-tracks-label { font-size: 0.6rem; }
-  .music-modal-tracks li    { font-size: 0.78rem; }
-
-  /* Close button: pinned top-right, always visible because modal has overflow:hidden */
-  .music-modal-close {
-    top: calc(env(safe-area-inset-top) + 0.75rem);
-    right: 0.9rem;
-    width: 2.2rem;
-    height: 2.2rem;
-    font-size: 0.7rem;
-  }
+  /* On mobile, album clicks navigate to the detail page — no modal needed */
+  .music-modal,
+  .music-backdrop { display: none !important; }
 }

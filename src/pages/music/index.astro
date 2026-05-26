@@ -3,6 +3,7 @@ import MusicAlbumCard from "@/components/content/MusicAlbumCard.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { Image } from "astro:assets";
 import { getCollection, render } from "astro:content";
+import { entryHref } from "@/utilities/content";
 
 const entries = (await getCollection("music")).sort(
     (a, b) => b.data.entryDate.valueOf() - a.data.entryDate.valueOf(),
@@ -42,6 +43,7 @@ const rendered = await Promise.all(entries.map((e) => render(e)));
             genre={entry.data.genre}
             description={entry.data.description}
             priority={true}
+            url={entryHref("music", entry.id)}
           />
         ))}
       </div>
@@ -130,6 +132,14 @@ const rendered = await Promise.all(entries.map((e) => render(e)));
     var _activeModalId = null;
 
     function _openModal(id) {
+      // On mobile, navigate to the detail page instead of showing a popup
+      if (window.innerWidth <= 940) {
+        var card = grid.querySelector('button.music-album-card[data-music-id="' + id + '"]');
+        if (card && card.dataset.musicUrl) {
+          window.location.href = card.dataset.musicUrl;
+          return;
+        }
+      }
       var modal    = document.getElementById("music-modal-" + id);
       var backdrop = document.getElementById("music-backdrop");
       if (!modal || !backdrop) return;
