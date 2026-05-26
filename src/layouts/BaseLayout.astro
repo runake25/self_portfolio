@@ -949,6 +949,9 @@ const deriveSeedFromFingerprint = async (source) => {
           if (document.body.getAttribute("data-theme") !== theme) {
             document.body.setAttribute("data-theme", theme);
           }
+          if (document.documentElement.getAttribute("data-theme") !== theme) {
+            document.documentElement.setAttribute("data-theme", theme);
+          }
           setThemeLabel(theme);
           drawMaze();
         };
@@ -1111,7 +1114,10 @@ const deriveSeedFromFingerprint = async (source) => {
             document.addEventListener("astro:before-swap", (e) => {
               // Copy current theme + ui-hidden to incoming body so there's never a wrong-theme frame
               const theme = document.body.getAttribute("data-theme");
-              if (theme) e.newDocument.body.setAttribute("data-theme", theme);
+              if (theme) {
+                e.newDocument.body.setAttribute("data-theme", theme);
+                e.newDocument.documentElement.setAttribute("data-theme", theme);
+              }
               const uiHidden = document.body.getAttribute("data-ui-hidden");
               if (uiHidden) e.newDocument.body.setAttribute("data-ui-hidden", uiHidden);
             });
