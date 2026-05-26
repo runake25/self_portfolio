@@ -1522,7 +1522,11 @@ body[data-theme="day"] .border-zinc-800 {
     left: 0;
     right: 0;
     height: env(safe-area-inset-top);
-    background: var(--bg-elevated);
+    background: linear-gradient(
+      to bottom,
+      var(--bg-elevated) 0%,
+      transparent 100%
+    );
     z-index: 5;
   }
 
@@ -2235,6 +2239,111 @@ body[data-theme="day"] .music-album-card {
   color: var(--accent);
   font-size: 0.6rem;
   top: 0.18em;
+}
+
+/* ── Music detail page (/music/[slug]) ───────────────────────────────────── */
+.music-entry-hero {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  margin-bottom: 1.75rem;
+  padding-bottom: 1.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.music-entry-art-wrap {
+  flex-shrink: 0;
+  width: 160px;
+  height: 160px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--surface);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+}
+
+.music-entry-art-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  opacity: 0.18;
+}
+
+.music-entry-art-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.music-entry-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.music-entry-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin: 0.3rem 0 0.1rem;
+}
+
+.music-entry-artist {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.music-entry-tags {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-top: 0.3rem;
+}
+
+.music-entry-year {
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  color: var(--text-faint);
+}
+
+.music-entry-desc {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0 0 1.5rem;
+}
+
+.music-entry-tracks {
+  margin-bottom: 1.75rem;
+  padding-bottom: 1.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.music-entry-prose {
+  margin-top: 0.5rem;
+}
+
+/* Mobile: stack art above meta */
+@media (max-width: 520px) {
+  .music-entry-hero {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .music-entry-art-wrap {
+    width: 130px;
+    height: 130px;
+  }
+
+  .music-entry-title {
+    font-size: 1.35rem;
+  }
 }
 
 @media (max-width: 940px) {

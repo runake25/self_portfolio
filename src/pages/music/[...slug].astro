@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { entryHref, entrySlugFromId } from "@/utilities/content";
+import { Image } from "astro:assets";
 import { getCollection, render } from "astro:content";
 
 export async function getStaticPaths() {
@@ -21,12 +22,6 @@ export async function getStaticPaths() {
 const { entry, prevEntry, nextEntry } = Astro.props;
 const { Content } = await render(entry);
 
-const dateFormatter = new Intl.DateTimeFormat("en-US", {
-  year: "numeric",
-  month: "long",
-  day: "numeric",
-});
-
 const prevPage = prevEntry
   ? { label: "Older entry", title: prevEntry.data.title, url: entryHref("music", prevEntry.id) }
   : null;
@@ -44,19 +39,59 @@ const nextPage = nextEntry
   noSketch={true}
 >
   <article class="article-page">
-    <a href="/music" class="article-back">← Back</a>
-    <header class="article-header">
-      <p class="section-label">Music</p>
-      <h1>{entry.data.title}</h1>
-      <div class="article-meta">
-        {entry.data.artist && <span>{entry.data.artist}</span>}
-        {entry.data.artist && <span>•</span>}
-        <span>Listened {dateFormatter.format(entry.data.entryDate)}</span>
-      </div>
-      {entry.data.description && <p class="lead">{entry.data.description}</p>}
-    </header>
+    <a href="/music" class="article-back">← Back to Music</a>
 
-    <div class="prose max-w-none">
+    <!-- Hero: art + core metadata -->
+    <div class="music-entry-hero">
+      {entry.data.coverArt ? (
+        <div class="music-entry-art-wrap">
+          <Image
+            src={entry.data.coverArt}
+            alt={`${entry.data.title}${entry.data.artist ? ` by ${entry.data.artist}` : ""} album cover`}
+            width={500}
+            height={500}
+            format="avif"
+            loading="eager"
+            decoding="async"
+            class="music-entry-art-img"
+          />
+        </div>
+      ) : (
+        <div class="music-entry-art-wrap music-entry-art-placeholder">♪</div>
+      )}
+
+      <div class="music-entry-meta">
+        <p class="section-label">Music</p>
+        <h1 class="music-entry-title">{entry.data.title}</h1>
+        {entry.data.artist && <p class="music-entry-artist">{entry.data.artist}</p>}
+        <div class="music-entry-tags">
+          {entry.data.releaseYear && (
+            <span class="music-entry-year">{entry.data.releaseYear}</span>
+          )}
+          {entry.data.genre?.map((g) => (
+            <span class="music-genre-tag">{g}</span>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <!-- Description -->
+    {entry.data.description && (
+      <p class="music-entry-desc">{entry.data.description}</p>
+    )}
+
+    <!-- Key tracks -->
+    {entry.data.keyTracks && entry.data.keyTracks.length > 0 && (
+      <div class="music-modal-tracks music-entry-tracks">
+        <p class="music-modal-tracks-label">Key Tracks</p>
+        <ul>
+          {entry.data.keyTracks.map((track) => <li>{track}</li>)}
+        </ul>
+      </div>
+    )}
+
+    <!-- Prose / MDX content -->
+    <div class="prose max-w-none music-entry-prose">
       <Content />
     </div>
   </article>
