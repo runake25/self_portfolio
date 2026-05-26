@@ -110,6 +110,7 @@ function isActivePath(href: string) {
       <span class="sr-only" data-ui-toggle-label>hide_ui</span>
     </button>
     <div class="site-shell" transition:animate="none">
+      <div class="safe-area-top-fade" aria-hidden="true"></div>
       {(!noSketch || bgPoster || bgCapture) && (
         <div aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;z-index:1;overflow:hidden;">
           {!noSketch && (
@@ -229,6 +230,7 @@ function isActivePath(href: string) {
           <span>rendered_data: <span data-render-size>--</span></span>
         </div>
       </footer>
+      <div class="safe-area-bottom-fade" aria-hidden="true"></div>
     </div>
 
     <script is:inline>

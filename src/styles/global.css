@@ -162,6 +162,13 @@ body.cursor-hidden .cursor-ring {
   opacity: 0.8;
 }
 
+/* Safe-area edge fades — hidden on desktop, activated in mobile media query */
+.safe-area-top-fade,
+.safe-area-bottom-fade {
+  display: none;
+  pointer-events: none;
+}
+
 .bg-grid {
   position: fixed;
   inset: 0;
@@ -1503,9 +1510,13 @@ body[data-theme="day"] .border-zinc-800 {
     padding-bottom: env(safe-area-inset-bottom);
   }
 
-  /* Safe-area gradient fades — solid over notch/home-bar zone, fades to transparent */
-  body::before {
-    content: "";
+  /* Safe-area gradient fades — fixed inside shell stacking context (z-index 5 < backdrop 50 < modal 51) */
+  .safe-area-top-fade,
+  .safe-area-bottom-fade {
+    display: block;
+  }
+
+  .safe-area-top-fade {
     position: fixed;
     top: 0;
     left: 0;
@@ -1517,12 +1528,10 @@ body[data-theme="day"] .border-zinc-800 {
       var(--bg-elevated) env(safe-area-inset-top),
       transparent 100%
     );
-    pointer-events: none;
-    z-index: 10;
+    z-index: 5;
   }
 
-  body::after {
-    content: "";
+  .safe-area-bottom-fade {
     position: fixed;
     bottom: 0;
     left: 0;
@@ -1534,8 +1543,7 @@ body[data-theme="day"] .border-zinc-800 {
       var(--bg-elevated) env(safe-area-inset-bottom),
       transparent 100%
     );
-    pointer-events: none;
-    z-index: 10;
+    z-index: 5;
   }
 
   .site-shell {
@@ -2230,15 +2238,40 @@ body[data-theme="day"] .music-album-card {
   top: 0.18em;
 }
 
-@media (max-width: 560px) {
+@media (max-width: 940px) {
+  /* Full-screen modal within safe areas — fixes overflow + close-button visibility */
+  .music-modal {
+    top: calc(env(safe-area-inset-top) + 0.5rem);
+    bottom: calc(env(safe-area-inset-bottom) + 0.5rem);
+    left: 0.65rem;
+    right: 0.65rem;
+    width: auto;
+    max-height: none;
+    /* remap entry animation: slide up instead of scale from 50%/50% center */
+    transform: translateY(32px) scale(0.97);
+  }
+  .music-modal.is-active {
+    transform: translateY(0) scale(1);
+  }
+
   .music-modal-inner {
     flex-direction: column;
-    padding: 1rem;
+    padding: 1.1rem;
+    gap: 0.9rem;
   }
+
   .music-modal-art-wrap {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 1;
+    width: 120px;
+    height: 120px;
+    align-self: center;
   }
-  .music-modal-info { padding-right: 0; }
+
+  .music-modal-info {
+    padding-right: 0;
+  }
+
+  .music-modal-close {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
 }
