@@ -1555,7 +1555,7 @@ body[data-theme="day"] .border-zinc-800 {
     border-right: 0;
     border-top: 0;
     border-bottom: 0;
-    padding-top: env(safe-area-inset-top);
+    padding-top: calc(env(safe-area-inset-top) + 3.5rem);
     padding-bottom: env(safe-area-inset-bottom);
   }
 
@@ -2239,50 +2239,69 @@ body[data-theme="day"] .music-album-card {
 }
 
 @media (max-width: 940px) {
-  /* Mobile music modal: art on top, content below, compact PC-style fonts */
+  /* Mobile: bottom sheet — slides up from bottom, completely clears the site header */
   .music-modal {
-    /* Remove the left:50% centering — anchor left/right instead */
-    left: 0.5rem;
-    right: 0.5rem;
-    width: auto;
-    /* Anchor to below notch, never overflow bottom safe area */
-    top: calc(env(safe-area-inset-top) + 0.5rem);
-    bottom: auto;
-    max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 1rem);
-    /* Entry: slide in from below (no horizontal translate needed) */
-    transform: translateY(24px) scale(0.97);
-    border-radius: 16px;
+    /* Anchor to bottom, full width */
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-height: 85dvh;
+    /* Rounded top corners only */
+    border-radius: 20px 20px 0 0;
+    /* Entry: slide up from off-screen */
+    transform: translateY(100%);
+    transition: opacity 0.26s ease, transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
   }
   .music-modal.is-active {
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
   }
 
+  /* Drag handle at top of sheet */
+  .music-modal::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 36px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border-subtle);
+  }
+
+  /* Column layout: art on top, info below */
   .music-modal-inner {
     flex-direction: column;
-    padding: 0.9rem;
-    gap: 0.7rem;
+    padding: 1.1rem 1rem 1rem;
+    padding-bottom: calc(env(safe-area-inset-bottom) + 1rem);
+    gap: 0.85rem;
   }
 
+  /* Art: left-aligned, compact */
   .music-modal-art-wrap {
-    width: 120px;
-    height: 120px;
+    width: 110px;
+    height: 110px;
   }
 
+  /* Info: full width, compact fonts, no extra right padding (close btn is top-right of sheet) */
   .music-modal-info {
-    padding-right: 0; /* close btn not near info section in column layout */
-    gap: 0.28rem;
+    padding-right: 0;
+    gap: 0.3rem;
   }
 
-  .music-modal-title    { font-size: 0.95rem; line-height: 1.25; }
-  .music-modal-artist   { font-size: 0.76rem; }
+  .music-modal-title      { font-size: 0.95rem; line-height: 1.25; }
+  .music-modal-artist     { font-size: 0.76rem; }
   .music-modal-year-genre { font-size: 0.64rem; }
   .music-modal-description { font-size: 0.76rem; line-height: 1.55; }
   .music-modal-tracks-label { font-size: 0.57rem; }
   .music-modal-tracks li    { font-size: 0.73rem; }
 
   .music-modal-close {
-    top: 0.55rem;
-    right: 0.55rem;
+    top: 0.6rem;
+    right: 0.75rem;
     width: 2rem;
     height: 2rem;
     font-size: 0.66rem;
