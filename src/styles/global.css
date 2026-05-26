@@ -1510,7 +1510,7 @@ body[data-theme="day"] .border-zinc-800 {
     top: 0;
     left: 0;
     right: 0;
-    height: calc(env(safe-area-inset-top) + 0.5rem);
+    height: calc(env(safe-area-inset-top) + 3.5rem);
     background: linear-gradient(
       to bottom,
       var(--bg-elevated) 0%,
@@ -1545,8 +1545,15 @@ body[data-theme="day"] .border-zinc-800 {
     min-height: 100svh;
     border-left: 0;
     border-right: 0;
+    border-top: 0;
+    border-bottom: 0;
     padding-top: env(safe-area-inset-top);
     padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .site-shell::before {
+    border-top: none;
+    border-bottom: none;
   }
 
   .maze-canvas {
