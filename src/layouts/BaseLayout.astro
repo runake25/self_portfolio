@@ -595,7 +595,7 @@ const deriveSeedFromFingerprint = async (source) => {
             return;
           }
 
-          engine.dpr = clamp(window.devicePixelRatio || 1, 1, 2);
+          engine.dpr = navigator.maxTouchPoints > 0 ? 1 : clamp(window.devicePixelRatio || 1, 1, 2);
           const width = Math.max(window.innerWidth, 1);
           const height = Math.max(window.innerHeight, 1);
 
@@ -680,6 +680,7 @@ const deriveSeedFromFingerprint = async (source) => {
           engine.context.lineJoin = "round";
           engine.context.lineCap = "round";
 
+          engine.context.beginPath();
           for (let row = 0; row < mazeState.rows; row += 1) {
             for (let col = 0; col < mazeState.columns; col += 1) {
               const index = row * mazeState.columns + col;
@@ -689,31 +690,24 @@ const deriveSeedFromFingerprint = async (source) => {
               const size = mazeState.cellSize;
 
               if (walls[0]) {
-                engine.context.beginPath();
                 engine.context.moveTo(x, y);
                 engine.context.lineTo(x + size, y);
-                engine.context.stroke();
               }
               if (walls[1]) {
-                engine.context.beginPath();
                 engine.context.moveTo(x + size, y);
                 engine.context.lineTo(x + size, y + size);
-                engine.context.stroke();
               }
               if (walls[2]) {
-                engine.context.beginPath();
                 engine.context.moveTo(x, y + size);
                 engine.context.lineTo(x + size, y + size);
-                engine.context.stroke();
               }
               if (walls[3]) {
-                engine.context.beginPath();
                 engine.context.moveTo(x, y);
                 engine.context.lineTo(x, y + size);
-                engine.context.stroke();
               }
             }
           }
+          engine.context.stroke();
 
           const position = getBallPosition(engine.distance);
           if (!position) {
@@ -737,14 +731,17 @@ const deriveSeedFromFingerprint = async (source) => {
             }
           }
 
+          const isTouch = navigator.maxTouchPoints > 0;
           const emissionAlpha = (0.32 + 0.5 * pulse) * (behindOverviewUi ? 0.34 : 1);
           const emissionBlur =
             mazeState.ballRadius * (1.6 + 1.35 * pulse) * (behindOverviewUi ? 2.8 : 1);
           const coreAlpha = behindOverviewUi ? 0.24 : 1;
 
           engine.context.save();
-          engine.context.shadowColor = `rgba(${palette.ballBase}, ${emissionAlpha.toFixed(3)})`;
-          engine.context.shadowBlur = emissionBlur;
+          if (!isTouch) {
+            engine.context.shadowColor = `rgba(${palette.ballBase}, ${emissionAlpha.toFixed(3)})`;
+            engine.context.shadowBlur = emissionBlur;
+          }
           engine.context.beginPath();
           engine.context.fillStyle = `rgba(${palette.ballBase}, ${coreAlpha.toFixed(3)})`;
           engine.context.arc(position.x, position.y, mazeState.ballRadius, 0, Math.PI * 2);
@@ -952,6 +949,9 @@ const deriveSeedFromFingerprint = async (source) => {
           if (document.body.getAttribute("data-theme") !== theme) {
             document.body.setAttribute("data-theme", theme);
           }
+          if (document.documentElement.getAttribute("data-theme") !== theme) {
+            document.documentElement.setAttribute("data-theme", theme);
+          }
           setThemeLabel(theme);
           drawMaze();
         };
@@ -1114,7 +1114,10 @@ const deriveSeedFromFingerprint = async (source) => {
             document.addEventListener("astro:before-swap", (e) => {
               // Copy current theme + ui-hidden to incoming body so there's never a wrong-theme frame
               const theme = document.body.getAttribute("data-theme");
-              if (theme) e.newDocument.body.setAttribute("data-theme", theme);
+              if (theme) {
+                e.newDocument.body.setAttribute("data-theme", theme);
+                e.newDocument.documentElement.setAttribute("data-theme", theme);
+              }
               const uiHidden = document.body.getAttribute("data-ui-hidden");
               if (uiHidden) e.newDocument.body.setAttribute("data-ui-hidden", uiHidden);
             });

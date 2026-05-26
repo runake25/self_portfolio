@@ -1510,14 +1510,20 @@ body[data-theme="day"] .border-zinc-800 {
     min-height: 100svh;
     border-left: 0;
     border-right: 0;
-  }
-
-  .site-header {
-    padding: calc(env(safe-area-inset-top) + 1rem) 0.9rem 0.8rem;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
   }
 
   .maze-canvas {
     opacity: 0.65;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+  }
+
+  .site-header {
+    padding: 1rem 0.9rem 0.8rem;
   }
 
   .header-top {
@@ -1978,6 +1984,20 @@ body[data-theme="day"] .music-album-card {
       0 0 0 4px   color-mix(in srgb, var(--accent) 55%, transparent),
       0 0 0 8px   color-mix(in srgb, var(--accent) 16%, transparent),
       0 22px 50px rgba(0,0,0,0.68);
+  }
+}
+
+/* ── Pick One: simplified scan on touch devices (no transform/shadow churn) ── */
+@media (hover: none) and (pointer: coarse) {
+  .movie-poster-card.pick-scanning {
+    box-shadow: none !important;
+    transition: border-color 40ms !important;
+  }
+
+  .music-album-card.pick-scanning {
+    transform: none !important;
+    box-shadow: none !important;
+    transition: border-color 40ms !important;
   }
 }
 
