@@ -24,8 +24,4 @@ pnpm-debug.log*
 .idea/
 CONTENT_GUIDE.md
 
-# wrangler files
-.wrangler
-.dev.vars*
-!.dev.vars.example
-!.env.example
+
