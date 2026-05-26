@@ -117,11 +117,16 @@ const rendered = await Promise.all(entries.map((e) => render(e)));
 </BaseLayout>
 
 <script is:inline>
-  // ── One-time setup via guard flag ─────────────────────────────────────────
-  // document-level delegated listeners persist through ALL View Transitions.
-  // DOM elements are looked up at event-time so stale references are never an issue.
-  if (!window.__musicReady) {
-    window.__musicReady = true;
+  function __initMusicPage() {
+    var pickBtn = document.getElementById("music-pick-btn");
+    var grid    = document.getElementById("music-grid");
+    if (!pickBtn || !grid) return; // not on the music index page
+
+    // Abort and replace previous listener group each visit
+    if (window.__musicAbort) window.__musicAbort.abort();
+    window.__musicAbort = new AbortController();
+    var sig = window.__musicAbort.signal;
+
     var _activeModalId = null;
 
     function _openModal(id) {
@@ -161,40 +166,15 @@ const rendered = await Promise.all(entries.map((e) => render(e)));
       if (card) { _openModal(card.dataset.musicId); return; }
       if (e.target.id === "music-backdrop") { _closeModal(); return; }
       if (e.target.closest(".music-modal-close")) { _closeModal(); return; }
-      var grid = document.getElementById("music-grid");
-      if (grid) {
-        var hl = grid.querySelector(".pick-highlight");
-        if (hl && !hl.contains(e.target)) hl.classList.remove("pick-highlight");
-      }
-    });
+      var hl = grid.querySelector(".pick-highlight");
+      if (hl && !hl.contains(e.target)) hl.classList.remove("pick-highlight");
+    }, { signal: sig });
 
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape" && _activeModalId) _closeModal();
-    });
+    }, { signal: sig });
 
-    window.addEventListener("pageshow", function (e) {
-      if (!e.persisted) return;
-      _closeModal();
-      var grid = document.getElementById("music-grid");
-      if (grid) grid.querySelectorAll(".pick-scanning,.pick-highlight").forEach(function (c) {
-        c.classList.remove("pick-scanning", "pick-highlight");
-      });
-      var pickBtn = document.getElementById("music-pick-btn");
-      if (pickBtn) { pickBtn.textContent = "◎ pick one"; pickBtn.disabled = false; }
-    });
-  }
-
-  // ── Pick One re-init each visit ───────────────────────────────────────────
-  // Needs fresh element refs + reset `running` flag on every navigation.
-  (function () {
-    var pickBtn  = document.getElementById("music-pick-btn");
-    var grid     = document.getElementById("music-grid");
-    if (!pickBtn || !grid) return;
-
-    if (window.__pickAbort) window.__pickAbort.abort();
-    window.__pickAbort = new AbortController();
-    var sig = window.__pickAbort.signal;
-
+    // ── Pick One ─────────────────────────────────────────────────────────────
     var pickCards = Array.from(grid.querySelectorAll("button.music-album-card"));
     if (pickCards.length < 2) return;
 
@@ -232,8 +212,9 @@ const rendered = await Promise.all(entries.map((e) => render(e)));
       }
       scan();
     }, { signal: sig });
-  })();
-</script>
+  }
+
+  document.addEventListener("astro:page-load", __initMusicPage);
 </script>
 
 
