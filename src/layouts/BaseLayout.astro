@@ -206,13 +206,13 @@ function isActivePath(href: string) {
         {(prevPage || nextPage) && (
             <nav class="entry-footer-nav" aria-label="Entry navigation">
               {prevPage && (
-                <a href={prevPage.url}>
+                <a href={prevPage.url} class="entry-prev">
                   <p class="section-label">{prevPage.label}</p>
                   <p>{prevPage.title}</p>
                 </a>
               )}
               {nextPage && (
-                <a href={nextPage.url}>
+                <a href={nextPage.url} class="entry-next">
                   <p class="section-label">{nextPage.label}</p>
                   <p>{nextPage.title}</p>
                 </a>

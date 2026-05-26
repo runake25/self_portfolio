@@ -1148,7 +1148,17 @@ body[data-theme="night"] .card-link:hover {
 .entry-footer-nav {
   margin-top: 1rem;
   display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 0.55rem;
+}
+
+/* Older entry always left, newer entry always right */
+.entry-prev {
+  grid-column: 1;
+}
+.entry-next {
+  grid-column: 2;
+  text-align: right;
 }
 
 .entry-footer-nav a {
@@ -1521,7 +1531,7 @@ body[data-theme="day"] .border-zinc-800 {
     top: 0;
     left: 0;
     right: 0;
-    height: calc(env(safe-area-inset-top) + 3.5rem);
+    height: env(safe-area-inset-top);
     background: linear-gradient(
       to bottom,
       var(--bg-elevated) 0%,
@@ -1535,7 +1545,7 @@ body[data-theme="day"] .border-zinc-800 {
     bottom: 0;
     left: 0;
     right: 0;
-    height: calc(env(safe-area-inset-bottom) + 3.5rem);
+    height: env(safe-area-inset-bottom);
     background: linear-gradient(
       to top,
       var(--bg-elevated) 0%,
