@@ -1987,6 +1987,20 @@ body[data-theme="day"] .music-album-card {
   }
 }
 
+/* ── Pick One: simplified scan on touch devices (no transform/shadow churn) ── */
+@media (hover: none) and (pointer: coarse) {
+  .movie-poster-card.pick-scanning {
+    box-shadow: none !important;
+    transition: border-color 40ms !important;
+  }
+
+  .music-album-card.pick-scanning {
+    transform: none !important;
+    box-shadow: none !important;
+    transition: border-color 40ms !important;
+  }
+}
+
 @media (max-width: 540px) {
   .music-grid {
     grid-template-columns: 1fr;
