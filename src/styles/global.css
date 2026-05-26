@@ -1503,6 +1503,41 @@ body[data-theme="day"] .border-zinc-800 {
     padding-bottom: env(safe-area-inset-bottom);
   }
 
+  /* Safe-area gradient fades — solid over notch/home-bar zone, fades to transparent */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: calc(env(safe-area-inset-top) + 0.5rem);
+    background: linear-gradient(
+      to bottom,
+      var(--bg-elevated) 0%,
+      var(--bg-elevated) env(safe-area-inset-top),
+      transparent 100%
+    );
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  body::after {
+    content: "";
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: calc(env(safe-area-inset-bottom) + 1rem);
+    background: linear-gradient(
+      to top,
+      var(--bg-elevated) 0%,
+      var(--bg-elevated) env(safe-area-inset-bottom),
+      transparent 100%
+    );
+    pointer-events: none;
+    z-index: 10;
+  }
+
   .site-shell {
     width: 100%;
     height: auto;
