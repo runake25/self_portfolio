@@ -8,15 +8,12 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "npm run build && wrangler dev",
+    "preview": "astro preview",
     "check": "astro check",
     "lint": "astro check",
-    "astro": "astro",
-    "generate-types": "wrangler types",
-    "deploy": "npm run build && wrangler deploy"
+    "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/cloudflare": "^13.5.5",
     "@astrojs/mdx": "^5.0.4",
     "@astrojs/react": "^5.0.4",
     "@astrojs/sitemap": "^3.7.2",
@@ -34,10 +31,6 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.8",
-    "typescript": "^5.9.3",
-    "wrangler": "^4.94.0"
-  },
-  "overrides": {
-    "vite": "^7"
+    "typescript": "^5.9.3"
   }
 }
