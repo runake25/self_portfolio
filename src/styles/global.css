@@ -1521,7 +1521,7 @@ body[data-theme="day"] .border-zinc-800 {
     top: 0;
     left: 0;
     right: 0;
-    height: env(safe-area-inset-top);
+    height: calc(env(safe-area-inset-top) + 3.5rem);
     background: linear-gradient(
       to bottom,
       var(--bg-elevated) 0%,
@@ -1535,11 +1535,10 @@ body[data-theme="day"] .border-zinc-800 {
     bottom: 0;
     left: 0;
     right: 0;
-    height: calc(env(safe-area-inset-bottom) + 1rem);
+    height: calc(env(safe-area-inset-bottom) + 3.5rem);
     background: linear-gradient(
       to top,
       var(--bg-elevated) 0%,
-      var(--bg-elevated) env(safe-area-inset-bottom),
       transparent 100%
     );
     z-index: 5;
