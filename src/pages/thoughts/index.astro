@@ -25,7 +25,7 @@ const posts = (await getCollection("thoughts", ({ data }) => !data.draft)).sort(
 
     {
       posts.length === 0 ? (
-        <p style="color:var(--text-faint)">No entries yet. Add your first note in src/content/thoughts.</p>
+        <p style="color:var(--text-faint)">No entries yet. Thinking hard ...</p>
       ) : (
         <div class="grid gap-4">
           {posts.map((post) => (

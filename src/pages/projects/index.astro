@@ -18,7 +18,7 @@ const projects = (await getCollection("projects")).sort(
 
     {
       projects.length === 0 ? (
-        <p class="text-zinc-400">No projects yet. Add your first gallery item in src/content/projects.</p>
+        <p class="text-zinc-400">No projects yet. Working hard to bring one...</p>
       ) : (
         <div class="grid gap-4 md:grid-cols-2">
           {projects.map((project) => (

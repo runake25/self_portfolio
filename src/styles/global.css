@@ -441,6 +441,7 @@ body[data-theme="day"] .mode-toggle {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 0.35rem;
   cursor: pointer;
   z-index: 6;
   box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 0%, transparent);
@@ -1535,8 +1536,8 @@ body[data-theme="day"] .border-zinc-800 {
   }
 
   .ui-visibility-toggle {
-    top: 0.65rem;
-    right: 0.68rem;
+    top: 1rem;
+    right: calc(40px + 2rem);
     min-height: 40px;
     min-width: 74px;
   }

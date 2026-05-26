@@ -109,85 +109,21 @@ const entries = (await getCollection("music")).sort(
 </BaseLayout>
 
 <script is:inline>
-  (function () {
-    // ─── Pick One ────────────────────────────────────────────────
-    var pickBtn = document.getElementById("music-pick-btn");
-    var grid = document.getElementById("music-grid");
-    if (pickBtn && grid) {
-      var pickCards = Array.from(grid.querySelectorAll("button.music-album-card"));
-      if (pickCards.length >= 2) {
-        var running = false;
-        function clearPicks() {
-          pickCards.forEach(function (c) {
-            c.classList.remove("pick-scanning", "pick-highlight");
-          });
-        }
-        window.addEventListener("pageshow", function (e) {
-          if (e.persisted) {
-            clearPicks();
-            pickBtn.textContent = "◎ pick one";
-            pickBtn.disabled = false;
-            running = false;
-          }
-        });
-        pickBtn.addEventListener("click", function () {
-          if (running) return;
-          running = true;
-          pickBtn.disabled = true;
-          pickBtn.textContent = "scanning...";
-          clearPicks();
-          var total = pickCards.length;
-          var targetIndex = Math.floor(Math.random() * total);
-          var totalSteps = 4 * total + targetIndex + 1;
-          var step = 0;
-          var prevIdx = -1;
-          function scan() {
-            if (prevIdx >= 0) pickCards[prevIdx].classList.remove("pick-scanning");
-            var idx = step % total;
-            pickCards[idx].classList.add("pick-scanning");
-            prevIdx = idx;
-            step++;
-            if (step < totalSteps) {
-              var progress = step / totalSteps;
-              // starts fast (~35ms), decelerates sharply at end
-              var delay = 35 + Math.pow(progress, 2.8) * 480;
-              setTimeout(scan, delay);
-            } else {
-              pickCards[prevIdx].classList.remove("pick-scanning");
-              var winner = pickCards[targetIndex];
-              winner.classList.add("pick-highlight");
-              winner.scrollIntoView({ behavior: "smooth", block: "nearest" });
-              pickBtn.textContent = "◎ pick one";
-              pickBtn.disabled = false;
-              running = false;
-            }
-          }
-          scan();
-        });
+  // ── One-time setup via guard flag ─────────────────────────────────────────
+  // document-level delegated listeners persist through ALL View Transitions.
+  // DOM elements are looked up at event-time so stale references are never an issue.
+  if (!window.__musicReady) {
+    window.__musicReady = true;
+    var _activeModalId = null;
 
-        // Clear pick highlight when clicking anywhere outside the winner
-        document.addEventListener("click", function (e) {
-          var highlighted = grid.querySelector(".pick-highlight");
-          if (!highlighted) return;
-          if (!highlighted.contains(e.target)) {
-            highlighted.classList.remove("pick-highlight");
-          }
-        });
-      }
-    }
-
-    // ─── Album modal ─────────────────────────────────────────────
-    var backdrop = document.getElementById("music-backdrop");
-    var activeModal = null;
-
-    function openModal(id) {
-      var modal = document.getElementById("music-modal-" + id);
+    function _openModal(id) {
+      var modal    = document.getElementById("music-modal-" + id);
+      var backdrop = document.getElementById("music-backdrop");
       if (!modal || !backdrop) return;
-      activeModal = modal;
+      _activeModalId = id;
       modal.removeAttribute("hidden");
       backdrop.removeAttribute("hidden");
       document.body.style.overflow = "hidden";
-      // Double rAF ensures hidden→visible transition fires
       requestAnimationFrame(function () {
         requestAnimationFrame(function () {
           backdrop.classList.add("is-active");
@@ -198,35 +134,98 @@ const entries = (await getCollection("music")).sort(
       if (closeBtn) closeBtn.focus();
     }
 
-    function closeModal() {
-      if (!activeModal || !backdrop) return;
-      var toHide = activeModal;
-      activeModal = null;
-      toHide.classList.remove("is-active");
-      backdrop.classList.remove("is-active");
+    function _closeModal() {
+      if (!_activeModalId) return;
+      var modal    = document.getElementById("music-modal-" + _activeModalId);
+      var backdrop = document.getElementById("music-backdrop");
+      _activeModalId = null;
+      if (modal)    modal.classList.remove("is-active");
+      if (backdrop) backdrop.classList.remove("is-active");
       document.body.style.overflow = "";
       setTimeout(function () {
-        toHide.setAttribute("hidden", "");
-        backdrop.setAttribute("hidden", "");
+        if (modal)    modal.setAttribute("hidden", "");
+        if (backdrop) backdrop.setAttribute("hidden", "");
       }, 280);
     }
 
-    document.querySelectorAll("button.music-album-card[data-music-id]").forEach(function (card) {
-      card.addEventListener("click", function () {
-        openModal(card.dataset.musicId);
-      });
-    });
-
-    if (backdrop) backdrop.addEventListener("click", closeModal);
-
-    document.querySelectorAll(".music-modal-close").forEach(function (btn) {
-      btn.addEventListener("click", closeModal);
+    document.addEventListener("click", function (e) {
+      var card = e.target.closest("button.music-album-card[data-music-id]");
+      if (card) { _openModal(card.dataset.musicId); return; }
+      if (e.target.id === "music-backdrop") { _closeModal(); return; }
+      if (e.target.closest(".music-modal-close")) { _closeModal(); return; }
+      var grid = document.getElementById("music-grid");
+      if (grid) {
+        var hl = grid.querySelector(".pick-highlight");
+        if (hl && !hl.contains(e.target)) hl.classList.remove("pick-highlight");
+      }
     });
 
     document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape" && activeModal) closeModal();
+      if (e.key === "Escape" && _activeModalId) _closeModal();
     });
+
+    window.addEventListener("pageshow", function (e) {
+      if (!e.persisted) return;
+      _closeModal();
+      var grid = document.getElementById("music-grid");
+      if (grid) grid.querySelectorAll(".pick-scanning,.pick-highlight").forEach(function (c) {
+        c.classList.remove("pick-scanning", "pick-highlight");
+      });
+      var pickBtn = document.getElementById("music-pick-btn");
+      if (pickBtn) { pickBtn.textContent = "◎ pick one"; pickBtn.disabled = false; }
+    });
+  }
+
+  // ── Pick One re-init each visit ───────────────────────────────────────────
+  // Needs fresh element refs + reset `running` flag on every navigation.
+  (function () {
+    var pickBtn  = document.getElementById("music-pick-btn");
+    var grid     = document.getElementById("music-grid");
+    if (!pickBtn || !grid) return;
+
+    if (window.__pickAbort) window.__pickAbort.abort();
+    window.__pickAbort = new AbortController();
+    var sig = window.__pickAbort.signal;
+
+    var pickCards = Array.from(grid.querySelectorAll("button.music-album-card"));
+    if (pickCards.length < 2) return;
+
+    var running = false;
+    function clearPicks() {
+      pickCards.forEach(function (c) { c.classList.remove("pick-scanning", "pick-highlight"); });
+    }
+
+    pickBtn.addEventListener("click", function () {
+      if (running) return;
+      running = true;
+      pickBtn.disabled = true;
+      pickBtn.textContent = "scanning...";
+      clearPicks();
+      var total       = pickCards.length;
+      var targetIndex = Math.floor(Math.random() * total);
+      var totalSteps  = 4 * total + targetIndex + 1;
+      var step = 0, prevIdx = -1;
+      function scan() {
+        if (prevIdx >= 0) pickCards[prevIdx].classList.remove("pick-scanning");
+        var idx = step % total;
+        pickCards[idx].classList.add("pick-scanning");
+        prevIdx = idx; step++;
+        if (step < totalSteps) {
+          setTimeout(scan, 35 + Math.pow(step / totalSteps, 2.8) * 480);
+        } else {
+          pickCards[prevIdx].classList.remove("pick-scanning");
+          var winner = pickCards[targetIndex];
+          winner.classList.add("pick-highlight");
+          winner.scrollIntoView({ behavior: "smooth", block: "nearest" });
+          pickBtn.textContent = "◎ pick one";
+          pickBtn.disabled = false;
+          running = false;
+        }
+      }
+      scan();
+    }, { signal: sig });
   })();
+</script>
 </script>
 
 
