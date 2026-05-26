@@ -6,18 +6,18 @@
   --font-mono: "JetBrains Mono", "Fira Code", monospace;
   --ease-soft: 280ms cubic-bezier(0.22, 0.61, 0.36, 1);
 
-  --bg: #050505;
-  --bg-elevated: #0d0d0d;
-  --surface: rgba(255, 255, 255, 0.035);
-  --surface-hover: rgba(255, 255, 255, 0.09);
-  --border: rgba(255, 255, 255, 0.2);
-  --border-subtle: rgba(255, 255, 255, 0.09);
-  --grid: rgba(255, 255, 255, 0.045);
-  --text-primary: #fafafa;
-  --text-secondary: #c2c2c2;
-  --text-faint: #9a9a9a;
-  --accent: #ffffff;
-  --accent-strong: #ffffff;
+  --bg: #0b0b14;
+  --bg-elevated: #12121e;
+  --surface: rgba(160, 160, 220, 0.06);
+  --surface-hover: rgba(160, 160, 230, 0.13);
+  --border: rgba(180, 180, 255, 0.18);
+  --border-subtle: rgba(180, 180, 255, 0.09);
+  --grid: rgba(100, 100, 200, 0.05);
+  --text-primary: #ede8e2;
+  --text-secondary: #9498ba;
+  --text-faint: #5e6280;
+  --accent: #d97756;
+  --accent-strong: #ef9070;
   --success: #38d39f;
 }
 
@@ -179,19 +179,19 @@ body[data-theme="day"] .bg-grid {
 
 body[data-theme="day"],
 html[data-theme="day"] {
-  --bg: #f2f0eb;
-  --bg-elevated: #f8f6f1;
-  --surface: rgba(0, 0, 0, 0.04);
-  --surface-hover: rgba(0, 0, 0, 0.075);
-  --border: rgba(18, 18, 18, 0.2);
-  --border-subtle: rgba(0, 0, 0, 0.1);
-  --grid: rgba(30, 30, 30, 0.06);
-  --text-primary: #050505;
-  --text-secondary: #2a2a2a;
-  --text-faint: #505050;
-  --accent: #0a0a0a;
-  --accent-strong: #0a0a0a;
-  --success: #1a8f68;
+  --bg: #ede0cc;
+  --bg-elevated: #f5ead8;
+  --surface: rgba(80, 35, 10, 0.04);
+  --surface-hover: rgba(80, 35, 10, 0.08);
+  --border: rgba(90, 45, 15, 0.18);
+  --border-subtle: rgba(90, 45, 15, 0.09);
+  --grid: rgba(90, 50, 15, 0.05);
+  --text-primary: #1e0d03;
+  --text-secondary: #6a4028;
+  --text-faint: #945734;
+  --accent: #9a4020;
+  --accent-strong: #7a2e10;
+  --success: #2a7f5e;
 }
 
 body[data-theme="day"]::after {
@@ -199,7 +199,7 @@ body[data-theme="day"]::after {
 }
 
 body[data-theme="night"] {
-  --bg: #040404;
+  /* already defined in :root */
 }
 
 a {
@@ -1195,7 +1195,7 @@ body[data-theme="night"] .card-link:hover {
 }
 
 body[data-theme="day"] .nav-link[data-active="true"] {
-  color: #0d0d0d;
+  color: var(--text-primary);
 }
 
 @keyframes status-heartbeat {
@@ -1473,15 +1473,15 @@ html {
 }
 
 body[data-theme="day"] .text-zinc-100 {
-  color: #0d0d0d !important;
+  color: var(--text-primary) !important;
 }
 
 body[data-theme="day"] .text-zinc-400 {
-  color: #383838 !important;
+  color: var(--text-secondary) !important;
 }
 
 body[data-theme="day"] .text-zinc-500 {
-  color: #666666 !important;
+  color: var(--text-faint) !important;
 }
 
 body[data-theme="day"] .border-zinc-800 {
@@ -1814,7 +1814,7 @@ body[data-theme="day"] .border-zinc-800 {
   gap: 0.95rem;
   padding: 1rem;
   border-radius: 10px;
-  background: #181818;
+  background: #181825;
   border: 1px solid var(--border-subtle);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
   transition:
@@ -1824,8 +1824,8 @@ body[data-theme="day"] .border-zinc-800 {
 }
 
 body[data-theme="day"] .music-album-card {
-  background: #faf8f3;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+  background: #fff5ee;
+  box-shadow: 0 2px 10px rgba(80, 35, 10, 0.1);
 }
 
 .music-album-card:hover {

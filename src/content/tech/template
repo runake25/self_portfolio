@@ -1,0 +1,24 @@
+---
+title: "Starting with Astro Content Collections"
+publishedDate: 2026-04-27
+description: "A quick pattern for keeping personal site content typed and easy to scale."
+tags:
+  - astro
+  - mdx
+  - architecture
+draft: false
+---console.log();
+
+Astro collections are useful when you want structure and flexibility at the same time.
+
+## Why collections help
+
+Without a schema, content fields drift over time.
+
+With collections, frontmatter is validated at build time, and mistakes fail fast.
+
+## Practical tip
+
+Use a small required schema first, then expand only when a real post needs extra metadata.
+
+For algorithm-heavy notes, this also keeps equations readable, for example $T(n)=O(n \log n)$.

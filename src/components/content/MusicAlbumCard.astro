@@ -35,6 +35,7 @@ const byline = [artist, releaseYear].filter(Boolean).join(" · ");
         alt={`${title}${artist ? ` by ${artist}` : ""} album cover`}
         width={400}
         height={400}
+        format="avif"
         loading={priority ? "eager" : "lazy"}
         fetchpriority={priority ? "high" : "auto"}
         decoding="async"

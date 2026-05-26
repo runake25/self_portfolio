@@ -7,12 +7,11 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
 	description="Overview, projects, tech notes, and movie writing in one content-first Astro site."
 >
 	<section class="space-y-8">
-		<p class="section-label">Brian</p>
-		<h1 class="text-3xl font-bold tracking-tight sm:text-4xl" style="color:var(--text-primary)">About me</h1>
+		<p class="section-label">About me</p>
+		<h1 class="text-3xl font-bold tracking-tight sm:text-4xl" style="color:var(--text-primary)">Brian</h1>
 		<p class="max-w-3xl text-sm leading-relaxed" style="color:var(--text-secondary)">
-			Born 2002. Learning coding, <br>
-			I dedicate myself to try anything that makes me better at it. <br>
-			Enjoy hearing how you think, and sharing my own thoughts.  
+			Data engineer. Born 2002, based in Hong Kong.<br>
+			I build things with Python, read too much into movies, and occasionally share what's on my mind.
 		</p>
 		
 
@@ -33,7 +32,7 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
 								<span class="xp-role">Data Engineer</span>
 								<span class="xp-company">Premialab</span>
 								<span class="xp-date">Dec 2025 — Present</span>
-								<span class="xp-summary">Building pipelines and engines that keep the numbers honest.</span>
+								<span class="xp-summary">Building risk engines and pipelines that keep the numbers honest.</span>
 								<div class="xp-tags">
 									<span class="tag-chip">Python</span>
 									<span class="tag-chip">SQL</span>
@@ -109,10 +108,24 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
 			</article>
 
 			<div class="dashboard-span-4" style="display:flex;flex-direction:column;gap:0.8rem">
+				<article class="card-link space-y-3" style="border-top:2px solid #34d399;flex:1">
+					<div class="space-y-1">
+						<p class="section-label">Projects</p>
+						<h2 class="text-xl font-bold" style="color:var(--text-primary)">Gallery</h2>
+					</div>
+					<p class="text-sm" style="color:var(--text-secondary)">
+						Everything I've shipped — side projects, experiments, work samples.
+					</p>
+					<a class="explore-link" href="/projects">
+						<span>Browse projects</span>
+						<span class="explore-link-arrow">→</span>
+					</a>
+				</article>
+
 				<article class="card-link space-y-4" style="border-top:2px solid #fbbf24;flex:1">
 					<div class="space-y-1">
-						<p class="section-label">Explore</p>
-						<h2 class="text-xl font-bold" style="color:var(--text-primary)">Ideas</h2>
+						<p class="section-label">Personal</p>
+						<h2 class="text-xl font-bold" style="color:var(--text-primary)">Sharing</h2>
 					</div>
 					<div class="explore-links">
 						<a class="explore-link" href="/movies">
@@ -123,25 +136,11 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
 							<span>Music</span>
 							<span class="explore-link-arrow">→</span>
 						</a>
-					<a class="explore-link" href="/thoughts">
-						<span>Thoughts</span>
+						<a class="explore-link" href="/thoughts">
+							<span>Thoughts</span>
 							<span class="explore-link-arrow">→</span>
 						</a>
 					</div>
-				</article>
-
-				<article class="card-link space-y-3" style="border-top:2px solid #34d399;flex:1">
-					<div class="space-y-1">
-						<p class="section-label">Portfolio</p>
-						<h2 class="text-xl font-bold" style="color:var(--text-primary)">View Works</h2>
-					</div>
-					<p class="text-sm" style="color:var(--text-secondary)">
-						Projects, experiments, and things I've built.
-					</p>
-					<a class="explore-link" href="/projects">
-						<span>Browse gallery</span>
-						<span class="explore-link-arrow">→</span>
-					</a>
 				</article>
 
 				<article class="card-link space-y-3" style="border-top:2px solid #f472b6;flex:1">

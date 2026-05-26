@@ -69,6 +69,7 @@ const entries = (await getCollection("music")).sort(
               alt={`${entry.data.title}${entry.data.artist ? ` by ${entry.data.artist}` : ""} album cover`}
               width={500}
               height={500}
+              format="avif"
               loading="lazy"
               decoding="async"
               class="music-modal-art"
