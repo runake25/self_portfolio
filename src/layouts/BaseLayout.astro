@@ -124,26 +124,28 @@ function isActivePath(href: string) {
             />
           )}
           {(bgCapture || bgPoster) && (
-            bgCapture ? (
-              <Image
-                src={bgCapture}
-                alt=""
-                loading="eager"
-                fetchpriority="high"
-                decoding="async"
-                style="position:absolute;top:0;right:0;height:100%;width:auto;object-fit:contain;object-position:right top;opacity:0.42;-webkit-mask-image:linear-gradient(to right,transparent 0%,rgba(0,0,0,0.45) 25%,black 55%),linear-gradient(to bottom,black 0%,black 50%,transparent 67%);-webkit-mask-composite:source-in;mask-image:linear-gradient(to right,transparent 0%,rgba(0,0,0,0.45) 25%,black 55%),linear-gradient(to bottom,black 0%,black 50%,transparent 67%);mask-composite:intersect;user-select:none;"
-              />
-            ) : (
-              <Image
-                src={bgPoster!}
-                inferSize
-                alt=""
-                loading="eager"
-                fetchpriority="high"
-                decoding="async"
-                style="position:absolute;top:0;right:0;height:100%;width:auto;object-fit:contain;object-position:right top;opacity:0.42;-webkit-mask-image:linear-gradient(to right,transparent 0%,rgba(0,0,0,0.45) 25%,black 55%),linear-gradient(to bottom,black 0%,black 50%,transparent 67%);-webkit-mask-composite:source-in;mask-image:linear-gradient(to right,transparent 0%,rgba(0,0,0,0.45) 25%,black 55%),linear-gradient(to bottom,black 0%,black 50%,transparent 67%);mask-composite:intersect;user-select:none;"
-              />
-            )
+            <div class="shell-poster-bg">
+              {bgCapture ? (
+                <Image
+                  src={bgCapture}
+                  alt=""
+                  loading="eager"
+                  fetchpriority="high"
+                  decoding="async"
+                  style="position:absolute;top:0;right:0;height:100%;width:auto;object-fit:contain;object-position:right top;opacity:0.42;-webkit-mask-image:linear-gradient(to right,transparent 0%,rgba(0,0,0,0.45) 25%,black 55%),linear-gradient(to bottom,black 0%,black 50%,transparent 67%);-webkit-mask-composite:source-in;mask-image:linear-gradient(to right,transparent 0%,rgba(0,0,0,0.45) 25%,black 55%),linear-gradient(to bottom,black 0%,black 50%,transparent 67%);mask-composite:intersect;user-select:none;"
+                />
+              ) : (
+                <Image
+                  src={bgPoster!}
+                  inferSize
+                  alt=""
+                  loading="eager"
+                  fetchpriority="high"
+                  decoding="async"
+                  style="position:absolute;top:0;right:0;height:100%;width:auto;object-fit:contain;object-position:right top;opacity:0.42;-webkit-mask-image:linear-gradient(to right,transparent 0%,rgba(0,0,0,0.45) 25%,black 55%),linear-gradient(to bottom,black 0%,black 50%,transparent 67%);-webkit-mask-composite:source-in;mask-image:linear-gradient(to right,transparent 0%,rgba(0,0,0,0.45) 25%,black 55%),linear-gradient(to bottom,black 0%,black 50%,transparent 67%);mask-composite:intersect;user-select:none;"
+                />
+              )}
+            </div>
           )}
         </div>
       )}

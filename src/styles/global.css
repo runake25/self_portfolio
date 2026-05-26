@@ -1562,6 +1562,10 @@ body[data-theme="day"] .border-zinc-800 {
     border-bottom: none;
   }
 
+  .shell-poster-bg {
+    display: none;
+  }
+
   .header-top {
     gap: 0.55rem;
   }
