@@ -1510,10 +1510,16 @@ body[data-theme="day"] .border-zinc-800 {
     min-height: 100svh;
     border-left: 0;
     border-right: 0;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
   }
 
   .maze-canvas {
     opacity: 0.65;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
   }
 
   .site-header {
