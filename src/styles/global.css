@@ -1584,10 +1584,6 @@ body[data-theme="day"] .border-zinc-800 {
     padding: 1rem 0.9rem 0.8rem;
     padding-top: calc(env(safe-area-inset-top) + 1rem);
     border-bottom: none;
-    position: sticky;
-    top: 0;
-    z-index: 6;
-    background: var(--bg-elevated);
   }
 
   .shell-poster-bg {
