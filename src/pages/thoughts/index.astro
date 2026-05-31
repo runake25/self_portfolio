@@ -2,6 +2,7 @@
 import CollectionCard from "@/components/content/CollectionCard.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { entryHref } from "@/utilities/content";
+import { tagAccentColor } from "@/utilities/tagColors";
 import { getCollection } from "astro:content";
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
@@ -27,7 +28,7 @@ const posts = (await getCollection("thoughts", ({ data }) => !data.draft)).sort(
       posts.length === 0 ? (
         <p style="color:var(--text-faint)">No entries yet. Thinking hard ...</p>
       ) : (
-        <div class="grid gap-4">
+        <div class="grid gap-4 md:grid-cols-2">
           {posts.map((post) => (
             <CollectionCard
               href={entryHref("thoughts", post.id)}
@@ -35,6 +36,8 @@ const posts = (await getCollection("thoughts", ({ data }) => !data.draft)).sort(
               description={post.data.description}
               meta={dateFormatter.format(post.data.publishedDate)}
               tags={post.data.tags}
+              accentColor={tagAccentColor(post.data.tags)}
+              readTime={Math.max(1, Math.ceil((post.body?.split(/\s+/).filter(Boolean).length ?? 0) / 200))}
             />
           ))}
         </div>

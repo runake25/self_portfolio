@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { entryHref, entrySlugFromId } from "@/utilities/content";
+import { tagAccentEntry } from "@/utilities/tagColors";
 import { getCollection, render } from "astro:content";
 
 export async function getStaticPaths() {
@@ -20,6 +21,9 @@ export async function getStaticPaths() {
 
 const { entry, prevEntry, nextEntry } = Astro.props;
 const { Content } = await render(entry);
+
+const topicAccent = tagAccentEntry(entry.data.tags);
+const readTime = Math.max(1, Math.ceil((entry.body?.split(/\s+/).filter(Boolean).length ?? 0) / 200));
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
   year: "numeric",
@@ -46,16 +50,21 @@ const nextPage = nextEntry
   <article class="article-page">
     <a href="/thoughts" class="article-back">← Back</a>
     <header class="article-header">
-      <p class="section-label">Thoughts</p>
+      {topicAccent
+        ? <p class="section-label" style={`color:${topicAccent.color}`}>{topicAccent.tag}</p>
+        : <p class="section-label">Thoughts</p>
+      }
       <h1>{entry.data.title}</h1>
       <div class="article-meta">
-        <span>{dateFormatter.format(entry.data.publishedDate)}</span>
         {entry.data.tags && entry.data.tags.length > 0 && (
           <>
-            <span>•</span>
-            <span>{entry.data.tags.join(" · ")}</span>
+            {entry.data.tags.map((tag) => <span class="tag-chip">{tag}</span>)}
+            <span style="color:var(--text-faint)">|</span>
           </>
         )}
+        <span>{dateFormatter.format(entry.data.publishedDate)}</span>
+        <span style="color:var(--text-faint)">|</span>
+        <span>{readTime} min read</span>
       </div>
       {entry.data.description && <p class="lead">{entry.data.description}</p>}
     </header>

@@ -5,25 +5,28 @@ interface Props {
   description?: string;
   meta?: string;
   tags?: string[];
+  accentColor?: string;
+  readTime?: number;
 }
 
-const { href, title, description, meta, tags = [] } = Astro.props;
+const { href, title, description, meta, tags = [], accentColor, readTime } = Astro.props;
 ---
 
-<article class="card-link h-full">
-  <a href={href} class="block h-full space-y-4">
-    <div class="flex items-center justify-between gap-3">
-      {meta && <p class="section-label">topic: {meta}</p>}
-      <span class="card-arrow">subtopic -> open</span>
+<article class="card-link h-full" style={accentColor ? `border-top: 2px solid ${accentColor}` : undefined}>
+  <a href={href} class="flex flex-col h-full gap-4">
+    <div class="flex items-start justify-between gap-2">
+      <h2 class="text-xl font-bold" style="color:var(--text-primary)">{title}</h2>
+      <span class="card-arrow" style="margin-top:0.25rem">→</span>
     </div>
-    <h2 class="text-xl font-bold" style="color:var(--text-primary)">{title}</h2>
-    {description && <p class="text-sm" style="color:var(--text-secondary)">{description}</p>}
-    {
-      tags.length > 0 && (
-        <div class="flex flex-wrap gap-2">
+    {description && <p style="font-size:0.9rem;line-height:1.75;color:var(--text-secondary)">{description}</p>}
+    {(meta || tags.length > 0 || readTime) && (
+      <div class="flex items-center justify-between gap-4 mt-auto">
+        <div class="flex items-center flex-wrap gap-2">
           {tags.map((tag) => <span class="tag-chip">{tag}</span>)}
+          {readTime && <span style="color:var(--text-faint);font-size:0.68rem;letter-spacing:0.08em;font-family:var(--font-mono);white-space:nowrap;margin-left:0.75rem">{readTime} min read</span>}
         </div>
-      )
-    }
+        {meta && <span class="section-label">{meta}</span>}
+      </div>
+    )}
   </a>
 </article>
