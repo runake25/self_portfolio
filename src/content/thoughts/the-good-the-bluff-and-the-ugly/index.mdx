@@ -1,0 +1,85 @@
+---
+title: "The Good, the Bluff, and the Ugly"
+publishedDate: 2026-06-01
+description: "A definitive guide to approach poker effectively. And how to spot patterns to yield better decisions , through the lens of abstraction."
+tags:
+  - Poker
+  - Fundamental
+---
+import PokerRangeGrid from '@/components/content/PokerRangeGrid'
+
+## TODO
+<div class="note"><strong>Note —</strong> This article focuses on decision making  assumes you know the basic rules of Texas Hold'em. It is not a beginner's guide to how poker is played — it's a framework for how to *think* about it.</div>
+
+Whenever I talk about poker, people immediately bring up math and probability. They're not wrong — in fact, I'd argue most people actually *underestimate* how deeply the game is rooted in math.
+
+
+
+The answers are cheap today — solvers, forums, training sites. What actually sets you apart is knowing the right questions to ask.
+
+## TODO END
+---
+
+## The Three Principles
+
+Before any framework, three truths you need to internalize fully.
+
+### 1. You cannot win every hand — under any circumstance
+
+# TODO
+Suppose you have `K♠️Q♠️` and flop comes `A♦️8♣️5♣️`, it is disrespectful to even think your skill can overcome the fact that you missed your hand. The hand is not in your odds anymore, and you need to re-evaluate . The goal is to be right *more often* and to lose *less* when you're wrong.
+
+<div class="note"><strong>Note —</strong> "Wrong" here refers to a decision that deviated from your prior expectation — not necessarily a -EV play.</div>
+
+### 2. Preflop decisions dictate the hand
+
+Think of poker like a gunfight. Your preflop hand is your weapon — and even the best shooter struggles when handed a broken gun. Play junk preflop and you're already fighting at a disadvantage. Worse, when you pull the trigger, nobody flinches — they know your gun is broken.
+
+Below is a theoretical opening range for UTG in a 6-max game.
+<PokerRangeGrid
+  range={['AA','KK','QQ','JJ','TT','99','88', '77', '66', '55','AKs','AQs','AJs','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KQs','KJs','KTs','QJs','QTs','JTs','AKo','AQo']}
+  mixed={['K9s','KJo', 'QJo', 'Q9s','J9s','T9s','T8s','98s','87s','77','76s','66','65s','55','54s','44','33','AJo','ATo','KQo']}
+  legend={[
+    { color: 'range', label: 'Open raise (100%)' },
+    { color: 'mixed', label: 'Mixed frequency' },
+    { color: 'empty', label: 'Fold' },
+  ]}
+/>
+
+22%, that's the number of hands you should be opening when you act first on preflop. By removing the bottom 50-75% of hands, you are helping yourself tremendously in a few ways:
+- You are less likely to be exploited by better players
+- You avoid tough decisions preflop & postflop with weak holdings
+- You build a tighter image, making your bluffs more credible
+
+
+<div class="note"><strong>Note —</strong> To put matter into perspective, you have a 30x EV advantage facing others with a top 20% range (0.11 vs 3.11)</div>
+
+### 3. Ask yourself questions — you will figure it out
+
+I really like this one, I believe even a beginner can come up answer their own doubts if they ask the right questions. 
+
+<div class="tip"><strong>Tip —</strong> When you're stuck on a decision at the table, verbalize it internally as a question. "What hands call here that I beat?" forces clearer reasoning than "should I bet?"</div>
+
+---
+
+## Math vs. Abstraction
+
+Here's an easy way to illustrate the distinction.
+
+**Math** tells you: calling a pot-sized bet requires 33% equity to break even.
+
+**Abstraction** tells you: does your hand actually have 33% equity against *this specific player's range in this specific spot*? And even if it does — should you be folding to apply pressure elsewhere, or calling to disguise your hand strength?
+
+The math is the same for everyone at the table. The abstraction is where edges are made.
+
+| Layer | What it answers |
+|---|---|
+| Math | Is this call +EV in a vacuum? |
+| Range reading | Against *who* and *what*? |
+| Abstraction | What story am I telling? What's the metagame? |
+
+---
+
+## Takeaway
+
+Most losing players know the math. The gap is almost never in the numbers — it's in the framing. Build the habit of asking questions over looking for answers, and the answers will follow.

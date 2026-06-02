@@ -1408,6 +1408,11 @@ html {
   margin-bottom: 0.35em;
 }
 
+.prose :where(strong) {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
 .prose :where(blockquote) {
   border-left: 3px solid var(--accent);
   padding-left: 1.25rem;
@@ -1427,6 +1432,11 @@ html {
   border-radius: 3px;
   color: var(--text-primary);
   font-weight: 500;
+}
+
+.prose :where(code):not(pre code)::before,
+.prose :where(code):not(pre code)::after {
+  content: none;
 }
 
 .prose :where(pre) {
