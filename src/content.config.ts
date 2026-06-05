@@ -73,23 +73,10 @@ const music = defineCollection({
   }),
 });
 
-const places = defineCollection({
-  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/places" }),
-  schema: z.object({
-    title: z.string(),
-    visitedDate: z.date(),
-    description: z.string().optional(),
-    location: z.string().optional(),
-    rating: z.number().min(0).max(5).optional(),
-    tags: z.array(z.string()).optional(),
-  }),
-});
-
 export const collections = {
   projects,
   tech,
   movies,
   thoughts,
   music,
-  places,
 };
