@@ -1525,8 +1525,8 @@ html {
 }
 
 .warn {
-  border-color: #f59e0b;
-  background: color-mix(in srgb, #f59e0b 8%, var(--bg-elevated));
+  border-color: #ef4444;
+  background: color-mix(in srgb, #ef4444 8%, var(--bg-elevated));
   color: var(--text-secondary);
 }
 

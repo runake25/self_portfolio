@@ -1,39 +1,46 @@
 ---
 title: "The Good, the Bluff, and the Ugly"
 publishedDate: 2026-06-01
-description: "A definitive guide to approach poker as a new player, without overwhelmed by math and patterns."
+description: "A definitive guide to approaching poker as a new player — without getting overwhelmed by math and patterns."
 tags:
   - Poker
   - Fundamental
 ---
+
 import PokerRangeGrid from '@/components/content/PokerRangeGrid'
 
-## TODO
-<div class="note"><strong>Note —</strong> This article focuses on decision making  assumes you know the basic rules of Texas Hold'em. It is not a beginner's guide to how poker is played — it's a framework for how to *think* about it.</div>
+<div class="note">
+  <strong>Note —</strong> This article focuses on decision-making and assumes you know the basic rules of Texas Hold'em. It is not a beginner's guide to how poker is played — it's a framework for how to think about it.
+</div>
 
-Whenever I talk about poker, people immediately bring up math and probability. They're not wrong — in fact, I'd argue most people actually *underestimate* how deeply the game is rooted in math.
+Whenever I bring up poker, people immediately jump to math and probability. They're not wrong — I'd actually argue most people *underestimate* how deeply the game is rooted in math.
 
-The answers are cheap today — solvers, forums, training sites. What actually sets you apart is knowing the right questions to ask.
+But here's the thing: answers are cheap today. Solvers, forums, training sites — they're all a Google search away. What actually sets you apart is knowing the **right questions** to ask.
 
-## TODO END
 ---
 
 ## The Three Principles
 
-Before any framework, three truths you need to internalize fully.
+Before diving into any framework, there are three truths you need to internalize fully.
 
-### 1. You cannot win every hand — under any circumstance
+### 1. You Cannot Win Every Hand — Under Any Circumstance
 
-# TODO
-Suppose you have `K♠️Q♠️` and flop comes `A♦️8♣️5♣️`, it is disrespectful to even think your skill can overcome the fact that you missed your hand. The hand is not in your odds anymore, and you need to re-evaluate . The goal is to be right *more often* and to lose *less* when you're wrong.
+Suppose you're holding `K♠️Q♠️` and the flop comes `A♦️8♣️5♣️`. It's borderline disrespectful to think that skill alone can overcome the fact that you missed. This hand is no longer in your favor — accept it and re-evaluate. 
 
-<div class="note"><strong>Note —</strong> "Wrong" here refers to a decision that deviated from your prior expectation — not necessarily a -EV play.</div>
+The goal isn't to win every hand; it's to be **right more often**, and to **lose less** when you're wrong.
 
-### 2. Preflop decisions dictate the hand
+<div class="note">
+  <strong>Note —</strong> "Wrong" here means a decision that deviated from your prior expectation, not necessarily a negative Expected Value (-EV) play.
+</div>
 
-Think of poker like a gunfight. Your preflop hand is your weapon — and even the best shooter struggles when handed a broken gun. Play junk preflop and you're already fighting at a disadvantage. Worse, when you pull the trigger, nobody flinches — they know your gun is broken.
+---
 
-Below is a theoretical opening range for UTG in a 6-max game.
+### 2. Preflop Decisions Dictate the Hand
+
+Think of poker like a gunfight. Your preflop hand is your weapon — and even the best shooter struggles when handed a broken gun. Play junk preflop and you're already fighting at a disadvantage. Worse, when you do pull the trigger, nobody flinches. They can see your gun is broken.
+
+Below is a theoretical opening range for Under the Gun (UTG) in a 6-max game.
+
 <PokerRangeGrid
   range={['AA','KK','QQ','JJ','TT','99','88', '77', '66', '55','AKs','AQs','AJs','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KQs','KJs','KTs','QJs','QTs','JTs','AKo','AQo']}
   mixed={['K9s','KJo', 'QJo', 'Q9s','J9s','T9s','T8s','98s','87s','77','76s','66','65s','55','54s','44','33','AJo','ATo','KQo']}
@@ -44,61 +51,54 @@ Below is a theoretical opening range for UTG in a 6-max game.
   ]}
 />
 
-22%, that's the number of hands you should be opening when you act first on preflop. By removing the bottom 50-75% of hands, you are helping yourself tremendously in a few ways:
-- You are less likely to be exploited by better players
-- You avoid tough decisions preflop & postflop with weak holdings
-- You build a tighter image, making your bluffs more credible
+<div style="margin: 1.75em 0 1.25em; padding: 1.1rem 1.4rem; border-left: 3px solid var(--accent); background: color-mix(in srgb, var(--accent) 7%, var(--bg-elevated)); border-radius: 0 4px 4px 0; display: flex; align-items: baseline; gap: 1.1rem;">
+  <span style="font-size: 2.4rem; font-weight: 700; color: var(--accent); font-family: var(--font-mono); line-height: 1; flex-shrink: 0;">22%</span>
+  <span style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6;">of hands should be opened from UTG in a 6-max game. By cutting the bottom 50–75%, you gain several compounding advantages:</span>
+</div>
 
+- **Immunity:** You are far less likely to be exploited by stronger players.
+- **Simplicity:** You avoid tough, marginal spots preflop and postflop with weak holdings.
+- **Credibility:** You build a tighter table image, making your bluffs far more believable.
 
-<div class="note"><strong>Note —</strong> To put matter into perspective, you have a 30x EV advantage facing others with a top 20% range (0.11 vs 3.11)</div>
-
-### 3. Ask yourself questions — you will figure it out
-
-I really like this one and I wish to write a whole article to share about it, but I will try to illustrate the importance of it before your attention goes away. 
-
-I believe even a beginner can come up answer their own doubts if they ask the right questions. You should train yourself extensively to ask the right question in the right order (*not only in poker but also in life !*). Let say you are facing a scenario:
-
-    You are holding `2♠️3♠️`, after betting flop and turn you are now on the river with `A♦️8♠️5♠️K♥️7♦️`. Opponent checks to you, what do you do?
-
-Well clearly there are only 2 options, fold, to give up, or bluff to try to win the pot. Most beginner will dabble between the like this:
-
-    "Should I bluff here? But what if he has a strong hand? But what if he is weak? But what if he never folds? But what if ...
-  
-These are all valid questions, but they are not bring you to anywhere, **if you dont go for one of them**. Try treating them as a rope and climb it with everything you have:
-
-
-    "Should I bluff here? But what if he has a strong hand? Does he look like he has a strong hand? Does those strong hand play like this? How about weak hands? Does he has more weak hand play like this compare with the strong hand ..."
-
-    "Ok I think he has more weak hand that play like this, so I will bluff here. But what if he never folds? Does he look like a player that never folds? Does he have history of folding in similar spot?"
-
-The more you ask, the more you will find your answer. They might not be the right answer, and most of the time they are not, but they are your answer, with logical reasoning behind it, and that is what matter. This feedback loop serves as a training for your intuition, and is way superior than blind solver studies (although they are costly when you lose) for a couple reasons:
-- It is active, the strong feedback loop will help you memorize the pattern and the reasoning behind it, which is what you need to make decision in real time.
-- The chain of thought serve as a perfect study point for you to review and improve later on, you can study those key heuristic questions and correct them if you misestimate any part.
-
-
-
-<div class="tip"><strong>Tip —</strong> When you're stuck on a decision at the table, verbalize it internally as a question. "What hands call here that I beat?" forces clearer reasoning than "should I bet?"</div>
+<div class="note">
+  <strong>Note —</strong> To put this in perspective, you have a 30x EV advantage facing others with a top 20% range (0.11 vs 3.11).
+</div>
 
 ---
 
-## Math vs. Abstraction
+### 3. Ask Questions — You'll Find the Answer
 
-Here's an easy way to illustrate the distinction.
+I genuinely believe that even a complete beginner can work through their own doubts if they ask the right questions in the right order. 
+Consider this scenario:
 
-**Math** tells you: calling a pot-sized bet requires 33% equity to break even.
 
-**Abstraction** tells you: does your hand actually have 33% equity against *this specific player's range in this specific spot*? And even if it does — should you be folding to apply pressure elsewhere, or calling to disguise your hand strength?
+>You are holding `2♠️3♠️`. After betting the flop and turn, you are now on the river with a board of `A♦️8♠️5♠️K♥️7♦️`. Your opponent checks to you. What do you do?
 
-The math is the same for everyone at the table. The abstraction is where edges are made.
+There are only two options: fold and give up the pot, or bluff and try to take it. Most beginners spiral like this:
 
-| Layer | What it answers |
-|---|---|
-| Math | Is this call +EV in a vacuum? |
-| Range reading | Against *who* and *what*? |
-| Abstraction | What story am I telling? What's the metagame? |
+<div class="warn">
+  <strong>The loop —</strong> <em>"Should I bluff here? But what if he has a strong hand? But what if he is weak? But what if he never folds? But what if..."</em>
+</div>
+
+These are all valid questions — but they're going in circles. None of them lead anywhere **unless you use them as footholds** to climb higher. Treat them like a rope and pull yourself up, one question at a time:
+
+> *Should I bluff? Does he look like he has a strong hand? Would a strong hand actually play this way? What about weak hands — are there more weak hands that play like this than strong ones?"*
+>
+> "*Okay, I think he has more weak hands in this line. So I'll bluff. But wait — does he ever fold? Is he the type to let go in spots like this? Has he shown that tendency before?*
+
+The deeper you question, the closer you get to an answer. It may not be the *right* answer — and often it won't be — but it will be *your* answer, backed by a chain of reasoning. That's what matters.
+
+This feedback loop is what trains your intuition. It's far more effective than blind solver grinding (though it does cost chips along the way) for two key reasons:
+
+- **It is active.** The tight feedback loop burns the *reasoning* — not just the pattern — into memory. That's exactly what you need when making real-time decisions.
+- **It is reviewable.** Your chain of thought becomes a precise study point. You can revisit each step, identify where your estimates broke down, and correct them.
+
+<div class="tip">
+  <strong>Tip —</strong> When you're stuck on a decision at the table, frame it as a question internally. Asking <em>"What hands call here that I actually beat?"</em> forces sharper reasoning than simply asking <em>"Should I bet?"</em>. It's a lot like functional programming (model, then derive) vs. imperative programming (action, then justify).
+</div>
 
 ---
 
 ## Takeaway
 
-Most losing players know the math. The gap is almost never in the numbers — it's in the framing. Build the habit of asking questions over looking for answers, and the answers will follow.
+Most losing players know the math. The gap is almost never in the numbers — it's in the framing. Build the habit of asking questions over looking for answers, be completely honest to yourself, and the answers will follow.
