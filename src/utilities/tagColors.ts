@@ -13,6 +13,11 @@ const TAG_COLORS: Record<string, string> = {
   typescript: "#3178c6",
   python: "#3572a5",
 
+  // ── Finance / Trading ─────────────────────────────────────────
+  "options pricing": "#f59e0b",
+  crypto: "#f59e0b",
+  options: "#f59e0b",
+
   // ── Design ────────────────────────────────────────────────────
   design: "#a78bfa",
   ui: "#a78bfa",

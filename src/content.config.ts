@@ -7,11 +7,9 @@ const projects = defineCollection({
   schema: z.object({
     title: z.string(),
     description: z.string(),
+    tags: z.array(z.string()).optional(),
     year: z.number(),
     stack: z.array(z.string()),
-    complexityTime: z.string().default("O(log n)"),
-    complexitySpace: z.string().default("O(1)"),
-    protocol: z.string().default("Iterator Protocol"),
     order: z.number().default(0),
     liveUrl: z.url().optional(),
     repoUrl: z.url().optional(),

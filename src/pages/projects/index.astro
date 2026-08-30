@@ -1,6 +1,8 @@
 ---
+import CollectionCard from "@/components/content/CollectionCard.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { entryHref } from "@/utilities/content";
+import { tagAccentColor } from "@/utilities/tagColors";
 import { getCollection } from "astro:content";
 
 const projects = (await getCollection("projects")).sort(
@@ -22,22 +24,14 @@ const projects = (await getCollection("projects")).sort(
       ) : (
         <div class="grid gap-4 md:grid-cols-2">
           {projects.map((project) => (
-            <article class="card-link space-y-4">
-              <div class="flex flex-wrap items-center justify-between gap-2">
-                <p class="section-label">topic</p>
-                <span class="tag-chip">subtopic</span>
-              </div>
-
-              <h2 class="text-xl font-bold" style="color:var(--text-primary)">{project.data.title}</h2>
-              <p class="text-sm" style="color:var(--text-secondary)">{project.data.description}</p>
-              <p class="text-xs" style="color:var(--text-faint)">{project.data.year} | {project.data.stack.join(" | ")}</p>
-
-              <div class="flex flex-wrap gap-2">
-                <a class="execute-button" href={entryHref("projects", project.id)}>
-                  Open Project
-                </a>
-              </div>
-            </article>
+            <CollectionCard
+              href={entryHref("projects", project.id)}
+              title={project.data.title}
+              description={project.data.description}
+              meta={String(project.data.year)}
+              tags={project.data.tags}
+              accentColor={tagAccentColor(project.data.tags)}
+            />
           ))}
         </div>
       )

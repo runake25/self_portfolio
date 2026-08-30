@@ -1,0 +1,149 @@
+---
+title: "Crypto Options Analytics Platform"
+description: "A production options analytics engine that prices ~1,300 live BTC and ETH contracts at 400 msg/sec with 95 µs p99 latency, and renders the implied-volatility surface in 3D."
+year: 2026
+stack:
+  - Go
+  - React
+  - TypeScript
+  - Redis
+  - TimescaleDB
+  - Docker
+tags:
+  - Options Pricing
+  - Go
+  - Redis
+  - TimescaleDB
+complexityTime: "O(1)"
+complexitySpace: "O(n)"
+protocol: "WebSocket Pub/Sub"
+order: 1
+liveUrl: "https://optiondashboard.online"
+repoUrl: "https://github.com/brianthl/option_dashboard"
+featured: true
+---
+
+import ArchitectureDiagram from "@/components/content/ArchitectureDiagram";
+import LogScaleBars from "@/components/content/LogScaleBars";
+import StackedBar from "@/components/content/StackedBar";
+import ZScoreChart from "@/components/content/ZScoreChart";
+
+Deribit is the dominant venue for crypto options, but its raw feed gives you no way to reason
+about the *surface* — where volatility is rich or cheap, how a multi-leg structure pays off, or
+whether a given contract is trading away from its theoretical value.
+
+This platform turns that feed into a live analytics desk. It runs in production as four
+containers behind nginx.
+
+## What it does
+
+- Subscribes to **~1,300 BTC and ETH option contracts** simultaneously over Deribit's WebSocket API
+- Processes **200–400 market updates per second** through a bounded Go worker pool
+- Computes a **Black-Scholes theoretical price** for every contract on the hot path and flags its
+  deviation from the exchange mark
+- Maintains a live **implied-volatility surface** across the full strike × expiry grid, rendered as
+  an interactive 3D plot
+- Lets you assemble a **multi-leg position** and watch its payoff diagram and breakeven points
+  update in real time
+- Persists every tick to TimescaleDB with continuous aggregates at 1 min / 15 min / 1 hour
+
+<ArchitectureDiagram />
+
+## Engineering
+
+Every optimisation below came out of a `pprof` profile rather than a guess.
+
+<LogScaleBars
+  label="hot path — cost per stage"
+  rows={[
+    { label: "instrument metadata", value: 0.75e-9 },
+    { label: "JSON decode", value: 2e-6 },
+    { label: "Black-Scholes", value: 2e-6 },
+    { label: "Redis write", value: 5e-6 },
+  ]}
+  format={(v) => (v < 1e-6 ? `${(v * 1e9).toFixed(2)} ns` : `${v * 1e6} µs`)}
+/>
+
+The lookup table is my favourite tradeoff in the project. `math.Erf` was the hot spot, so I
+precomputed the standard normal CDF across the range -5 to +5 at 0.001 resolution — an 80 KB
+array, small enough to stay cache-resident, roughly 6× faster. Naive table lookup costs accuracy,
+so interpolating between adjacent entries recovers an order of magnitude (0.05% → 0.005% error)
+for about 5 ns. Space, time, and accuracy all quantified.
+
+I also had to be honest about what "latency" actually meant. The metrics dashboard reported 1.1 ms
+per message while `pprof` said 95 µs p99. Both numbers were real — the dashboard was including
+queue wait, which turned out to be 84% of the total.
+
+<StackedBar
+  label="p99 end-to-end — where the 95 µs actually goes"
+  segments={[
+    { label: "queue wait", value: 80, color: "var(--surface)" },
+    { label: "processing", value: 15, color: "var(--accent)" },
+  ]}
+  unit="µs"
+/>
+
+Queue wait dominating is *healthy* for an async worker pool (workers idle-waiting, not
+backlogged), but reporting it as processing time is misleading. I instrumented each stage
+separately so the number could actually be defended.
+
+Beyond that: a three-tier cache (in-process LRU → Redis with Pub/Sub fan-out → TimescaleDB
+hypertables), an `OptionState` struct laid out by access frequency so a filter sweep over 1,300
+contracts touches minimal cache lines, and a 1,300-row live table held at 60 fps through windowed
+virtualization.
+
+## The 7-day z-score lookback
+
+Raw price history is hard to read. A $200 move in BTC means nothing on its own — it matters only
+relative to how that contract normally behaves. So every historical endpoint computes a **z-score**
+over a 7-day lookback window: each time bucket is normalised against the *whole window's* mean and
+standard deviation.
+
+Concretely, for each metric — mark price, IV, delta, open interest, theoretical price, price
+deviation — the SQL buckets ticks with `time_bucket`, computes the window mean and `STDDEV_SAMP`,
+then turns every point into `(value − mean) / stddev`. The result is unitless, so a +2 on an
+illiquid far-dated contract and a +2 on BTC's front month are directly comparable: both are "two
+standard deviations from their own baseline".
+
+The frontend renders those bands as a chart rather than a number, with reference lines at the mean
+and ±2σ and colour-coded interpretation ranges.
+
+<ZScoreChart
+  label="mark IV z-score over the 7-day window (illustrative)"
+  data={[0.1, -0.3, -0.8, -0.5, 0.2, 0.9, 0.6, 1.4, 1.1, 0.7, 2.3, 2.6, 1.9, 1.2, 0.5, 0.0, -0.4]}
+/>
+
+The point of the feature isn't the formula — it's that a trader comparing a dozen strikes needs a
+single normalised axis, and the 7-day window is long enough to smooth intraday noise while short
+enough to stay responsive to the current regime.
+
+## The quantitative work
+
+Black-Scholes is the live pricer. The deeper modelling work targets the **Bates model** — Heston
+stochastic volatility plus Merton Poisson jumps — priced with the **Fourier-cosine (COS) method**
+of Fang & Oosterlee (2008). COS expands the risk-neutral density in a cosine series, collapsing
+European pricing to a single sum whose truncation range and payoff coefficients are computed once
+and reused across the entire strike ladder — dramatically cheaper than Monte Carlo.
+
+That implementation includes the "little Heston trap" branch correction for the complex logarithm
+(the naive branch makes long-dated prices oscillate and diverge), cumulant-based adaptive
+truncation widened for crypto's fat tails, adaptive Fourier term counts for short-dated options,
+and Feller condition validation to keep the variance process strictly positive.
+
+The genuinely interesting part is regime. Equity-calibrated parameters price BTC options 3–5×
+below market: crypto volatility runs roughly 10× equity's, mean-reverts about 3× slower, shows
+almost none of the leverage effect that anchors equity models, and jumps around 3× as often.
+
+## Status
+
+<div class="note">
+  <strong>Note —</strong> The ingestion pipeline, Black-Scholes pricing, IV surface, multi-leg PnL
+  engine, and Redis/TimescaleDB tiering are all live in production. The Bates COS pricer is
+  implemented and passes its numerical suite as a standalone module, but the production-wired
+  version still diverges — it double-counts the forward term between the characteristic function
+  and the summation loop, so prices blow up. I shipped the fast, correct path and kept the harder
+  model out of production rather than ship something I could not validate. Parameter calibration
+  (L-BFGS against the observed smile) is specified in the design docs but not yet built.
+</div>
+
+Being able to name the exact bug seemed more useful than a green checkmark.
