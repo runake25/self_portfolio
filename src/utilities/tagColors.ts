@@ -12,6 +12,9 @@ const TAG_COLORS: Record<string, string> = {
   javascript: "#f0db4f",
   typescript: "#3178c6",
   python: "#3572a5",
+  go: "#22d3ee",
+  redis: "#ef4444",
+  timescaledb: "#facc15",
 
   // ── Finance / Trading ─────────────────────────────────────────
   "options pricing": "#f59e0b",
@@ -37,6 +40,11 @@ export function tagAccentColor(tags: string[] | undefined): string | undefined {
     if (color) return color;
   }
   return undefined;
+}
+
+export function tagColorForTag(tag: string | undefined): string | undefined {
+  if (!tag) return undefined;
+  return TAG_COLORS[tag.toLowerCase()];
 }
 
 /**
