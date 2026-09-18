@@ -1502,6 +1502,13 @@ html {
   max-width: 100%;
 }
 
+/* Display math (KaTeX) can be wider than the 660px article column on small screens */
+.prose :where(.katex-display) {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.25rem 0;
+}
+
 /* ── Prose callouts ── */
 .note, .tip, .warn {
   padding: 0.9rem 1.1rem;
