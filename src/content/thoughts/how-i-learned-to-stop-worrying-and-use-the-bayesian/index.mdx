@@ -6,7 +6,6 @@ tags:
   - Poker
   - Bayesian
   - Advanced
-draft: true
 ---
 
 import EvCliffChart from '@/components/content/EvCliffChart'
@@ -113,13 +112,16 @@ $$
 
 ### Seeing the model as ranges
 
-It also helps to draw the BOM as sets of hands instead of a curve. The point of the picture is the divergence: the range you actually face is *this* player's, not the one theory hands you — so the bluff share inside it, and therefore the number you get to call with, is not the solver's either.
+It also helps to draw the BOM as sets of hands instead of a curve.
 
 <RangeVennDiagram
   label="the opponent model, as ranges"
-  caption="Three sets: the range theory gives them, the theoretical bluff range nested inside it, and the real range you face. The bluffs you actually face are where the theoretical bluff range crosses the real range — your number, not the solver's frequency for the spot."
-  note="Not to scale: the circles are sized to show how the ranges interact, not how often each one occurs. The point: the range you face is your prior for this player — not the GTO range."
+  caption="Three sets: the range theory gives them, the theoretical bluff range nested inside it, and the real range you face. The bluffs you actually face are where the theoretical bluff range crosses the real range."
 />
+
+<div class="note">
+  <strong>Not to scale —</strong> the circles are sized to show how the ranges interact, not how often each one occurs. The point: the range you face is your prior for this player, not the GTO range — so the bluff share you read off it is your number, not the solver's.
+</div>
 
 ---
 
