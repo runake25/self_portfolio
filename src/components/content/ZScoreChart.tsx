@@ -88,15 +88,15 @@ export default function ZScoreChart({ label, data, xLabels = ["-7d", "-3d", "now
         {band(min, 0.5, "#9ca3af", 0.06)}
         {band(0.5, 1, "#fbbf24", 0.08)}
         {band(1, 2, "#f59e0b", 0.1)}
-        {band(2, max, "#ef4444", 0.12)}
+        {band(2, max, "var(--tone-bad)", 0.12)}
         {band(-0.5, min, "#9ca3af", 0.06)}
         {band(-1, -0.5, "#fbbf24", 0.08)}
         {band(-2, -1, "#f59e0b", 0.1)}
-        {band(-3, -2, "#ef4444", 0.12)}
+        {band(-3, -2, "var(--tone-bad)", 0.12)}
 
         {line(0, "var(--text-faint)", "", "mean")}
-        {line(2, "#ef4444", "4 4", "+2σ")}
-        {line(-2, "#ef4444", "4 4", "-2σ")}
+        {line(2, "var(--tone-bad)", "4 4", "+2σ")}
+        {line(-2, "var(--tone-bad)", "4 4", "-2σ")}
 
         {/* y-axis ticks */}
         {[3, 1.5, 0, -1.5, -3].map((t) => (

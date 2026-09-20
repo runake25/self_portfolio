@@ -1,5 +1,6 @@
 // @ts-check
 import mdx from "@astrojs/mdx";
+import { unified } from "@astrojs/markdown-remark";
 import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
@@ -16,12 +17,20 @@ export default defineConfig({
         domains: ["image.tmdb.org", "coverartarchive.org"],
     },
 
-    integrations: [
-        react(),
-        mdx({
+    // Astro 7 uses the `satteri` processor by default, which cannot run
+    // remark/rehype plugins (no KaTeX support). Opt back into the unified
+    // pipeline so remark-math + rehype-katex keep rendering math, and MDX
+    // inherits these plugins automatically.
+    markdown: {
+        processor: unified({
             remarkPlugins: [remarkMath],
             rehypePlugins: [rehypeKatex],
         }),
+    },
+
+    integrations: [
+        react(),
+        mdx(),
         sitemap(),
     ],
 

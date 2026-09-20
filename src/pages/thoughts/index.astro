@@ -11,7 +11,7 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
   day: "numeric",
 });
 
-const posts = (await getCollection("thoughts", ({ data }) => !data.draft)).sort(
+const posts = (await getCollection("thoughts", ({ data }) => !data.draft || import.meta.env.DEV)).sort(
   (a, b) => b.data.publishedDate.valueOf() - a.data.publishedDate.valueOf(),
 );
 ---

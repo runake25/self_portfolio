@@ -19,6 +19,11 @@
   --accent: #d97756;
   --accent-strong: #ef9070;
   --success: #38d39f;
+
+  /* Chart tones — these sit on top of the plot area, so they need their own
+     per-theme values rather than inheriting the status palette. */
+  --tone-good: #38d39f;
+  --tone-bad: #ef5350;
 }
 
 * {
@@ -199,6 +204,8 @@ html[data-theme="day"] {
   --accent: #9a4020;
   --accent-strong: #7a2e10;
   --success: #2a7f5e;
+  --tone-good: #1f6b4d;
+  --tone-bad: #9e2f14;
 }
 
 body[data-theme="day"]::after {

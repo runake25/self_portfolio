@@ -5,7 +5,7 @@ import { tagAccentEntry } from "@/utilities/tagColors";
 import { getCollection, render } from "astro:content";
 
 export async function getStaticPaths() {
-  const posts = (await getCollection("thoughts", ({ data }) => !data.draft)).sort(
+  const posts = (await getCollection("thoughts", ({ data }) => !data.draft || import.meta.env.DEV)).sort(
     (a, b) => b.data.publishedDate.valueOf() - a.data.publishedDate.valueOf(),
   );
 
