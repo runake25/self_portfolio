@@ -1222,21 +1222,37 @@ a.card-link:active,
     translate: -50% 0;
     max-width: calc(100vw - 20px);
     padding: 5px;
-    background: var(--glass-bar);
+    background: color-mix(in srgb, var(--glass-bar) 60%, transparent);
     border-color: var(--glass-edge);
     box-shadow:
       var(--lg-rim),
-      0 14px 34px -12px rgb(0 0 0 / 0.55);
-    -webkit-backdrop-filter: blur(22px) saturate(170%);
-    backdrop-filter: blur(22px) saturate(170%);
+      0 14px 34px -14px rgb(0 0 0 / 0.45);
+    -webkit-backdrop-filter: blur(18px) saturate(170%);
+    backdrop-filter: blur(18px) saturate(170%);
+    transition:
+      translate 460ms var(--spring),
+      opacity 260ms var(--ease-out);
   }
 
-  /* With refraction (scripts/liquidGlass.ts) the bar can be clearer: the bent
-     rim does the work the heavy frost did. Labels keep enough tint behind them. */
+  /* With refraction (scripts/liquidGlass.ts) the bar can be clearer still: the
+     bent rim does the work the heavy frost did. */
   .site-nav.lens-on {
-    background: color-mix(in srgb, var(--glass-bar) 74%, transparent);
-    -webkit-backdrop-filter: blur(7px) saturate(180%);
-    backdrop-filter: blur(7px) saturate(180%);
+    background: color-mix(in srgb, var(--glass-bar) 44%, transparent);
+    -webkit-backdrop-filter: blur(9px) saturate(180%);
+    backdrop-filter: blur(9px) saturate(180%);
+  }
+
+  /* Labels stay legible on the clearer glass. */
+  .site-nav .nav-link {
+    text-shadow: 0 1px 6px var(--bg);
+  }
+
+  /* Scrolling down to read: the bar slides below the screen edge and fades
+     (scripts/chrome.ts). It slides back on any scroll up. */
+  :root[data-nav-hidden] .site-nav {
+    translate: -50% calc(100% + 28px + env(safe-area-inset-bottom));
+    opacity: 0;
+    pointer-events: none;
   }
 
   .nav-link {
