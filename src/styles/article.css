@@ -370,6 +370,13 @@
   }
 }
 
+/* Phones have no frame edge for it to sit on; the floating chrome owns the top. */
+@media (max-width: 940px) {
+  .read-progress {
+    display: none;
+  }
+}
+
 @keyframes read-progress {
   to {
     transform: scaleX(1);

@@ -86,8 +86,8 @@ function isActivePath(href: string) {
     <meta property="og:image:alt" content="Brian::sharespace — a maze, a sketch, and a terminal prompt" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="alternate" type="application/rss+xml" title="Brian::sharespace — thoughts" href="/rss.xml" />
-    <meta name="theme-color" content="#0b0b14" media="(prefers-color-scheme: dark)" />
-    <meta name="theme-color" content="#ede0cc" media="(prefers-color-scheme: light)" />
+    <!-- Browser chrome colour; the inline script below matches it to the site theme. -->
+    <meta name="theme-color" content="#0b0b14" data-theme-color />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <link rel="preload" href={spaceGroteskLatin} as="font" type="font/woff2" crossorigin />
@@ -107,6 +107,7 @@ function isActivePath(href: string) {
         }
         root.dataset.theme = theme;
         root.dataset.uiHidden = String(uiHidden);
+        document.querySelector("meta[data-theme-color]")?.setAttribute("content", theme === "day" ? "#ede0cc" : "#0b0b14");
       })();
     </script>
     <ClientRouter />
@@ -204,6 +205,7 @@ function isActivePath(href: string) {
             <span class="mode-icon mode-icon-moon" aria-hidden="true"></span>
           </button>
         </div>
+        <div class="scroll-edge" aria-hidden="true"></div>
       </header>
 
 

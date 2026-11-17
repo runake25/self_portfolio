@@ -37,8 +37,16 @@ function syncToggle() {
   button.setAttribute("aria-label", night ? "Switch to day theme" : "Switch to night theme");
 }
 
+// Matches the browser's own chrome (status bar, address bar) to the page.
+const THEME_COLOR: Record<Theme, string> = { night: "#0b0b14", day: "#ede0cc" };
+
+function syncThemeColor(doc: Document, theme: Theme) {
+  doc.querySelector("meta[data-theme-color]")?.setAttribute("content", THEME_COLOR[theme]);
+}
+
 function applyTheme(theme: Theme) {
   root.dataset.theme = theme;
+  syncThemeColor(document, theme);
   syncToggle();
   for (const listener of listeners) listener(theme);
 }
@@ -98,6 +106,7 @@ export function initTheme() {
   document.addEventListener("astro:before-swap", (event) => {
     const incoming = event.newDocument.documentElement;
     incoming.dataset.theme = getTheme();
+    syncThemeColor(event.newDocument, getTheme());
     if (root.dataset.uiHidden) incoming.dataset.uiHidden = root.dataset.uiHidden;
   });
 
