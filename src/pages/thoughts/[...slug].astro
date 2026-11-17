@@ -64,11 +64,11 @@ const nextPage = nextEntry
         {entry.data.tags && entry.data.tags.length > 0 && (
           <>
             {entry.data.tags.map((tag) => <span class="tag-chip">{tag}</span>)}
-            <span style="color:var(--text-faint)">|</span>
+            <span class="article-meta-sep" aria-hidden="true">·</span>
           </>
         )}
         <span>{dateFormatter.format(entry.data.publishedDate)}</span>
-        <span style="color:var(--text-faint)">|</span>
+        <span class="article-meta-sep" aria-hidden="true">·</span>
         <span>{readTime} min read</span>
       </div>
       {entry.data.description && <p class="lead">{entry.data.description}</p>}

@@ -4,21 +4,21 @@ import "@/styles/home.css";
 ---
 
 <BaseLayout>
-	<section class="space-y-8">
+	<section class="home">
 		<p class="section-label">About me</p>
-		<h1 class="text-3xl font-bold tracking-tight sm:text-4xl" style="color:var(--text-primary)">Brian</h1>
-		<p class="max-w-3xl text-sm leading-relaxed" style="color:var(--text-secondary)">
+		<h1 class="home-title">Brian</h1>
+		<p class="home-intro">
 			Data engineer. Born 2002, based in Hong Kong.<br>
 			I build things with Python, and occasionally share what's on my mind.
 		</p>
 		
 
 		<div class="dashboard-grid">
-			<article class="card-link dashboard-span-8 space-y-4" style="border-top:2px solid #60a5fa">
-				<div class="space-y-1">
+			<article class="card-link home-card dashboard-span-8">
+				<header class="card-head">
 					<p class="section-label">Overview</p>
-					<h2 class="text-xl font-bold" style="color:var(--text-primary)">Experience</h2>
-				</div>
+					<h2 class="card-title">Experience</h2>
+				</header>
 
 				<div class="xp-columns">
 					<!-- Work timeline -->
@@ -85,7 +85,7 @@ import "@/styles/home.css";
 							</div>
 							<div class="xp-entry">
 								<div class="xp-dot"></div>
-								<span class="xp-role">Code for Good <span style="color:var(--text-faint);font-weight:400">— 1st place</span></span>
+								<span class="xp-role">Code for Good <span class="xp-note">— 1st place</span></span>
 								<span class="xp-company">J.P. Morgan</span>
 						
 							</div>
@@ -105,26 +105,28 @@ import "@/styles/home.css";
 				</div>
 			</article>
 
-			<div class="dashboard-span-4" style="display:flex;flex-direction:column;gap:0.8rem">
-				<article class="card-link space-y-3" style="border-top:2px solid #34d399;flex:1">
-					<div class="space-y-1">
+			<div class="dashboard-span-4 dashboard-side">
+				<article class="card-link home-card">
+					<header class="card-head">
 						<p class="section-label">Projects</p>
-						<h2 class="text-xl font-bold" style="color:var(--text-primary)">Gallery</h2>
-					</div>
-					<p class="text-sm" style="color:var(--text-secondary)">
+						<h2 class="card-title">Gallery</h2>
+					</header>
+					<p class="card-text">
 						Everything I've shipped — side projects, experiments, work samples.
 					</p>
-					<a class="explore-link" href="/projects">
-						<span>Browse projects</span>
-						<span class="explore-link-arrow">→</span>
-					</a>
+					<div class="explore-links">
+						<a class="explore-link" href="/projects">
+							<span>Browse projects</span>
+							<span class="explore-link-arrow">→</span>
+						</a>
+					</div>
 				</article>
 
-				<article class="card-link space-y-4" style="border-top:2px solid #fbbf24;flex:1">
-					<div class="space-y-1">
+				<article class="card-link home-card">
+					<header class="card-head">
 						<p class="section-label">Explore</p>
-						<h2 class="text-xl font-bold" style="color:var(--text-primary)">Sharing</h2>
-					</div>
+						<h2 class="card-title">Sharing</h2>
+					</header>
 					<div class="explore-links">
 						<a class="explore-link" href="/movies">
 							<span>Movies</span>
@@ -141,18 +143,20 @@ import "@/styles/home.css";
 					</div>
 				</article>
 
-				<article class="card-link space-y-3" style="border-top:2px solid #f472b6;flex:1">
-					<div class="space-y-1">
+				<article class="card-link home-card">
+					<header class="card-head">
 						<p class="section-label">Contact</p>
-						<h2 class="text-xl font-bold" style="color:var(--text-primary)">Say hello.</h2>
-					</div>
-					<p class="text-sm" style="color:var(--text-secondary)">
+						<h2 class="card-title">Say hello.</h2>
+					</header>
+					<p class="card-text">
 						Open to conversations about work, ideas, or anything interesting.
 					</p>
-					<a class="explore-link" href="/contact">
-						<span>Send a message</span>
-						<span class="explore-link-arrow">→</span>
-					</a>
+					<div class="explore-links">
+						<a class="explore-link" href="/contact">
+							<span>Send a message</span>
+							<span class="explore-link-arrow">→</span>
+						</a>
+					</div>
 				</article>
 			</div>
 		</div>

@@ -24,7 +24,7 @@ const byline = [artist, releaseYear].filter(Boolean).join(" · ");
   left-clicks and opens the album in a dialog instead; middle-click, ctrl/cmd-click,
   phones, and no-JS all just follow the link.
 -->
-<a href={url} class="music-album-card" data-music-id={musicId}>
+<a href={url} class="music-album-card card-link" data-music-id={musicId}>
   <div class="music-album-art-wrap">
     {coverArt ? (
       <Image

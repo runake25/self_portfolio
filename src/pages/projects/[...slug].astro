@@ -48,8 +48,7 @@ const nextPage = nextEntry
       <h1>{entry.data.title}</h1>
       <div class="article-meta">
         <span>{entry.data.year}</span>
-        <span>|</span>
-        <span>{entry.data.stack.join(" | ")}</span>
+        {entry.data.stack.map((item: string) => <span class="tag-chip">{item}</span>)}
       </div>
       {entry.data.description && <p class="lead">{entry.data.description}</p>}
       <div class="flex flex-wrap gap-3" style="margin-top: 1.25rem;">

@@ -33,13 +33,15 @@ const allTags = [...tagCounts.entries()]
 ---
 
 <BaseLayout title="Thoughts | Brian" description="Reflections and writing.">
-  <section class="space-y-8">
-    <p class="section-label">Brian</p>
-    <h1 class="text-3xl font-bold tracking-tight sm:text-4xl" style="color:var(--text-primary)">Thoughts</h1>
-    <p class="max-w-3xl text-sm" style="color:var(--text-secondary)">
-      Reflections, opinions, and things I think about.
-      <a class="rss-link" href="/rss.xml">rss</a>
-    </p>
+  <section class="space-y-6">
+    <header class="space-y-3">
+      <p class="section-label">Brian</p>
+      <h1 class="text-3xl font-bold tracking-tight sm:text-4xl" style="color:var(--text-primary)">Thoughts</h1>
+      <p class="max-w-3xl text-sm" style="color:var(--text-secondary)">
+        Reflections, opinions, and things I think about.
+        <a class="rss-link" href="/rss.xml">rss</a>
+      </p>
+    </header>
 
     {
       allTags.length >= 2 && (

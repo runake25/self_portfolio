@@ -1,5 +1,5 @@
 /**
- * The "window chrome" around the page: footer telemetry, the hide-UI toggle,
+ * The "window chrome" around the page: the footer clock, the hide-UI toggle,
  * and keyboard scrolling for the content pane.
  */
 const root = document.documentElement;
@@ -23,23 +23,6 @@ function renderClock() {
 function tickClock() {
   renderClock();
   setTimeout(tickClock, 1000 - (Date.now() % 1000));
-}
-
-// ── "rendered_data" ───────────────────────────────────────────────────────────
-// Previously computed by serializing the whole DOM (outerHTML) and UTF-8 encoding
-// it on every page load. The browser already measured the real response, so we
-// read it from the Performance API for free.
-function showPageSize() {
-  const node = document.querySelector("[data-render-size]");
-  if (!node) return;
-  const here = location.href.split("#")[0];
-  const entries = [
-    ...performance.getEntriesByType("resource"),
-    ...performance.getEntriesByType("navigation"),
-  ] as PerformanceResourceTiming[];
-  const entry = entries.reverse().find((e) => e.name.split("#")[0].replace(/\/$/, "") === here.replace(/\/$/, ""));
-  const bytes = entry?.decodedBodySize;
-  node.textContent = bytes ? `${(bytes / 1024).toFixed(1)}kb` : "--";
 }
 
 // ── Hide-UI toggle (shows off the maze) ───────────────────────────────────────
@@ -82,7 +65,6 @@ export function initChrome() {
 
   document.addEventListener("astro:page-load", () => {
     renderClock();
-    showPageSize();
     syncUiToggle();
     focusContent();
   });

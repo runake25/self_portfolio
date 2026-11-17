@@ -9,6 +9,7 @@
  */
 import { setUiHidden } from "./chrome";
 import { DIRS, cellCenter, entryPoint, exitPoint, feelFor, wallAhead, type Dir, type Maze, type MazeHost } from "./maze";
+import { watchLens } from "./liquidGlass";
 import { Timeline, type LegEnd } from "./mazeMotion";
 
 const KEYS: Record<string, Dir> = {
@@ -76,7 +77,9 @@ export function startGame(host: MazeHost): () => void {
   help.className = "maze-hud-help";
   help.textContent = "arrows / wasd / click · esc to quit";
   hud.append(stats, help);
+  hud.dataset.lens = "10";
   document.body.append(hud);
+  watchLens(hud);
   const render = () => {
     stats.textContent = banner || `maze ${solved + 1} · moves ${moves} · ${clock(performance.now() - startedAt)}`;
   };

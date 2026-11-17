@@ -14,7 +14,8 @@ interface Props {
 const { href, title, poster, director, releasedYear, genre = [], priority = false } = Astro.props;
 ---
 
-<a href={href} class="movie-poster-card">
+<a href={href} class="movie-poster-card card-link">
+  <div class="movie-poster-frame">
   {poster ? (
     <Image
       class="movie-poster-img"
@@ -45,5 +46,6 @@ const { href, title, poster, director, releasedYear, genre = [], priority = fals
         {genre.map((g) => <span class="movie-genre-tag">{g}</span>)}
       </div>
     )}
+  </div>
   </div>
 </a>

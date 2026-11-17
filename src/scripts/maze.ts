@@ -483,8 +483,9 @@ export function initMaze() {
   const ball = document.querySelector<HTMLElement>("[data-maze-ball]");
   const core = ball?.querySelector<HTMLElement>(".maze-ball-core");
   const ring = ball?.querySelector<HTMLElement>(".maze-ball-ring");
-  if (!canvas || !ball || !core || !ring) return;
-  parts = { ball, core, ring };
+  const skin = ball?.querySelector<HTMLElement>(".maze-ball-skin");
+  if (!canvas || !ball || !core || !ring || !skin) return;
+  parts = { ball, core, ring, skin };
 
   seed = hashString(
     [navigator.userAgent, screen.width, screen.height, Intl.DateTimeFormat().resolvedOptions().timeZone].join("|"),

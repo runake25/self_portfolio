@@ -2,9 +2,13 @@
 @plugin "@tailwindcss/typography";
 
 /* ════════════════════════════════════════════════════════════════════════════
-   Site-wide styles: theme tokens, the window "shell", header/nav/footer,
-   shared components. Page-specific styles live next to their pages
-   (home.css, music.css, movies.css, article.css, contact.css).
+   Site-wide styles: theme tokens, the glass window, header / nav / footer,
+   shared components, page transitions. Page-specific styles live next to their
+   pages (home.css, music.css, movies.css, article.css, contact.css, thoughts.css).
+
+   Design language: "terminal under glass". The maze and the ball stay visible
+   through a frosted window; controls are soft capsules instead of boxes; motion
+   uses one spring curve everywhere so the whole site moves the same way.
    ════════════════════════════════════════════════════════════════════════════ */
 
 /* ── Theme tokens ─────────────────────────────────────────────────────────────
@@ -13,23 +17,54 @@
 :root {
   --font-ui: "Space Grotesk Variable", "Space Grotesk", system-ui, sans-serif;
   --font-mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, monospace;
-  --ease-soft: 280ms cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  /* Motion: a spring-like ease for anything that moves, a quick ease-out for fades. */
+  --spring: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-soft: 240ms var(--ease-out); /* kept for page styles */
+
+  /* Shape */
+  --r-shell: 26px;
+  --r-card: 18px;
+  --r-ctl: 12px;
 
   --bg: #0b0b14;
   --bg-elevated: #12121e;
-  --surface: rgba(160, 160, 220, 0.06);
-  --surface-hover: rgba(160, 160, 230, 0.13);
-  --border: rgba(180, 180, 255, 0.18);
-  --border-subtle: rgba(180, 180, 255, 0.09);
+  --surface: rgba(160, 160, 220, 0.05);
+  --surface-hover: rgba(160, 160, 230, 0.1);
+  --border: rgba(200, 200, 255, 0.12);
+  --border-subtle: rgba(200, 200, 255, 0.07);
   --grid: rgba(100, 100, 200, 0.05);
   --text-primary: #ede8e2;
-  --text-secondary: #9498ba;
-  /* Was #5e6280 (3.1:1 contrast, fails WCAG AA for small text); now 4.8:1. */
+  --text-secondary: #9a9ebf;
   --text-faint: #7c80a3;
   --accent: #d97756;
   --accent-strong: #ef9070;
   --success: #38d39f;
   --maze-ball: 255 210 0;
+
+  /* Glass */
+  --glass: rgb(22 22 38 / 0.58);
+  --glass-solid: rgb(18 18 30 / 0.95); /* browsers without backdrop-filter */
+  --glass-bar: rgb(26 26 44 / 0.7);
+  --glass-edge: rgb(255 255 255 / 0.09);
+  --glass-shine: rgb(255 255 255 / 0.12);
+  --tile: rgb(255 255 255 / 0.035);
+  --tile-hover: rgb(255 255 255 / 0.065);
+  --tile-shine: rgb(255 255 255 / 0.05);
+  /* Cards get more body than small tiles so the sketch behind them reads as
+     frosted (a real backdrop blur can't reach it from inside the content pane). */
+  --card: rgb(26 26 44 / 0.62);
+  --card-hover: rgb(34 34 56 / 0.72);
+  --hairline: rgb(255 255 255 / 0.07);
+  --shadow-float: 0 40px 90px -30px rgb(0 0 0 / 0.7);
+  /* Liquid-glass edge light: a bright rim where light enters (top-left), a
+     fainter one where it leaves (bottom-right), and a soft inner glow. */
+  --lg-rim:
+    inset 1.5px 1.5px 1px -1px rgb(255 255 255 / 0.42),
+    inset -1.5px -1.5px 1px -1px rgb(255 255 255 / 0.2),
+    inset 0 0 0 1px rgb(255 255 255 / 0.04),
+    inset 0 0 18px -6px rgb(255 255 255 / 0.08);
 
   /* Chart tones sit on top of the plot area, so they get their own per-theme values. */
   --tone-good: #38d39f;
@@ -41,10 +76,10 @@
 :root[data-theme="day"] {
   --bg: #ede0cc;
   --bg-elevated: #f5ead8;
-  --surface: rgba(80, 35, 10, 0.04);
-  --surface-hover: rgba(80, 35, 10, 0.08);
-  --border: rgba(90, 45, 15, 0.18);
-  --border-subtle: rgba(90, 45, 15, 0.09);
+  --surface: rgba(80, 35, 10, 0.035);
+  --surface-hover: rgba(80, 35, 10, 0.07);
+  --border: rgba(90, 45, 15, 0.13);
+  --border-subtle: rgba(90, 45, 15, 0.07);
   --grid: rgba(90, 50, 15, 0.05);
   --text-primary: #1e0d03;
   --text-secondary: #6a4028;
@@ -55,6 +90,24 @@
   --maze-ball: 196 20 20;
   --tone-good: #1f6b4d;
   --tone-bad: #9e2f14;
+
+  --glass: rgb(251 245 235 / 0.56);
+  --glass-solid: rgb(246 238 225 / 0.96);
+  --glass-bar: rgb(252 248 240 / 0.72);
+  --glass-edge: rgb(90 45 15 / 0.12);
+  --glass-shine: rgb(255 255 255 / 0.8);
+  --tile: rgb(255 255 255 / 0.34);
+  --tile-hover: rgb(255 255 255 / 0.58);
+  --tile-shine: rgb(255 255 255 / 0.6);
+  --card: rgb(249 243 232 / 0.62);
+  --card-hover: rgb(252 248 241 / 0.8);
+  --hairline: rgb(90 45 15 / 0.09);
+  --shadow-float: 0 34px 80px -34px rgb(70 35 10 / 0.38);
+  --lg-rim:
+    inset 1.5px 1.5px 1px -1px rgb(255 255 255 / 0.95),
+    inset -1.5px -1.5px 1px -1px rgb(255 255 255 / 0.6),
+    inset 0 0 0 1px rgb(255 255 255 / 0.22),
+    inset 0 0 18px -6px rgb(255 255 255 / 0.4);
 
   color-scheme: light;
 }
@@ -82,7 +135,7 @@ body {
   background: var(--bg);
   line-height: 1.58;
   letter-spacing: 0.01em;
-  transition: background-color var(--ease-soft), color var(--ease-soft);
+  transition: background-color 240ms var(--ease-out), color 240ms var(--ease-out);
   position: relative;
   overflow: hidden;
   display: flex;
@@ -101,14 +154,16 @@ a {
 }
 
 :focus-visible {
-  outline: 1px solid var(--accent);
+  outline: 2px solid color-mix(in srgb, var(--accent) 70%, transparent);
   outline-offset: 2px;
 }
 
+/* Instant response to touch: no grey tap flash, no double-tap-zoom delay. */
 a,
 button,
 [role="button"] {
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .sr-only {
@@ -138,76 +193,101 @@ button,
   background: color-mix(in srgb, var(--accent) 55%, transparent);
 }
 
-/* ── View transitions ─────────────────────────────────────────────────────────
-   Page navigations swap instantly (no cross-fade). The theme toggle runs its own
-   circular reveal from JS (scripts/theme.ts). */
+/* ── Page transitions (View Transitions API, driven by Astro's ClientRouter) ──
+   The frame stays put; only the content pane (#main-content) moves: it fades
+   out quickly and the new one rises in on a spring. The active-tab pill has its own name, so the browser glides it to the new tab.
+   All of this runs on the compositor; no JavaScript animates anything. */
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;
   mix-blend-mode: normal;
 }
 
-/* During the theme reveal, suspend per-element color transitions so colors
-   don't animate a second time inside the revealed circle. */
+.maze-ball {
+  view-transition-name: maze-ball; /* stays live and in place during navigation */
+}
+
+.nav-pill {
+  view-transition-name: nav-pill;
+}
+
+::view-transition-group(nav-pill) {
+  animation-duration: 460ms;
+  animation-timing-function: var(--spring);
+}
+
+/* The pill moves like a drop of liquid: it stretches along the way, then
+   settles with a small wobble. Old and new pills look the same, so only one shows. */
+::view-transition-old(nav-pill) {
+  animation: none;
+  opacity: 0;
+}
+
+::view-transition-new(nav-pill) {
+  animation: pill-morph 520ms ease-in-out both;
+}
+
+@keyframes pill-morph {
+  30% {
+    transform: scale(1.16, 0.8);
+  }
+  62% {
+    transform: scale(0.97, 1.05);
+  }
+  82% {
+    transform: scale(1.01, 0.99);
+  }
+}
+
+::view-transition-old(page) {
+  animation: vt-fade-out 130ms var(--ease-out) both;
+}
+
+::view-transition-new(page) {
+  animation: vt-rise-in 340ms var(--spring) both;
+}
+
+@keyframes vt-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes vt-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+/* Only the content pane moves; the root (frame, maze, top bar, tab bar) holds
+   completely still. The bars are deliberately left unnamed: a named element
+   becomes a "backdrop root", and the glass inside it could no longer blur the
+   page scrolling underneath. */
+.page-content {
+  view-transition-name: page;
+}
+
+/* The theme switch is a circular reveal of the whole page (scripts/theme.ts);
+   named parts would otherwise cross-fade on their own instead of being revealed. */
 :root[data-vt] *,
 :root[data-vt] *::before,
 :root[data-vt] *::after {
   transition: none !important;
+  view-transition-name: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
 }
 
 /* Prevent Astro ClientRouter fallback loading dim */
 :root[data-astro-transition-fallback] {
   opacity: 1 !important;
-}
-
-/* ── Custom cursor ────────────────────────────────────────────────────────────
-   Only active once scripts/cursor.ts adds .has-custom-cursor (fine pointers only),
-   so the native cursor is never hidden without a replacement. */
-.has-custom-cursor body,
-.has-custom-cursor a,
-.has-custom-cursor button,
-.has-custom-cursor [role="button"] {
-  cursor: none;
-}
-
-.cursor-dot,
-.cursor-ring {
-  position: fixed;
-  top: 0;
-  left: 0;
-  border-radius: 50%;
-  pointer-events: none;
-  translate: -50% -50%;
-  opacity: 0;
-  will-change: transform;
-}
-
-.cursor-dot {
-  width: 12px;
-  height: 12px;
-  background: var(--accent);
-  z-index: 9999;
-  transition: opacity 0.2s;
-}
-
-.cursor-ring {
-  width: 32px;
-  height: 32px;
-  border: 1.5px solid var(--accent);
-  z-index: 9998;
-  /* `scale` (not width/height) so the hover grow never triggers layout. */
-  transition: opacity 0.2s, scale 0.18s;
-}
-
-.cursor-visible .cursor-dot {
-  opacity: 1;
-}
-.cursor-visible .cursor-ring {
-  opacity: 0.55;
-}
-.cursor-visible.cursor-on-interactive .cursor-ring {
-  scale: 1.375;
-  opacity: 0.35;
 }
 
 /* ── Background: grid + maze ──────────────────────────────────────────────── */
@@ -236,12 +316,14 @@ button,
   opacity: 0.8;
 }
 
-/* The ball: an outer element that only moves (translate), with three layers:
-   a soft glow (::before), an impact ripple, and the shaded sphere itself, which
-   squashes when it hits a wall. scripts/mazeMotion.ts animates all of them with
-   transform/opacity only, so the compositor does all the work. */
+/* The ball: an outer element that only moves (translate), with these layers:
+   a soft glow (::before), an impact ripple, and the sphere itself, which
+   squashes when it hits a wall. Inside the sphere, the printed "8" disc slides
+   under fixed lighting as the ball rolls (see scripts/mazeMotion.ts). Everything
+   is animated with transform/opacity only, so the compositor does all the work. */
 .maze-ball {
   --size: var(--ball-size, 12px);
+  --round: calc(var(--size) * 3.14159); /* circumference: the skin repeats every turn */
   position: fixed;
   top: 0;
   left: 0;
@@ -263,19 +345,44 @@ button,
   animation: ball-pulse 3.5s ease-in-out infinite;
 }
 
-/* Lit from the top-left: a bright specular spot, the body colour, a darker rim,
-   and a small contact shadow underneath. */
+/* An 8-ball: a matte black sphere. The glow and impact ripple keep the theme
+   colour so it still stands out on the dark maze. */
 .maze-ball-core {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background:
-    radial-gradient(circle at 32% 28%, rgb(255 255 255 / 0.95) 0 9%, rgb(255 255 255 / 0) 30%),
-    radial-gradient(circle at 40% 36%, rgb(var(--maze-ball)) 0 45%, color-mix(in srgb, rgb(var(--maze-ball)) 55%, #000) 100%);
-  box-shadow:
-    1px 2px 3px rgb(0 0 0 / 0.45),
-    inset -1px -1px 2px rgb(0 0 0 / 0.25);
+  overflow: hidden;
+  background: #16161b;
+  box-shadow: 0.5px 1.5px 2.5px rgb(0 0 0 / 0.4);
   will-change: transform, opacity;
+}
+
+.maze-ball-skin {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(var(--round) + var(--size));
+  height: calc(var(--round) + var(--size));
+  transform: translate(calc(var(--round) * -1), calc(var(--round) * -1));
+  /* White "8" discs (about half the ball's width) on a staggered grid, two per
+     half-turn: a number rolls into view about half the time, as on a real
+     8-ball, and two are never in view at once. Seamless at one circumference. */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='25' cy='25' r='16.4' fill='%23f3efe6'/%3E%3Ctext x='25' y='26' fill='%23141418' font-family='Arial,Helvetica,sans-serif' font-weight='700' font-size='22' text-anchor='middle' dominant-baseline='central'%3E8%3C/text%3E%3Ccircle cx='75' cy='75' r='16.4' fill='%23f3efe6'/%3E%3Ctext x='75' y='76' fill='%23141418' font-family='Arial,Helvetica,sans-serif' font-weight='700' font-size='22' text-anchor='middle' dominant-baseline='central'%3E8%3C/text%3E%3C/svg%3E");
+  background-size: calc(var(--round) / 2) calc(var(--round) / 2);
+  will-change: transform;
+}
+
+/* Fixed lighting on top of the turning skin: diffuse light, a soft terminator,
+   and darker edges that hide where the flat texture would read as flat. */
+.maze-ball-core::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 34% 28%, rgb(255 255 255 / 0.2) 0, rgb(255 255 255 / 0) 50%),
+    radial-gradient(circle at 40% 36%, rgb(0 0 0 / 0) 50%, rgb(0 0 0 / 0.45) 100%);
+  box-shadow: inset 0 0 0 0.5px rgb(255 255 255 / 0.1);
 }
 
 .maze-ball-ring {
@@ -331,10 +438,12 @@ button,
   display: flex;
   gap: 1.1rem;
   padding: 0.5rem 0.95rem;
-  border: 1px solid var(--border);
+  border: 1px solid var(--glass-edge);
   border-radius: 999px;
-  background: color-mix(in srgb, var(--bg-elevated) 86%, transparent);
-  backdrop-filter: blur(6px);
+  background: var(--glass-bar);
+  box-shadow: var(--lg-rim), 0 12px 30px -14px rgb(0 0 0 / 0.5);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  backdrop-filter: blur(16px) saturate(150%);
   color: var(--text-primary);
   white-space: nowrap;
 }
@@ -343,73 +452,42 @@ button,
   color: var(--text-faint);
 }
 
-/* ── Window shell ─────────────────────────────────────────────────────────── */
+/* ── Window shell: frosted glass over the maze ────────────────────────────────
+   Opaque fallback first; real blur where supported. The blur samples the maze
+   canvas (static) and the ball, so it's cheap: nothing behind it repaints except
+   the small ball. */
 .site-shell {
-  width: min(90vw, 1100px);
-  height: min(90dvh, 920px);
-  border: 1px solid var(--border);
+  width: min(92vw, 1180px);
+  height: min(92dvh, 940px);
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--r-shell);
   background:
-    linear-gradient(150deg, rgba(255, 255, 255, 0.03), transparent 42%),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.015), transparent 24%),
-    var(--bg-elevated);
+    linear-gradient(135deg, rgb(255 255 255 / 0.05), transparent 38%),
+    var(--glass-solid);
   box-shadow:
-    0 28px 70px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.03);
+    var(--lg-rim),
+    var(--shadow-float);
   display: grid;
-  grid-template-rows: auto auto 1fr auto;
+  grid-template-rows: auto 1fr auto;
   transition:
-    background-color var(--ease-soft),
-    border-color var(--ease-soft),
-    box-shadow var(--ease-soft),
-    opacity 320ms cubic-bezier(0.22, 0.61, 0.36, 1),
-    visibility 320ms cubic-bezier(0.22, 0.61, 0.36, 1),
-    transform 320ms cubic-bezier(0.22, 0.61, 0.36, 1);
+    opacity 320ms var(--ease-out),
+    visibility 320ms var(--ease-out),
+    scale 480ms var(--spring);
   position: relative;
   overflow: hidden;
   isolation: isolate;
   z-index: 2;
+  timeline-scope: --page;
 }
 
-/* Corner brackets */
-.site-shell::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
-  background:
-    linear-gradient(to right, var(--accent) 0 18px, transparent 18px) top left / 30px 1px no-repeat,
-    linear-gradient(to bottom, var(--accent) 0 18px, transparent 18px) top left / 1px 30px no-repeat,
-    linear-gradient(to left, var(--accent) 0 18px, transparent 18px) top right / 30px 1px no-repeat,
-    linear-gradient(to bottom, var(--accent) 0 18px, transparent 18px) top right / 1px 30px no-repeat,
-    linear-gradient(to right, var(--accent) 0 18px, transparent 18px) bottom left / 30px 1px no-repeat,
-    linear-gradient(to top, var(--accent) 0 18px, transparent 18px) bottom left / 1px 30px no-repeat,
-    linear-gradient(to left, var(--accent) 0 18px, transparent 18px) bottom right / 30px 1px no-repeat,
-    linear-gradient(to top, var(--accent) 0 18px, transparent 18px) bottom right / 1px 30px no-repeat;
-  opacity: 0.5;
-}
-
-/* Faint scanlines */
-.site-shell::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    linear-gradient(rgba(255, 255, 255, 0.045) 50%, rgba(0, 0, 0, 0.03) 50%),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.016), rgba(255, 255, 255, 0.004), rgba(255, 255, 255, 0.016));
-  background-size:
-    100% 2px,
-    4px 100%;
-  opacity: 0.06;
-}
-
-:root[data-theme="day"] .site-shell {
-  box-shadow:
-    0 24px 55px rgba(0, 0, 0, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.65),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .site-shell {
+    background:
+      linear-gradient(135deg, rgb(255 255 255 / 0.05), transparent 38%),
+      var(--glass);
+    -webkit-backdrop-filter: blur(26px) saturate(150%);
+    backdrop-filter: blur(26px) saturate(150%);
+  }
 }
 
 /* Hide-UI mode (desktop only; on phones the toggle isn't shown). */
@@ -418,7 +496,7 @@ button,
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transform: scale(0.985);
+    scale: 0.97;
   }
 
   :root[data-ui-hidden="true"] .maze-canvas {
@@ -433,6 +511,12 @@ button,
   pointer-events: none;
   z-index: 1;
   overflow: hidden;
+  border-radius: inherit;
+}
+
+.sketch-wrap {
+  position: absolute;
+  inset: 0;
 }
 
 .sketch-bg {
@@ -444,13 +528,13 @@ button,
   object-fit: contain;
   object-position: bottom right;
   user-select: none;
-  opacity: 0.45;
+  opacity: 0.4;
 }
 
-/* The sketch is dark line art; invert it for the night theme. This used to key
-   off the OS setting, so it broke when the theme toggle disagreed with the OS. */
+/* The sketch is dark line art; invert it for the night theme. */
 :root[data-theme="night"] .sketch-bg {
   filter: invert(1);
+  opacity: 0.32;
 }
 
 .shell-poster-img {
@@ -473,7 +557,7 @@ button,
   mask-composite: intersect;
 }
 
-/* ── Header ───────────────────────────────────────────────────────────────── */
+/* ── Header: brand · tabs · actions, in one row ───────────────────────────── */
 .brand,
 .breadcrumb,
 .section-label,
@@ -483,142 +567,143 @@ button,
 .tag-chip,
 .card-arrow,
 .article-meta,
-.nav-link,
-.health-value {
+.nav-link {
   font-family: var(--font-mono);
 }
 
 .site-header {
-  display: block;
-  padding: 1.05rem 1.2rem 0.85rem;
-  border-bottom: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.8rem 0.9rem 0.8rem 1.5rem;
+  position: relative;
+  z-index: 3;
 }
 
-.header-top {
+/* A hairline under the header that fades in once the content scrolls under it. */
+.site-header::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--hairline);
+  opacity: 0;
+  pointer-events: none;
+}
+
+@supports (animation-timeline: --page) {
+  .page-content {
+    scroll-timeline-name: --page;
+    scroll-timeline-axis: block;
+  }
+  .site-header::after {
+    animation-name: hairline-in;
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+    animation-timeline: --page;
+    animation-range: 0 48px;
+  }
+}
+
+@keyframes hairline-in {
+  to {
+    opacity: 1;
+  }
+}
+
+.header-brand {
   display: flex;
   align-items: center;
-  gap: 0.82rem;
-  margin-bottom: 0.48rem;
+  gap: 0.85rem;
+  min-width: 0;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
 }
 
 .brand {
   display: inline-flex;
   align-items: center;
   color: var(--accent);
-  font-size: 0.82rem;
-  letter-spacing: 0.12em;
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .brand-socials {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-left: 0.75rem;
-  margin-right: auto;
+  gap: 0.15rem;
 }
 
 .brand-social-link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-secondary);
-  opacity: 0.65;
-  transition: color 0.18s, opacity 0.18s;
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  color: var(--text-faint);
+  transition:
+    color 200ms var(--ease-out),
+    background-color 200ms var(--ease-out),
+    scale 320ms var(--spring);
 }
 
 .brand-social-link svg {
-  width: 28px;
-  height: 24px;
+  width: 17px;
+  height: 17px;
 }
 
-.brand-social-link:hover {
-  color: var(--text-primary);
-  opacity: 1;
-}
-
-.breadcrumb {
-  margin: 0;
-  font-size: 0.74rem;
-  color: var(--text-secondary);
-  word-break: break-word;
-}
-
-/* ── Round toggle buttons (theme + hide UI) ───────────────────────────────── */
+/* ── Capsule controls: theme toggle + hide-UI toggle ──────────────────────── */
 .mode-toggle,
 .ui-visibility-toggle {
-  border: 1px solid var(--border);
+  border: 1px solid var(--hairline);
   color: var(--text-secondary);
-  min-height: 38px;
+  height: 36px;
   border-radius: 999px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  touch-action: manipulation;
   cursor: pointer;
+  background: var(--tile);
+  box-shadow: var(--lg-rim);
   transition:
-    color var(--ease-soft),
-    border-color var(--ease-soft),
-    background-color var(--ease-soft),
-    transform var(--ease-soft),
-    box-shadow var(--ease-soft);
+    color 200ms var(--ease-out),
+    background-color 200ms var(--ease-out),
+    border-color 200ms var(--ease-out),
+    scale 320ms var(--spring);
 }
 
 .mode-toggle {
-  background: transparent;
+  width: 36px;
   padding: 0;
-  width: 38px;
   position: relative;
 }
 
-.mode-toggle:hover,
-.ui-visibility-toggle:hover {
-  color: var(--text-primary);
-  border-color: color-mix(in srgb, var(--accent) 62%, var(--border));
-  background: color-mix(in srgb, var(--surface-hover) 55%, transparent);
-  transform: translateY(-1px);
-  box-shadow: 0 8px 16px color-mix(in srgb, var(--accent) 18%, transparent);
-}
-
-.mode-toggle:active,
-.ui-visibility-toggle:active {
-  transform: translateY(1px) scale(0.98);
-  box-shadow: none;
-}
-
-:root[data-theme="night"] .mode-toggle {
-  border-color: color-mix(in srgb, #ffffff 72%, var(--border));
-  background: color-mix(in srgb, #ffffff 10%, transparent);
-}
-
-:root[data-theme="day"] .mode-toggle {
-  background: var(--bg-elevated);
-}
-
 .mode-icon {
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
   display: inline-block;
   border-radius: 999px;
-  transition: transform var(--ease-soft);
+  transition: transform 420ms var(--spring);
 }
 
 .mode-icon-sun {
-  border: 2px solid #ffcf40;
-  box-shadow: 0 0 0 2px rgba(255, 207, 64, 0.2);
+  border: 2px solid #e8a317;
+  box-shadow: 0 0 0 2px rgba(232, 163, 23, 0.18);
 }
 
 .mode-icon-moon {
   box-shadow: inset 5px 0 0 0 #f4f4f4;
-}
-
-.mode-toggle:hover .mode-icon-sun {
-  transform: rotate(18deg) scale(1.04);
-}
-
-.mode-toggle:hover .mode-icon-moon {
-  transform: translateX(-1px) scale(1.04);
 }
 
 :root[data-theme="night"] .mode-icon-sun,
@@ -628,89 +713,143 @@ button,
 
 .ui-visibility-toggle {
   position: fixed;
-  top: 0.85rem;
+  top: 0.9rem;
   right: 0.95rem;
-  min-width: 72px;
-  padding: 0 0.62rem;
-  background: color-mix(in srgb, var(--bg-elevated) 84%, transparent);
-  backdrop-filter: blur(6px);
+  padding: 0 0.75rem;
   gap: 0.35rem;
   z-index: 6;
+  background: var(--glass-bar);
+  border-color: var(--glass-edge);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  backdrop-filter: blur(16px) saturate(150%);
 }
 
 :root[data-ui-hidden="true"] .ui-visibility-toggle {
   color: var(--text-primary);
-  border-color: color-mix(in srgb, var(--accent) 68%, var(--border));
-  background: color-mix(in srgb, var(--surface-hover) 74%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 50%, var(--glass-edge));
+}
+
+/* Clear liquid glass over the maze: barely frosted, so the refracted maze lines
+   bend visibly around the rim (Chromium; see scripts/liquidGlass.ts). */
+.ui-visibility-toggle.lens-on {
+  background: color-mix(in srgb, var(--glass-bar) 40%, transparent);
+  -webkit-backdrop-filter: blur(1.5px) saturate(170%) brightness(1.06);
+  backdrop-filter: blur(1.5px) saturate(170%) brightness(1.06);
+}
+
+.maze-hud.lens-on {
+  background: color-mix(in srgb, var(--glass-bar) 62%, transparent);
+  -webkit-backdrop-filter: blur(3px) saturate(170%);
+  backdrop-filter: blur(3px) saturate(170%);
 }
 
 .ui-toggle-icons {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.4rem;
 }
 
 .ui-toggle-sep {
   width: 1px;
-  height: 13px;
-  background: color-mix(in srgb, var(--accent) 30%, var(--border));
+  height: 12px;
+  background: var(--hairline);
 }
 
-/* ── Nav ──────────────────────────────────────────────────────────────────── */
+/* ── Tabs: a segmented control (desktop) / floating tab bar (phones) ───────── */
 .site-nav {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.46rem;
-  padding: 0.72rem 1.2rem;
-  border-bottom: 1px solid var(--border);
+  gap: 2px;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--tile);
+  border: 1px solid var(--hairline);
+  box-shadow: var(--lg-rim);
 }
 
 .nav-link {
-  border: 1px solid var(--border);
-  background: color-mix(in srgb, var(--surface) 84%, transparent);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
   color: var(--text-secondary);
-  font-size: 0.7rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 0.33rem 0.56rem;
+  font-size: 0.74rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  line-height: 1;
+  white-space: nowrap;
   transition:
-    color var(--ease-soft),
-    border-color var(--ease-soft),
-    background-color var(--ease-soft),
-    transform 60ms ease;
+    color 200ms var(--ease-out),
+    scale 360ms var(--spring);
 }
 
-.nav-link:hover,
-.nav-link[data-active="true"] {
-  color: var(--text-primary);
-  border-color: color-mix(in srgb, var(--accent) 64%, var(--border));
-  background: var(--surface-hover);
+.nav-label {
+  position: relative;
+  z-index: 1;
 }
 
 .nav-link[data-active="true"] {
-  color: var(--accent);
-  background: color-mix(in srgb, var(--surface-hover) 65%, transparent);
-}
-
-:root[data-theme="day"] .nav-link {
-  background: var(--bg-elevated);
-}
-
-:root[data-theme="day"] .nav-link[data-active="true"] {
   color: var(--text-primary);
 }
 
-.nav-link:active {
-  transform: scale(0.94);
+/* The active tab's background. Its view-transition name makes it slide. */
+.nav-pill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(120% 90% at 30% 0%, rgb(255 255 255 / 0.1), transparent 60%),
+    color-mix(in srgb, var(--accent) 17%, var(--glass-bar));
+  box-shadow:
+    var(--lg-rim),
+    inset 0 0 0 1px color-mix(in srgb, var(--accent) 30%, transparent),
+    0 6px 16px -8px color-mix(in srgb, var(--accent) 70%, transparent);
+}
+
+/* ── Press + hover feedback ─────────────────────────────────────────────────
+   Pressing anything shrinks it slightly at once; releasing springs it back.
+   Hover effects only on devices that really hover, so they never "stick"
+   after a tap on a phone. */
+.nav-link:active,
+.mode-toggle:active,
+.ui-visibility-toggle:active,
+.brand-social-link:active,
+.execute-button:active,
+.footer-cmd:active {
+  scale: 0.94;
+  transition: scale 90ms var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .nav-link:hover {
+    color: var(--text-primary);
+  }
+  .brand-social-link:hover {
+    color: var(--text-primary);
+    background: var(--tile-hover);
+  }
+  .mode-toggle:hover,
+  .ui-visibility-toggle:hover {
+    color: var(--text-primary);
+    background: var(--tile-hover);
+    border-color: color-mix(in srgb, var(--accent) 40%, var(--hairline));
+  }
+  .mode-toggle:hover .mode-icon-sun {
+    transform: rotate(25deg);
+  }
+  .mode-toggle:hover .mode-icon-moon {
+    transform: rotate(-12deg);
+  }
 }
 
 /* ── Content pane ─────────────────────────────────────────────────────────── */
 .page-content {
-  padding: 1.1rem 1.2rem;
+  padding: 0.75rem 1.6rem 1.6rem;
   overflow: auto;
   overscroll-behavior: contain;
   position: relative;
-  /* A visible (thin) scrollbar: it's the only cue for how long an article is. */
+  z-index: 2; /* its view-transition name makes it a stacking context; keep it above the sketch */
   scrollbar-width: thin;
   scrollbar-gutter: stable;
 }
@@ -728,95 +867,97 @@ button,
 .section-label {
   margin: 0;
   color: var(--accent);
-  font-size: 0.72rem;
-  letter-spacing: 0.11em;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   font-weight: 600;
 }
 
+/* Cards are glass tiles: a faint fill, a hairline edge and a top highlight. */
 .card-link {
-  border: 1px solid color-mix(in srgb, var(--text-faint) 52%, transparent);
-  background: var(--bg-elevated);
-  padding: 1.5rem 1.5rem 1.75rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-card);
+  background: var(--card);
+  box-shadow: inset 0 1px 0 var(--tile-shine);
+  padding: 1.4rem 1.5rem 1.6rem;
   transition:
-    border-color var(--ease-soft),
-    background-color var(--ease-soft),
-    box-shadow var(--ease-soft),
-    transform var(--ease-soft);
+    background-color 220ms var(--ease-out),
+    border-color 220ms var(--ease-out),
+    translate 420ms var(--spring),
+    scale 420ms var(--spring);
 }
 
-.card-link:hover {
-  border-color: color-mix(in srgb, var(--accent) 62%, var(--border));
-  background: var(--surface-hover);
-  transform: translateY(-1px);
+a.card-link:active,
+.card-link a:active {
+  scale: 0.985;
+  transition: scale 100ms var(--ease-out);
 }
 
-/* Night theme: only the border lights up on hover */
-:root[data-theme="night"] .card-link:hover {
-  background: color-mix(in srgb, var(--surface) 84%, transparent);
-}
-
-:root[data-theme="day"] .card-link {
-  background: var(--bg-elevated);
+@media (hover: hover) and (pointer: fine) {
+  a.card-link:hover,
+  .card-link:has(> a:hover) {
+    background: var(--card-hover);
+    border-color: color-mix(in srgb, var(--accent) 28%, var(--hairline));
+    translate: 0 -2px;
+  }
 }
 
 .card-arrow {
   color: var(--text-faint);
   font-size: 0.68rem;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 .tag-chip {
-  border: 1px solid color-mix(in srgb, var(--accent) 56%, var(--border));
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 11%, transparent);
   color: var(--text-secondary);
   font-size: 0.66rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  padding: 0.15rem 0.42rem;
+  letter-spacing: 0.02em;
+  padding: 0.2rem 0.6rem;
 }
 
 .execute-button {
-  border: 1px solid color-mix(in srgb, var(--accent) 64%, var(--border));
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--hairline));
+  border-radius: 999px;
   color: var(--text-primary);
-  background: color-mix(in srgb, var(--accent) 12%, transparent);
-  font-size: 0.69rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 0.38rem 0.66rem;
+  background: color-mix(in srgb, var(--accent) 13%, transparent);
+  box-shadow: inset 0 1px 0 var(--tile-shine);
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
   transition:
-    background-color var(--ease-soft),
-    border-color var(--ease-soft),
-    color var(--ease-soft),
-    transform 80ms ease;
-}
-
-.execute-button:hover {
-  border-color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 24%, transparent);
+    background-color 200ms var(--ease-out),
+    border-color 200ms var(--ease-out),
+    scale 360ms var(--spring);
 }
 
 .execute-button.secondary {
-  background: transparent;
-  border-color: var(--border);
+  background: var(--tile);
+  border-color: var(--hairline);
   color: var(--text-secondary);
 }
 
-.execute-button.secondary:hover {
-  border-color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 12%, transparent);
-  color: var(--text-primary);
-}
-
-.execute-button:active {
-  transform: scale(0.96);
+@media (hover: hover) and (pointer: fine) {
+  .execute-button:hover {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 22%, transparent);
+  }
+  .execute-button.secondary:hover {
+    border-color: color-mix(in srgb, var(--accent) 45%, var(--hairline));
+    background: var(--tile-hover);
+    color: var(--text-primary);
+  }
 }
 
 .pick-one-btn {
   font-family: var(--font-mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.12em;
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -837,15 +978,14 @@ button,
 
 /* ── Prev / next entry nav ────────────────────────────────────────────────── */
 .entry-footer-nav {
-  margin-top: 1rem;
+  margin-top: 1.25rem;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.55rem;
+  gap: 0.6rem;
   position: relative;
   z-index: 2;
 }
 
-/* Older entry always left, newer entry always right */
 .entry-prev {
   grid-column: 1;
 }
@@ -855,69 +995,107 @@ button,
 }
 
 .entry-footer-nav a {
-  border: 1px solid var(--border);
-  background: var(--bg-elevated);
-  padding: 0.7rem;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-ctl);
+  background: var(--tile);
+  padding: 0.8rem 0.95rem;
   color: var(--text-secondary);
+  transition:
+    color 200ms var(--ease-out),
+    background-color 200ms var(--ease-out),
+    scale 360ms var(--spring);
 }
 
-.entry-footer-nav a:hover {
-  color: var(--text-primary);
-  border-color: color-mix(in srgb, var(--accent) 56%, var(--border));
-  background: var(--surface-hover);
+.entry-footer-nav a:active {
+  scale: 0.98;
 }
 
-/* ── Footer ───────────────────────────────────────────────────────────────── */
+@media (hover: hover) and (pointer: fine) {
+  .entry-footer-nav a:hover {
+    color: var(--text-primary);
+    background: var(--tile-hover);
+  }
+}
+
+/* ── Footer: where you are · commands · clock ─────────────────────────────── */
 .site-footer {
   display: flex;
   justify-content: space-between;
-  gap: 0.8rem;
+  gap: 1rem;
   align-items: center;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--hairline);
   color: var(--text-faint);
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.09em;
-  padding: 0.56rem 1.2rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  padding: 0.6rem 1.5rem 0.7rem;
   position: relative;
   z-index: 2;
-  background: var(--bg-elevated);
 }
 
-.site-footer > span,
-.footer-right > span {
+.footer-left {
   display: flex;
   align-items: center;
-  gap: 0.22rem;
+  gap: 0.6rem;
   min-width: 0;
 }
 
+.breadcrumb {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .footer-right {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  justify-content: flex-end;
+  gap: 1.1rem;
+  flex-shrink: 0;
   font-variant-numeric: tabular-nums; /* the clock doesn't jitter as digits change */
 }
 
-.footer-sep {
-  margin: 0 0.62rem;
-  color: color-mix(in srgb, var(--accent) 52%, var(--text-faint));
-}
-
-.health-value {
+.footer-cmd {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
-  color: var(--text-primary);
-  font-size: 0.74rem;
-  letter-spacing: 0.04em;
+  gap: 0.4rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+  transition:
+    color 160ms var(--ease-out),
+    scale 320ms var(--spring);
 }
 
-/* Heartbeat: the ripple is a pseudo-element animated with transform/opacity.
-   (Animating box-shadow, as before, forced a repaint on every frame, forever.) */
+.footer-cmd kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.5em;
+  height: 1.5em;
+  border: 1px solid var(--hairline);
+  border-radius: 6px;
+  background: var(--tile);
+  font: inherit;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .footer-cmd:hover {
+    color: var(--accent);
+  }
+}
+
+.footer-cmd:focus-visible {
+  color: var(--accent);
+}
+
+/* Heartbeat: the ripple is a pseudo-element animated with transform/opacity. */
 .status-marker {
   position: relative;
   display: inline-block;
+  flex-shrink: 0;
   width: 6px;
   height: 6px;
   background: var(--success);
@@ -953,10 +1131,20 @@ button,
   }
 }
 
-/* ── Phone / narrow layout ────────────────────────────────────────────────────
-   The shell becomes the full page and the document scrolls normally. The maze
-   would be fully covered here, so it isn't rendered (or animated) at all. */
+/* ── Phones / narrow screens ──────────────────────────────────────────────────
+   The window becomes the page and the document scrolls normally. A compact
+   glass top bar sticks to the top, and the tabs float at the bottom where a
+   thumb can reach them. The maze would be fully covered here, so it isn't
+   rendered (or animated) at all. */
 @media (max-width: 940px) {
+  /* Bars float over moving text here, so they need more body to stay readable. */
+  :root {
+    --glass-bar: rgb(26 26 44 / 0.82);
+  }
+  :root[data-theme="day"] {
+    --glass-bar: rgb(252 248 240 / 0.84);
+  }
+
   html {
     height: 100%;
     overflow-y: auto;
@@ -967,7 +1155,6 @@ button,
     overflow: visible;
     height: auto;
     min-height: 100dvh;
-    padding-bottom: env(safe-area-inset-bottom);
   }
 
   .maze-canvas,
@@ -977,150 +1164,125 @@ button,
     display: none;
   }
 
-  .safe-area-top-fade,
-  .safe-area-bottom-fade {
-    position: fixed;
-    left: 0;
-    right: 0;
-    z-index: 5;
-    pointer-events: none;
-  }
-
-  .safe-area-top-fade {
-    top: 0;
-    height: env(safe-area-inset-top);
-    background: linear-gradient(to bottom, var(--bg-elevated), transparent);
-  }
-
-  .safe-area-bottom-fade {
-    bottom: 0;
-    height: env(safe-area-inset-bottom);
-    background: linear-gradient(to top, var(--bg-elevated), transparent);
-  }
-
-  .site-shell {
+  .site-shell,
+  .site-shell[data-reading] {
     width: 100%;
     height: auto;
     min-height: 100svh;
     border: 0;
-    padding-bottom: env(safe-area-inset-bottom);
+    border-radius: 0;
+    box-shadow: none;
+    background: var(--bg);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    display: block;
+    overflow: clip; /* clips the sketch without breaking the sticky top bar */
   }
 
-  .site-shell::before {
-    border-top: none;
-    border-bottom: none;
-  }
-
+  /* The glass sits on a pseudo-element: a backdrop-filter on the header itself
+     would trap the fixed tab bar inside it. */
   .site-header {
-    padding: 1rem 0.9rem 0.8rem;
-    padding-top: calc(env(safe-area-inset-top) + 1rem);
-    border-bottom: none;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    grid-template-columns: 1fr auto;
+    padding: calc(env(safe-area-inset-top) + 0.55rem) max(0.75rem, env(safe-area-inset-right)) 0.55rem
+      max(1rem, env(safe-area-inset-left));
+  }
+
+  .site-header::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--glass-bar);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    backdrop-filter: blur(20px) saturate(160%);
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .site-header::after {
+    display: none;
+  }
+
+  .brand {
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+  }
+
+  .header-brand {
+    gap: 0.4rem;
+  }
+
+  .site-nav {
+    position: fixed;
+    z-index: 30;
+    left: 50%;
+    bottom: calc(env(safe-area-inset-bottom) + 14px);
+    translate: -50% 0;
+    max-width: calc(100vw - 20px);
+    padding: 5px;
+    background: var(--glass-bar);
+    border-color: var(--glass-edge);
+    box-shadow:
+      var(--lg-rim),
+      0 14px 34px -12px rgb(0 0 0 / 0.55);
+    -webkit-backdrop-filter: blur(22px) saturate(170%);
+    backdrop-filter: blur(22px) saturate(170%);
+  }
+
+  /* With refraction (scripts/liquidGlass.ts) the bar can be clearer: the bent
+     rim does the work the heavy frost did. Labels keep enough tint behind them. */
+  .site-nav.lens-on {
+    background: color-mix(in srgb, var(--glass-bar) 74%, transparent);
+    -webkit-backdrop-filter: blur(7px) saturate(180%);
+    backdrop-filter: blur(7px) saturate(180%);
+  }
+
+  .nav-link {
+    min-height: 42px;
+    padding: 0 0.85rem;
+    font-size: 0.76rem;
+  }
+
+  .page-content {
+    padding: 1.1rem max(1rem, env(safe-area-inset-right)) 1.5rem max(1rem, env(safe-area-inset-left));
+    overflow: visible;
+    scrollbar-gutter: auto;
+  }
+
+  /* Room under the footer for the floating tab bar. */
+  .site-footer {
+    flex-wrap: wrap;
+    padding: 0.9rem max(1rem, env(safe-area-inset-right)) calc(env(safe-area-inset-bottom) + 5.2rem)
+      max(1rem, env(safe-area-inset-left));
+  }
+
+  .footer-clock {
+    display: none;
+  }
+
+  .sketch-bg {
+    height: auto;
+    width: 92%;
+    right: -12%;
+    opacity: 0.22;
+  }
+
+  :root[data-theme="night"] .sketch-bg {
+    opacity: 0.18;
   }
 
   .shell-poster-bg {
     display: none;
   }
-
-  .header-top {
-    gap: 0.55rem;
-  }
-
-  .brand {
-    font-size: 0.75rem;
-    letter-spacing: 0.06em;
-  }
-
-  .mode-toggle {
-    min-height: 40px;
-    width: 40px;
-  }
-
-  .site-nav,
-  .page-content,
-  .site-footer {
-    padding-left: 0.9rem;
-    padding-right: 0.9rem;
-  }
-
-  .page-content {
-    overflow: visible;
-    scrollbar-gutter: auto;
-  }
-
-  .site-footer {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.35rem;
-  }
-
-  .footer-right {
-    justify-content: flex-start;
-    flex-wrap: wrap;
-  }
-
-  .footer-sep {
-    margin: 0 0.45rem;
-  }
 }
 
-.safe-area-top-fade,
-.safe-area-bottom-fade {
-  pointer-events: none;
-}
-
-@media (min-width: 941px) {
-  .safe-area-top-fade,
-  .safe-area-bottom-fade {
-    display: none;
+@media (max-width: 380px) {
+  .nav-link {
+    padding: 0 0.62rem;
+    font-size: 0.72rem;
   }
-}
-
-/* ── Reading mode ─────────────────────────────────────────────────────────────
-   Long-form pages (articles, project write-ups) get a bigger window, so more of
-   the screen is text and less is frame. */
-@media (min-width: 941px) {
-  .site-shell[data-reading] {
-    width: min(94vw, 1180px);
-    height: min(96dvh, 1240px);
-  }
-}
-
-/* ── Footer command button ────────────────────────────────────────────────── */
-.footer-left {
-  display: inline-flex;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.footer-cmd {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: inherit;
-  font: inherit;
-  letter-spacing: inherit;
-  text-transform: inherit;
-  cursor: pointer;
-  transition: color 0.15s;
-}
-
-.footer-cmd:hover,
-.footer-cmd:focus-visible {
-  color: var(--accent);
-}
-
-.footer-cmd kbd {
-  display: inline-grid;
-  place-items: center;
-  min-width: 1.35em;
-  height: 1.35em;
-  border: 1px solid var(--border);
-  border-radius: 3px;
-  font: inherit;
 }
 
 /* ── Command palette (scripts/palette.ts) ─────────────────────────────────── */
@@ -1130,17 +1292,20 @@ button,
   margin: 14vh auto auto;
   padding: 0;
   color: var(--text-primary);
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  box-shadow: 0 30px 80px rgb(0 0 0 / 0.45);
+  background: var(--glass-bar);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  backdrop-filter: blur(28px) saturate(160%);
+  border: 1px solid var(--glass-edge);
+  border-radius: 20px;
+  box-shadow: var(--lg-rim), 0 40px 90px -20px rgb(0 0 0 / 0.55);
   font-family: var(--font-mono);
   overflow: hidden;
   opacity: 0;
   translate: 0 -8px;
   transition:
     opacity 0.16s ease,
-    translate 0.2s cubic-bezier(0.2, 0.8, 0.3, 1),
+    translate 0.36s var(--spring),
+    scale 0.36s var(--spring),
     overlay 0.2s allow-discrete,
     display 0.2s allow-discrete;
 }
@@ -1148,18 +1313,21 @@ button,
 .palette[open] {
   opacity: 1;
   translate: 0 0;
+  scale: 1;
 }
 
 @starting-style {
   .palette[open] {
     opacity: 0;
     translate: 0 -8px;
+    scale: 0.98;
   }
 }
 
 .palette::backdrop {
-  background: rgb(0 0 0 / 0.45);
-  backdrop-filter: blur(3px);
+  background: rgb(0 0 0 / 0.32);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
 }
 
 .palette-input-row {
@@ -1167,7 +1335,7 @@ button,
   align-items: center;
   gap: 0.6rem;
   padding: 0.85rem 1rem;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--hairline);
 }
 
 .palette-prompt {
@@ -1203,13 +1371,13 @@ button,
   align-items: baseline;
   gap: 0.75rem;
   padding: 0.55rem 0.65rem;
-  border-radius: 6px;
+  border-radius: 12px;
   cursor: pointer;
   font-size: 0.82rem;
 }
 
 .palette-item[aria-selected="true"] {
-  background: var(--surface-hover);
+  background: var(--tile-hover);
 }
 
 .palette-item[aria-selected="true"] .palette-label {
@@ -1248,7 +1416,7 @@ button,
 .palette-foot {
   margin: 0;
   padding: 0.5rem 1rem;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--hairline);
   color: var(--text-faint);
   font-size: 0.64rem;
   letter-spacing: 0.08em;

@@ -13,12 +13,14 @@ export default defineConfig({
     site: process.env.SITE_URL ?? "https://example.pages.dev",
     output: "static",
 
-    // Fetch a page in the background as soon as its link is hovered or focused,
-    // so the click feels instant. (Replaces the <script type="speculationrules">
-    // tag, which the ClientRouter's fetch-based navigation doesn't benefit from.)
+    // Fetch pages in the background before they're clicked, so navigation is
+    // instant. "viewport" fetches a link once it scrolls into view: phones have
+    // no hover, so a hover strategy left every tap waiting ~100 ms on the network.
+    // Pages are ~15 KB, and Astro skips prefetching on Save-Data / slow connections.
+    // The four main tabs use "load" (see BaseLayout).
     prefetch: {
         prefetchAll: true,
-        defaultStrategy: "hover",
+        defaultStrategy: "viewport",
     },
 
     image: {

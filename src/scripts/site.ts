@@ -5,14 +5,14 @@
  * everything here binds global listeners once and reacts to `astro:page-load`.
  */
 import { initChrome } from "./chrome";
-import { initCursor } from "./cursor";
+import { initLiquidGlass } from "./liquidGlass";
 import { initMaze } from "./maze";
 import { initTheme } from "./theme";
 
 initTheme();
 initChrome();
-initCursor();
 initMaze();
+initLiquidGlass();
 
 // ── Command palette ───────────────────────────────────────────────────────────
 // Only this tiny listener ships with every page; the palette itself is a separate

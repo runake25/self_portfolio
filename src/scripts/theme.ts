@@ -99,9 +99,6 @@ export function initTheme() {
     const incoming = event.newDocument.documentElement;
     incoming.dataset.theme = getTheme();
     if (root.dataset.uiHidden) incoming.dataset.uiHidden = root.dataset.uiHidden;
-    for (const runtimeClass of ["has-custom-cursor", "cursor-visible"]) {
-      if (root.classList.contains(runtimeClass)) incoming.classList.add(runtimeClass);
-    }
   });
 
   document.addEventListener("astro:page-load", syncToggle);

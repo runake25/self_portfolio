@@ -1,32 +1,31 @@
 /* Movie grid and poster cards.
-   Imported only by the pages that need it, so other pages never download it. */
+   Imported only by the pages that need it, so other pages never download it.
+   Cards reuse the global glass tile (.card-link); the poster sits in it as a
+   rounded frame with the title overlaid on the poster. */
 
 /* ── Movie poster grid ── */
 .movie-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1rem;
-
 }
 
-.movie-poster-card {
+/* The "a." raises specificity above .card-link's padding regardless of CSS order. */
+a.movie-poster-card {
   position: relative;
   display: block;
-  aspect-ratio: 2 / 3;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  background: var(--surface);
+  padding: 0.4rem;
   text-decoration: none;
-  transition:
-    transform 0.24s cubic-bezier(0.22, 0.61, 0.36, 1),
-    box-shadow 0.24s cubic-bezier(0.22, 0.61, 0.36, 1),
-    border-color 0.22s;
 }
 
-.movie-poster-card:hover {
-  transform: translateY(-4px) scale(1.02);
-  border-color: color-mix(in srgb, var(--accent) 58%, var(--border));
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+/* Inner radius = card radius minus padding, so the curves stay concentric. */
+.movie-poster-frame {
+  position: relative;
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  border-radius: var(--r-ctl);
+  background: var(--tile);
+  box-shadow: 0 10px 30px -14px rgb(0 0 0 / 0.5);
 }
 
 .movie-poster-img {
@@ -34,11 +33,13 @@
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: transform 0.34s cubic-bezier(0.22, 0.61, 0.36, 1);
+  transition: scale 520ms var(--spring);
 }
 
-.movie-poster-card:hover .movie-poster-img {
-  transform: scale(1.07);
+@media (hover: hover) and (pointer: fine) {
+  .movie-poster-card:hover .movie-poster-img {
+    scale: 1.05;
+  }
 }
 
 .movie-poster-placeholder {
@@ -47,52 +48,50 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: color-mix(in srgb, var(--surface) 90%, var(--accent) 10%);
+  background: color-mix(in srgb, var(--accent) 16%, #1a1a28);
 }
 
 .movie-poster-placeholder-icon {
   font-size: 2rem;
-  color: var(--text-faint);
-  opacity: 0.35;
+  color: #fff;
+  opacity: 0.3;
 }
 
+/* The overlay sits on a photo, so its text stays light in both themes. */
 .movie-poster-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    to top,
-    rgba(0, 0, 0, 0.92) 0%,
-    rgba(0, 0, 0, 0.48) 42%,
-    transparent 68%
-  );
+  background: linear-gradient(to top, rgb(0 0 0 / 0.88) 0%, rgb(0 0 0 / 0.42) 40%, transparent 66%);
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 0.9rem 0.8rem;
+  padding: 0.85rem 0.8rem;
   gap: 0.3rem;
 }
 
 .movie-poster-title {
   margin: 0;
-  font-size: 0.92rem;
-  font-weight: 700;
-  color: #ffffff;
+  font-family: var(--font-ui);
+  font-size: 0.96rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  color: #fff;
   line-height: 1.25;
-  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.8);
+  text-shadow: 0 1px 6px rgb(0 0 0 / 0.6);
 }
 
 .movie-poster-meta {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.22rem;
+  gap: 0.25rem;
   font-family: var(--font-mono);
-  font-size: 0.64rem;
-  color: rgba(255, 255, 255, 0.62);
+  font-size: 0.7rem;
+  color: rgb(255 255 255 / 0.72);
 }
 
 .movie-meta-sep {
-  opacity: 0.4;
+  opacity: 0.5;
 }
 
 .movie-poster-genre {
@@ -102,48 +101,88 @@
   margin-top: 0.1rem;
 }
 
+/* Borderless pills; the light fill reads on any poster. */
 .movie-genre-tag {
+  display: inline-flex;
+  align-items: center;
   font-family: var(--font-mono);
-  font-size: 0.55rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.55);
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  padding: 0.1rem 0.35rem;
+  font-size: 0.66rem;
+  letter-spacing: 0.02em;
+  color: rgb(255 255 255 / 0.85);
+  background: rgb(255 255 255 / 0.16);
+  border-radius: 999px;
+  padding: 0.14rem 0.55rem;
+}
+
+/* ── Pick One ─────────────────────────────────────────────────────────────
+   pickOne.ts toggles .pick-scanning as the highlight sweeps by, then
+   .pick-highlight on the winner. Only colour, scale/translate and a ring
+   pseudo-element (transform + opacity) animate. */
+a.movie-poster-card.pick-scanning {
+  background: color-mix(in srgb, var(--accent) 22%, var(--tile));
+  border-color: color-mix(in srgb, var(--accent) 75%, var(--hairline));
+  scale: 1.03;
+  transition:
+    background-color 55ms linear,
+    border-color 55ms linear,
+    scale 60ms linear;
+}
+
+a.movie-poster-card.pick-highlight {
+  z-index: 5;
+  background: color-mix(in srgb, var(--accent) 16%, var(--tile-hover));
+  border-color: var(--accent);
+  translate: 0 -5px;
+  scale: 1.04;
+  box-shadow:
+    inset 0 1px 0 var(--tile-shine),
+    0 24px 46px -22px color-mix(in srgb, var(--accent) 65%, transparent);
+}
+
+a.movie-poster-card.pick-highlight::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border: 2px solid var(--accent);
+  border-radius: inherit;
+  pointer-events: none;
+  animation: movie-pick-ring 700ms var(--ease-out) both;
+}
+
+@keyframes movie-pick-ring {
+  from {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.12);
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  a.movie-poster-card.pick-scanning {
+    scale: 1;
+    transition:
+      background-color 40ms linear,
+      border-color 40ms linear;
+  }
 }
 
 @media (max-width: 940px) {
   .movie-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 0.65rem;
+    gap: 0.7rem;
+  }
+  .pick-one-btn {
+    min-height: 40px;
+    padding-inline: 1.1rem;
   }
 }
 
-/* scanning flash — movie poster cards */
-.movie-poster-card.pick-scanning {
-  border-color: color-mix(in srgb, var(--accent) 80%, transparent) !important;
-  box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 28%, transparent) !important;
-  transition: border-color 60ms, box-shadow 60ms !important;
-}
-
-/* winner — movie poster card */
-.movie-poster-card.pick-highlight {
-  border-color: var(--accent) !important;
-  transform: translateY(-6px) scale(1.04) !important;
-  z-index: 5;
-  position: relative;
-  animation: pick-ripple-poster 0.55s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
-}
-
-@keyframes pick-ripple-poster {
-  0%   { box-shadow: 0 0 0 0px  color-mix(in srgb, var(--accent) 70%, transparent), 0 8px 20px rgba(0,0,0,0.5); }
-  40%  { box-shadow: 0 0 0 10px color-mix(in srgb, var(--accent) 0%,  transparent), 0 24px 55px rgba(0,0,0,0.75); }
-  100% { box-shadow: 0 0 0 2px  color-mix(in srgb, var(--accent) 48%, transparent), 0 20px 48px rgba(0,0,0,0.65); }
-}
-
-@media (hover: none) and (pointer: coarse) {
-  .movie-poster-card.pick-scanning {
-    box-shadow: none !important;
-    transition: border-color 40ms !important;
+@media (prefers-reduced-motion: reduce) {
+  a.movie-poster-card.pick-highlight::after {
+    animation: none;
+    opacity: 0;
   }
 }

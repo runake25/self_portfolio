@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 export const mono = { fontFamily: "var(--font-mono)" } as const;
 
 interface Props {
-  /** Uppercase caption shown above the chart */
+  /** Small mono caption shown above the chart */
   label?: string;
   /** Label colour — charts use this to carry a per-opponent verdict tone */
   labelColor?: string;
@@ -22,7 +22,7 @@ interface Props {
  */
 export default function ChartFrame({ label, labelColor = "var(--text-faint)", caption, note, children }: Props) {
   return (
-    <div style={{ margin: "1.75em 0" }}>
+    <div className="chart-frame" style={{ margin: "1.75em 0" }}>
       {label && (
         <p
           style={{
@@ -30,8 +30,7 @@ export default function ChartFrame({ label, labelColor = "var(--text-faint)", ca
             fontSize: "0.78rem",
             color: labelColor,
             marginBottom: "0.75em",
-            letterSpacing: "0.05em",
-            textTransform: "uppercase",
+            letterSpacing: "0.02em",
           }}
         >
           {label}

@@ -18,8 +18,15 @@
  * handful of keyframes, each with its own easing, and the browser's compositor plays
  * it: no requestAnimationFrame loop and no JavaScript per frame.
  *
- * Three animations run in lockstep on the ball's three layers:
+ * Four animations run in lockstep on the ball's layers:
  *   position (outer element) · squash-and-stretch + fade (core) · impact ripple (ring)
+ *   · rolling surface (skin)
+ *
+ * Rolling: the skin (the printed "8" disc) slides under fixed lighting. A ball
+ * that rolls without slipping turns its surface by exactly the distance it
+ * travels, so the texture slides by that same distance, wrapping every
+ * circumference (2πr). Each wrap splits a phase into constant-acceleration pieces,
+ * so the skin uses the same exact easing as the position track.
  */
 
 export interface Vec {
@@ -33,6 +40,7 @@ export interface BallParts {
   ball: HTMLElement;
   core: HTMLElement;
   ring: HTMLElement;
+  skin: HTMLElement;
 }
 
 export interface Feel {
@@ -54,6 +62,12 @@ interface BodyKey {
   o: number;
   easing: string;
 }
+interface SkinKey {
+  t: number;
+  u: number; // texture offset along x, 0 ≤ u ≤ one circumference
+  v: number; // … and along y
+  easing: string;
+}
 interface RingKey {
   t: number;
   dx: number;
@@ -73,6 +87,9 @@ function quadEasing(v0: number, v1: number, t: number, s: number) {
 }
 
 export class Timeline {
+  /** Where the surface texture was left, so the next run picks it up without a jump. */
+  private static skinCarry = { u: 0, v: 0 };
+
   private t = 0;
   private x: number;
   private y: number;
@@ -80,6 +97,9 @@ export class Timeline {
   private pos: PosKey[];
   private body: BodyKey[];
   private ring: RingKey[];
+  private skin: SkinKey[];
+  private u: number;
+  private v: number;
 
   constructor(
     start: Vec,
@@ -92,6 +112,14 @@ export class Timeline {
     this.pos = [{ t: 0, x: start.x, y: start.y, easing: "linear" }];
     this.body = [{ t: 0, sx: 1, sy: 1, o: this.opacity, easing: "linear" }];
     this.ring = [{ t: 0, dx: 0, dy: 0, s: 0.4, o: 0, easing: "linear" }];
+    const period = this.circumference; // the ball size changes with each new maze
+    this.u = Timeline.skinCarry.u % period;
+    this.v = Timeline.skinCarry.v % period;
+    this.skin = [{ t: 0, u: this.u, v: this.v, easing: "linear" }];
+  }
+
+  private get circumference() {
+    return 2 * Math.PI * this.feel.radius;
   }
 
   get duration() {
@@ -107,10 +135,51 @@ export class Timeline {
     if (dist < 0.01 || v0 + v1 <= 0) return;
     const duration = (2 * dist) / (v0 + v1);
     this.pos[this.pos.length - 1].easing = quadEasing(v0, v1, duration, dist);
+    this.roll(dir, dist, v0, v1);
     this.t += duration;
     this.x += dir.x * dist;
     this.y += dir.y * dist;
     this.pos.push({ t: this.t, x: this.x, y: this.y, easing: "linear" });
+  }
+
+  /** Turn the surface along with a phase, wrapping the texture every circumference. */
+  private roll(dir: Vec, dist: number, v0: number, v1: number) {
+    const period = this.circumference;
+    const accel = (v1 * v1 - v0 * v0) / (2 * dist);
+    const sign = dir.x !== 0 ? Math.sign(dir.x) : Math.sign(dir.y);
+    const alongX = dir.x !== 0;
+    let at = alongX ? this.u : this.v;
+    let t = this.t;
+    let speed = v0;
+    let left = dist;
+    this.holdSkin(t);
+    const push = () =>
+      this.skin.push({ t, u: alongX ? at : this.u, v: alongX ? this.v : at, easing: "linear" });
+
+    while (left > 1e-6) {
+      const room = sign > 0 ? period - at : at;
+      if (room <= 1e-6) {
+        at = sign > 0 ? 0 : period; // seamless: the texture repeats every period
+        push();
+        continue;
+      }
+      const piece = Math.min(left, room);
+      const next = Math.sqrt(Math.max(0, speed * speed + 2 * accel * piece));
+      const span = (2 * piece) / (speed + next);
+      this.skin[this.skin.length - 1].easing = quadEasing(speed, next, span, piece);
+      t += span;
+      at += sign * piece;
+      left -= piece;
+      speed = next;
+      push();
+    }
+    if (alongX) this.u = at;
+    else this.v = at;
+  }
+
+  private holdSkin(t: number) {
+    const last = this.skin[this.skin.length - 1];
+    if (t > last.t) this.skin.push({ t, u: this.u, v: this.v, easing: "linear" });
   }
 
   pause(seconds: number) {
@@ -213,8 +282,10 @@ export class Timeline {
     return this;
   }
 
-  /** Start the three synchronized animations. Index 0 is the position track. */
-  animate({ ball, core, ring }: BallParts): Animation[] {
+  /** Start the synchronized animations. Index 0 is the position track. */
+  animate({ ball, core, ring, skin }: BallParts): Animation[] {
+    Timeline.skinCarry = { u: this.u, v: this.v };
+    const period = this.circumference;
     const total = Math.max(this.t, 0.001);
     const close = <K extends { t: number }>(keys: K[]) => {
       const last = keys[keys.length - 1];
@@ -251,6 +322,14 @@ export class Timeline {
           easing: k.easing,
           transform: `translate(${f(k.dx)}px, ${f(k.dy)}px) scale(${f(k.s)})`,
           opacity: k.o,
+        })),
+        timing,
+      ),
+      skin.animate(
+        close(this.skin).map(({ offset, k }) => ({
+          offset,
+          easing: k.easing,
+          transform: `translate(${f(k.u - period)}px, ${f(k.v - period)}px)`,
         })),
         timing,
       ),

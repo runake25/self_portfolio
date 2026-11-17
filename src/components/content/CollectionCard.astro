@@ -1,44 +1,122 @@
 ---
-import { tagColorForTag } from "@/utilities/tagColors";
-
 interface Props {
   href: string;
   title: string;
   description?: string;
   meta?: string;
   tags?: string[];
+  /** Kept so existing callers keep compiling; cards no longer carry a coloured stripe. */
   accentColor?: string;
   readTime?: number;
 }
 
-const { href, title, description, meta, tags = [], accentColor, readTime } = Astro.props;
+const { href, title, description, meta, tags = [], readTime } = Astro.props;
 ---
 
-<article class="card-link h-full" style={accentColor ? `border-top: 2px solid ${accentColor}` : undefined}>
-  <a href={href} class="flex flex-col h-full gap-4">
-    <div class="flex items-start justify-between gap-2">
-      <h2 class="text-xl font-bold" style="color:var(--text-primary)">{title}</h2>
-      <span class="card-arrow" style="margin-top:0.25rem">→</span>
+<article class="card-link collection-card h-full">
+  <a href={href} class="collection-link">
+    {
+      (meta || readTime) && (
+        <p class="collection-meta">
+          {meta && <span>{meta}</span>}
+          {meta && readTime && <span aria-hidden="true">·</span>}
+          {readTime && <span>{readTime} min read</span>}
+        </p>
+      )
+    }
+    <div class="collection-head">
+      <h2 class="collection-title">{title}</h2>
+      <span class="card-arrow" aria-hidden="true">→</span>
     </div>
-    {description && <p style="font-size:0.9rem;line-height:1.75;color:var(--text-secondary)">{description}</p>}
-    {(meta || tags.length > 0 || readTime) && (
-      <div class="flex items-center justify-between gap-4 mt-auto">
-        <div class="flex items-center flex-wrap gap-2">
-          {tags.map((tag) => {
-            const tagColor = tagColorForTag(tag);
-            return (
-              <span
-                class="tag-chip"
-                style={tagColor ? `border-color: color-mix(in srgb, ${tagColor} 45%, var(--border)); color: color-mix(in srgb, ${tagColor} 72%, var(--text-primary)); background: color-mix(in srgb, ${tagColor} 8%, transparent);` : undefined}
-              >
-                {tag}
-              </span>
-            );
-          })}
-          {readTime && <span style="color:var(--text-faint);font-size:0.68rem;letter-spacing:0.08em;font-family:var(--font-mono);white-space:nowrap;margin-left:0.75rem">{readTime} min read</span>}
+    {description && <p class="collection-desc">{description}</p>}
+    {
+      tags.length > 0 && (
+        <div class="collection-tags">
+          {tags.map((tag) => (
+            <span class="tag-chip">{tag}</span>
+          ))}
         </div>
-        {meta && <span class="section-label">{meta}</span>}
-      </div>
-    )}
+      )
+    }
   </a>
 </article>
+
+<style>
+  .collection-card {
+    padding: 1.3rem 1.4rem 1.4rem;
+  }
+
+  .collection-link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    height: 100%;
+    transition: scale 420ms var(--spring);
+  }
+
+  .collection-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.01em;
+    color: var(--text-faint);
+  }
+
+  .collection-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .collection-title {
+    margin: 0;
+    font-family: var(--font-ui);
+    font-size: 1.28rem;
+    font-weight: 650;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    color: var(--text-primary);
+    text-wrap: balance;
+  }
+
+  .collection-card :global(.card-arrow) {
+    flex-shrink: 0;
+    margin-top: 0.3rem;
+    font-size: 0.8rem;
+    transition:
+      color 200ms var(--ease-out),
+      translate 420ms var(--spring);
+  }
+
+  .collection-desc {
+    margin: 0;
+    font-size: 0.92rem;
+    line-height: 1.65;
+    color: var(--text-secondary);
+  }
+
+  .collection-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: auto;
+    padding-top: 0.35rem;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .collection-card:has(> a:hover) :global(.card-arrow) {
+      color: var(--accent);
+      translate: 3px 0;
+    }
+  }
+
+  @media (max-width: 940px) {
+    .collection-card {
+      padding: 1.1rem 1.1rem 1.15rem;
+    }
+  }
+</style>

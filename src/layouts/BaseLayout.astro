@@ -118,14 +118,12 @@ function isActivePath(href: string) {
     <canvas class="maze-canvas" data-maze-canvas aria-hidden="true" transition:persist="maze-canvas"></canvas>
     <div class="maze-ball" data-maze-ball aria-hidden="true" transition:persist="maze-ball">
       <div class="maze-ball-ring"></div>
-      <div class="maze-ball-core"></div>
+      <div class="maze-ball-core"><div class="maze-ball-skin"></div></div>
     </div>
     <p class="maze-hint" aria-hidden="true">click the maze to play</p>
     <div class="bg-grid" aria-hidden="true"></div>
-    <div class="cursor-dot" aria-hidden="true" transition:persist="cursor-dot"></div>
-    <div class="cursor-ring" aria-hidden="true" transition:persist="cursor-ring"></div>
 
-    <button class="ui-visibility-toggle" type="button" data-ui-toggle aria-label="Hide interface" aria-pressed="false">
+    <button class="ui-visibility-toggle" type="button" data-ui-toggle data-lens="9" aria-label="Hide interface" aria-pressed="false">
       <span class="ui-toggle-icons" aria-hidden="true">
         <svg width="13" height="13" viewBox="0 0 13 13" fill="none" focusable="false">
           <rect x="1.2" y="1.2" width="10.6" height="10.6" rx="1.2" stroke="currentColor" stroke-width="1"></rect>
@@ -142,10 +140,10 @@ function isActivePath(href: string) {
     </button>
 
     <div class="site-shell" data-reading={reading ? "" : undefined}>
-      <div class="safe-area-top-fade" aria-hidden="true"></div>
       {(!noSketch || bgPoster || bgCapture) && (
         <div class="shell-art" aria-hidden="true">
           {!noSketch && (
+            <div class="sketch-wrap" transition:persist="sketch">
             <Image
               src={sketchImg}
               alt=""
@@ -157,6 +155,7 @@ function isActivePath(href: string) {
               fetchpriority="low"
               decoding="async"
             />
+            </div>
           )}
           {(bgCapture || bgPoster) && (
             <div class="shell-poster-bg">
@@ -170,7 +169,7 @@ function isActivePath(href: string) {
         </div>
       )}
       <header class="site-header">
-        <div class="header-top">
+        <div class="header-brand">
           <a class="brand" href="/">Brian::sharespace</a>
           <div class="brand-socials">
             <a class="brand-social-link" href={githubUrl} target="_blank" rel="noreferrer noopener" aria-label="GitHub profile">
@@ -186,23 +185,27 @@ function isActivePath(href: string) {
               </a>
             )}
           </div>
+        </div>
+        <!-- Desktop: a segmented control in the header row. Phones: a floating tab bar.
+             The active "pill" carries a view-transition name, so it glides to the new tab. -->
+        <nav class="site-nav" aria-label="Main navigation" data-lens="16">
+          {
+            navigation.map((item) => (
+              <a class="nav-link" data-active={isActivePath(item.href)} aria-current={isActivePath(item.href) ? "page" : undefined} href={item.href} data-astro-prefetch="load">
+                {isActivePath(item.href) && <span class="nav-pill" aria-hidden="true"></span>}
+                <span class="nav-label">{item.label}</span>
+              </a>
+            ))
+          }
+        </nav>
+        <div class="header-actions">
           <button class="mode-toggle" type="button" data-theme-toggle aria-label="Toggle day and night theme" aria-pressed="false">
             <span class="mode-icon mode-icon-sun" aria-hidden="true"></span>
             <span class="mode-icon mode-icon-moon" aria-hidden="true"></span>
           </button>
         </div>
-        <p class="breadcrumb">{breadcrumbPath}</p>
       </header>
 
-      <nav class="site-nav" aria-label="Main navigation">
-        {
-          navigation.map((item) => (
-            <a class="nav-link" data-active={isActivePath(item.href)} aria-current={isActivePath(item.href) ? "page" : undefined} href={item.href}>
-              {item.label}
-            </a>
-          ))
-        }
-      </nav>
 
       <main id="main-content" class="page-content" tabindex="-1">
         <div class="page-content-inner">
@@ -229,18 +232,16 @@ function isActivePath(href: string) {
 
       <footer class="site-footer">
         <span class="footer-left">
-          <span class="footer-status">system_status: <span class="health-value"><span class="status-marker" aria-hidden="true"></span>online</span></span>
+          <span class="status-marker" aria-hidden="true"></span>
+          <span class="breadcrumb">{breadcrumbPath}</span>
+        </span>
+        <div class="footer-right">
           <button class="footer-cmd" type="button" data-palette-open aria-label="Open command palette (shortcut: /)">
             <kbd>/</kbd> commands
           </button>
-        </span>
-        <div class="footer-right">
-          <span>local_time: <span data-local-time>--:--:--</span></span>
-          <span class="footer-sep" aria-hidden="true">::</span>
-          <span>rendered_data: <span data-render-size>--</span></span>
+          <span class="footer-clock" data-local-time>--:--:--</span>
         </div>
       </footer>
-      <div class="safe-area-bottom-fade" aria-hidden="true"></div>
     </div>
   </body>
 </html>
