@@ -581,11 +581,6 @@ button,
   z-index: 3;
 }
 
-/* Phones only: the soft fade under the floating tab bar. */
-.scroll-edge {
-  display: none;
-}
-
 /* A hairline under the header that fades in once the content scrolls under it. */
 .site-header::after {
   content: "";
@@ -1154,7 +1149,7 @@ a.card-link:active,
     height: 100%;
     overflow-y: auto;
     background: var(--bg); /* rubber-band overscroll shows the page colour, not white */
-    scroll-padding-top: calc(env(safe-area-inset-top) + 4.5rem); /* anchors land below the brand */
+    scroll-padding-top: calc(env(safe-area-inset-top) + 1rem); /* anchors clear the status bar */
     scroll-padding-bottom: calc(env(safe-area-inset-bottom) + 5rem);
   }
 
@@ -1168,6 +1163,7 @@ a.card-link:active,
   .maze-canvas,
   .maze-ball,
   .maze-hint,
+  .bg-grid, /* covered by the page here, and a full-screen fixed layer makes Safari tint its bars */
   .ui-visibility-toggle {
     display: none;
   }
@@ -1188,115 +1184,21 @@ a.card-link:active,
   }
 
   /* ── Phone chrome ─────────────────────────────────────────────────────────
-     Nothing is glued to the screen edges. The brand and the theme toggle float
-     over the page, the tabs float above the home indicator, and two soft "scroll
-     edges" (a fade plus a blur that thins out) let content slip under them
-     instead of being cut by a hard band.
-
-     scripts/chrome.ts writes --hide (0 → 1) on the header as you scroll: it
-     follows your finger while you scroll, then springs to fully shown or hidden
-     when you stop. Every child derives its motion from that one number, so the
-     top and bottom always move together. Only translate and opacity change.
-     The header itself must never get a transform or filter: that would trap
-     the fixed tab bar inside it. */
+     Nothing is pinned to the screen edges: the header scrolls away with the
+     page, so iOS Safari can run content under the status bar and its own
+     toolbar with its native soft edge. (Safari paints a solid band behind any
+     fixed element touching the top or bottom edge.) The only fixed piece is the
+     tab bar, which floats clear of the bottom edge. */
   .site-header {
-    --hide: 0;
-    --top-room: calc(env(safe-area-inset-top) + 3.6rem);
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
+    position: relative;
     z-index: 20;
     grid-template-columns: 1fr auto;
     padding: calc(env(safe-area-inset-top) + 0.55rem) max(0.75rem, env(safe-area-inset-right)) 0.55rem
       max(1rem, env(safe-area-inset-left));
-    pointer-events: none; /* the empty middle must not swallow taps */
-  }
-
-  .header-brand,
-  .header-actions,
-  .site-nav {
-    pointer-events: auto;
-    transition:
-      translate 140ms var(--ease-out),
-      opacity 140ms var(--ease-out),
-      scale 140ms var(--ease-out);
-  }
-
-  /* After the finger lets go, the last stretch is a spring. */
-  .site-header[data-settle] :is(.header-brand, .header-actions, .site-nav, .scroll-edge),
-  .site-header[data-settle]::before {
-    transition:
-      translate 520ms var(--spring),
-      opacity 360ms var(--ease-out),
-      scale 520ms var(--spring);
-  }
-
-  .site-header[data-chrome-hidden] :is(.header-brand, .header-actions, .site-nav) {
-    pointer-events: none;
-  }
-
-  .header-brand,
-  .header-actions {
-    translate: 0 calc(var(--hide) * -1 * var(--top-room));
-    opacity: calc(1 - 1.6 * var(--hide));
-  }
-
-  /* Top scroll edge. It slides up with the controls but never fully leaves:
-     the status bar always keeps a soft backing. */
-  .site-header::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    height: calc(var(--top-room) + 1.6rem);
-    z-index: -1;
-    pointer-events: none;
-    background: linear-gradient(
-      to bottom,
-      color-mix(in srgb, var(--bg) 94%, transparent) 0%,
-      color-mix(in srgb, var(--bg) 78%, transparent) 45%,
-      color-mix(in srgb, var(--bg) 30%, transparent) 75%,
-      transparent 100%
-    );
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
-    -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 55%, transparent 100%);
-    mask-image: linear-gradient(to bottom, #000 0%, #000 55%, transparent 100%);
-    translate: 0 calc(var(--hide) * -1 * (var(--top-room) - env(safe-area-inset-top) - 0.5rem));
-    transition: translate 140ms var(--ease-out);
   }
 
   .site-header::after {
     display: none;
-  }
-
-  /* Bottom scroll edge, behind the tab bar. It thins out as the bar leaves. */
-  .scroll-edge {
-    display: block;
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: calc(env(safe-area-inset-bottom) + 5.5rem);
-    z-index: -1;
-    pointer-events: none;
-    background: linear-gradient(
-      to top,
-      color-mix(in srgb, var(--bg) 80%, transparent) 0%,
-      color-mix(in srgb, var(--bg) 45%, transparent) 50%,
-      transparent 100%
-    );
-    -webkit-backdrop-filter: blur(6px);
-    backdrop-filter: blur(6px);
-    -webkit-mask-image: linear-gradient(to top, #000 0%, #000 35%, transparent 100%);
-    mask-image: linear-gradient(to top, #000 0%, #000 35%, transparent 100%);
-    opacity: calc(1 - 0.75 * var(--hide));
-    translate: 0 calc(var(--hide) * 40%);
-    transition:
-      translate 140ms var(--ease-out),
-      opacity 140ms var(--ease-out);
   }
 
   .brand {
@@ -1308,24 +1210,21 @@ a.card-link:active,
     gap: 0.4rem;
   }
 
-  /* The theme toggle is a small liquid-glass bubble, like the tab bar. */
   .mode-toggle {
     width: 38px;
     height: 38px;
-    background: color-mix(in srgb, var(--glass-bar) 55%, transparent);
-    border-color: var(--glass-edge);
-    -webkit-backdrop-filter: blur(14px) saturate(170%);
-    backdrop-filter: blur(14px) saturate(170%);
   }
 
+  /* Reading: the bar glides below the screen and fades (scripts/chrome.ts
+     flips data-hidden on scroll direction). The motion is a plain transition
+     on translate/scale/opacity, so it runs on the compositor and stays smooth
+     even while iOS is momentum-scrolling. */
   .site-nav {
     position: fixed;
     z-index: 30;
     left: 50%;
     bottom: calc(env(safe-area-inset-bottom) + 14px);
-    translate: -50% calc(var(--hide) * (100% + 28px + env(safe-area-inset-bottom)));
-    scale: calc(1 - 0.06 * var(--hide));
-    opacity: calc(1 - 1.25 * var(--hide));
+    translate: -50% 0;
     max-width: calc(100vw - 20px);
     padding: 5px;
     background: color-mix(in srgb, var(--glass-bar) 60%, transparent);
@@ -1335,6 +1234,18 @@ a.card-link:active,
       0 14px 34px -14px rgb(0 0 0 / 0.45);
     -webkit-backdrop-filter: blur(18px) saturate(170%);
     backdrop-filter: blur(18px) saturate(170%);
+    will-change: translate, opacity;
+    transition:
+      translate 640ms var(--spring),
+      scale 640ms var(--spring),
+      opacity 480ms var(--ease-out);
+  }
+
+  .site-nav[data-hidden] {
+    translate: -50% calc(100% + 28px + env(safe-area-inset-bottom));
+    scale: 0.94;
+    opacity: 0;
+    pointer-events: none;
   }
 
   /* With refraction (scripts/liquidGlass.ts) the bar can be clearer still: the
@@ -1357,8 +1268,7 @@ a.card-link:active,
   }
 
   .page-content {
-    padding: calc(env(safe-area-inset-top) + 4.6rem) max(1rem, env(safe-area-inset-right)) 1.5rem
-      max(1rem, env(safe-area-inset-left));
+    padding: 1.1rem max(1rem, env(safe-area-inset-right)) 1.5rem max(1rem, env(safe-area-inset-left));
     overflow: visible;
     scrollbar-gutter: auto;
   }
@@ -1390,15 +1300,10 @@ a.card-link:active,
   }
 }
 
-/* Reduced motion: the phone chrome only fades; nothing slides. */
+/* Reduced motion: the tab bar only fades; nothing slides. */
 @media (max-width: 940px) and (prefers-reduced-motion: reduce) {
-  .header-brand,
-  .header-actions,
-  .site-header::before,
-  .scroll-edge {
-    translate: none;
-  }
-  .site-nav {
+  .site-nav,
+  .site-nav[data-hidden] {
     translate: -50% 0;
     scale: none;
   }

@@ -1,7 +1,7 @@
 /**
  * The "window chrome" around the page: the footer clock, the hide-UI toggle,
- * keyboard scrolling for the content pane, and the phone chrome (top controls
- * and tab bar) that steps aside while you read.
+ * keyboard scrolling for the content pane, and the phone tab bar that steps
+ * aside while you read.
  */
 const root = document.documentElement;
 const UI_KEY = "portfolio-ui-hidden";
@@ -55,68 +55,37 @@ function focusContent() {
   if (main && document.activeElement === document.body) main.focus({ preventScroll: true });
 }
 
-// ── Phone chrome: steps aside while you read ──────────────────────────────────
-// The floating brand/toggle and the tab bar share one number, --hide (0 shown,
-// 1 hidden), on the header. While you scroll it tracks your finger, so the bars
-// leave as gradually as you scroll; when scrolling stops it springs the rest of
-// the way in the direction you were going. Near the top or the end of the page
-// the chrome eases back in. One passive, rAF-batched listener; CSS does the rest.
+// ── Phone tab bar: steps aside while you read ─────────────────────────────────
+// Scrolling down hides the floating tab bar, scrolling up brings it back, and it
+// returns near the top or end of the page. The script only flips an attribute
+// when the direction changes (a few times per gesture, never per frame); the
+// glide itself is a CSS transition on the compositor, so it can't lag behind
+// iOS momentum scrolling the way scroll-tracking JavaScript does.
 const phone = matchMedia("(max-width: 940px)");
-const RANGE = 120; // px of scrolling that takes the chrome fully out (or in)
-const END_ZONE = 120; // px before the end of the page where it comes back
-const SETTLE_MS = 140; // quiet time that counts as "scrolling stopped"
-let header: HTMLElement | null = null;
-let hide = 0;
+const SLACK = 24; // px of travel in one direction before the bar reacts
+const EDGE = 120; // px from the top or end of the page where it always shows
+let nav: HTMLElement | null = null;
+let anchorY = 0; // where the current scroll direction started
 let lastY = 0;
-let heading = 0; // last scroll direction: 1 down, -1 up
 let ticking = false;
-let settleTimer = 0;
 
-function paintChrome(settle: boolean) {
-  if (!header) return;
-  header.style.setProperty("--hide", hide.toFixed(3));
-  header.toggleAttribute("data-settle", settle);
-  header.toggleAttribute("data-chrome-hidden", hide > 0.5);
+function setNavHidden(hidden: boolean) {
+  if (nav && nav.hasAttribute("data-hidden") !== hidden) nav.toggleAttribute("data-hidden", hidden);
 }
 
-function scrollBounds() {
+function trackNav() {
+  ticking = false;
+  if (!nav) return;
   const end = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
   const y = Math.min(Math.max(window.scrollY, 0), end); // ignore rubber-band overscroll
-  return { y, end };
-}
-
-function settleChrome() {
-  settleTimer = 0;
-  const { y, end } = scrollBounds();
-  if (y < RANGE || end - y < END_ZONE) hide = 0;
-  else if (hide > 0 && hide < 1) hide = heading > 0 ? (hide > 0.2 ? 1 : 0) : hide < 0.8 ? 0 : 1;
-  paintChrome(true);
-}
-
-function trackChrome() {
-  ticking = false;
-  if (!header) return;
-  if (!phone.matches) {
-    if (hide) showChrome();
+  if (!phone.matches || y < EDGE || end - y < EDGE) {
+    setNavHidden(false);
+    anchorY = lastY = y;
     return;
   }
-  const { y, end } = scrollBounds();
-  const dy = y - lastY;
+  if (Math.sign(y - lastY) !== Math.sign(lastY - anchorY)) anchorY = lastY; // direction changed
   lastY = y;
-  if (!dy) return;
-  heading = Math.sign(dy);
-  hide = Math.min(1, Math.max(0, hide + dy / RANGE));
-  // Ease back in, in proportion, as the top or the end of the page comes near.
-  hide = Math.min(hide, y / RANGE, (end - y) / END_ZONE);
-  paintChrome(false);
-  clearTimeout(settleTimer);
-  settleTimer = window.setTimeout(settleChrome, SETTLE_MS);
-}
-
-function showChrome() {
-  clearTimeout(settleTimer);
-  hide = 0;
-  paintChrome(true);
+  if (Math.abs(y - anchorY) >= SLACK) setNavHidden(y > anchorY);
 }
 
 export function initChrome() {
@@ -127,14 +96,14 @@ export function initChrome() {
     () => {
       if (ticking) return;
       ticking = true;
-      requestAnimationFrame(trackChrome);
+      requestAnimationFrame(trackNav);
     },
     { passive: true },
   );
-  phone.addEventListener("change", showChrome);
-  // Keyboard users tabbing into the chrome should always see it.
+  phone.addEventListener("change", () => setNavHidden(false));
+  // Keyboard users tabbing into the bar should always see it.
   document.addEventListener("focusin", (event) => {
-    if ((event.target as Element | null)?.closest(".site-header")) showChrome();
+    if ((event.target as Element | null)?.closest(".site-nav")) setNavHidden(false);
   });
 
   document.addEventListener("click", (event) => {
@@ -144,11 +113,8 @@ export function initChrome() {
   });
 
   document.addEventListener("astro:page-load", () => {
-    header = document.querySelector<HTMLElement>(".site-header");
-    clearTimeout(settleTimer);
-    hide = 0;
-    lastY = scrollBounds().y;
-    paintChrome(false);
+    nav = document.querySelector<HTMLElement>(".site-nav");
+    anchorY = lastY = Math.max(window.scrollY, 0);
     renderClock();
     syncUiToggle();
     focusContent();
