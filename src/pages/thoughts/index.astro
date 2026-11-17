@@ -1,4 +1,5 @@
 ---
+import "@/styles/thoughts.css";
 import CollectionCard from "@/components/content/CollectionCard.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { entryHref } from "@/utilities/content";
@@ -14,6 +15,21 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
 const posts = (await getCollection("thoughts", ({ data }) => !data.draft || import.meta.env.DEV)).sort(
   (a, b) => b.data.publishedDate.valueOf() - a.data.publishedDate.valueOf(),
 );
+
+// Count how many posts use each tag (keyed by the lowercased name so "Poker" and "poker" merge),
+// then sort by count descending, with ties broken alphabetically.
+const tagCounts = new Map<string, { label: string; count: number }>();
+for (const post of posts) {
+  for (const tag of post.data.tags ?? []) {
+    const key = tag.toLowerCase();
+    const existing = tagCounts.get(key);
+    if (existing) existing.count += 1;
+    else tagCounts.set(key, { label: tag, count: 1 });
+  }
+}
+const allTags = [...tagCounts.entries()]
+  .map(([key, { label, count }]) => ({ key, label, count }))
+  .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
 ---
 
 <BaseLayout title="Thoughts | Brian" description="Reflections and writing.">
@@ -22,7 +38,23 @@ const posts = (await getCollection("thoughts", ({ data }) => !data.draft || impo
     <h1 class="text-3xl font-bold tracking-tight sm:text-4xl" style="color:var(--text-primary)">Thoughts</h1>
     <p class="max-w-3xl text-sm" style="color:var(--text-secondary)">
       Reflections, opinions, and things I think about.
+      <a class="rss-link" href="/rss.xml">rss</a>
     </p>
+
+    {
+      allTags.length >= 2 && (
+        <div class="tag-filter" role="group" aria-label="Filter by tag" data-tag-filter>
+          <button type="button" class="tag-filter-btn" data-tag="" aria-pressed="true">
+            all <span>{posts.length}</span>
+          </button>
+          {allTags.map((tag) => (
+            <button type="button" class="tag-filter-btn" data-tag={tag.key} aria-pressed="false">
+              {tag.label} <span>{tag.count}</span>
+            </button>
+          ))}
+        </div>
+      )
+    }
 
     {
       posts.length === 0 ? (
@@ -30,18 +62,70 @@ const posts = (await getCollection("thoughts", ({ data }) => !data.draft || impo
       ) : (
         <div class="grid gap-4 md:grid-cols-2">
           {posts.map((post) => (
-            <CollectionCard
-              href={entryHref("thoughts", post.id)}
-              title={post.data.title}
-              description={post.data.description}
-              meta={dateFormatter.format(post.data.publishedDate)}
-              tags={post.data.tags}
-              accentColor={tagAccentColor(post.data.tags)}
-              readTime={Math.max(1, Math.ceil((post.body?.split(/\s+/).filter(Boolean).length ?? 0) / 200))}
-            />
+            <div data-tags={(post.data.tags ?? []).map((t) => t.toLowerCase()).join("|")}>
+              <CollectionCard
+                href={entryHref("thoughts", post.id)}
+                title={post.data.title}
+                description={post.data.description}
+                meta={dateFormatter.format(post.data.publishedDate)}
+                tags={post.data.tags}
+                accentColor={tagAccentColor(post.data.tags)}
+                readTime={Math.max(1, Math.ceil((post.body?.split(/\s+/).filter(Boolean).length ?? 0) / 200))}
+              />
+            </div>
           ))}
         </div>
       )
     }
   </section>
 </BaseLayout>
+
+<script>
+  // Tag filtering runs entirely in the browser: every post card is already in the HTML,
+  // we just show/hide them. Each card wrapper carries its tags in `data-tags="a|b"`.
+  function initTagFilter() {
+    const filter = document.querySelector<HTMLElement>("[data-tag-filter]");
+    if (!filter) return; // not on this page (or fewer than 2 tags): nothing to do
+
+    const buttons = Array.from(filter.querySelectorAll<HTMLButtonElement>(".tag-filter-btn"));
+    const cards = Array.from(document.querySelectorAll<HTMLElement>("[data-tags]"));
+
+    function applyTag(tag: string) {
+      // aria-pressed doubles as the accessible state and the CSS hook for the active style.
+      for (const btn of buttons) {
+        btn.setAttribute("aria-pressed", String(btn.dataset.tag === tag));
+      }
+      // The `hidden` attribute removes an element from layout (see thoughts.css).
+      for (const card of cards) {
+        const tags = (card.dataset.tags ?? "").split("|");
+        card.hidden = tag !== "" && !tags.includes(tag);
+      }
+    }
+
+    function setUrl(tag: string) {
+      // Keep the choice in the URL (?tag=poker) so it survives reloads and can be shared.
+      // replaceState swaps the current history entry instead of adding one, and we pass the
+      // existing history.state through because Astro's router stores its own data there.
+      const url = new URL(window.location.href);
+      if (tag) url.searchParams.set("tag", tag);
+      else url.searchParams.delete("tag");
+      history.replaceState(history.state, "", url);
+    }
+
+    for (const btn of buttons) {
+      btn.addEventListener("click", () => {
+        const tag = btn.dataset.tag ?? "";
+        applyTag(tag);
+        setUrl(tag);
+      });
+    }
+
+    // On load, honour ?tag= only if it matches a real button; otherwise show everything.
+    const initial = new URL(window.location.href).searchParams.get("tag")?.toLowerCase() ?? "";
+    applyTag(buttons.some((b) => b.dataset.tag === initial) ? initial : "");
+  }
+
+  // With Astro's ClientRouter the page isn't fully reloaded on navigation, so we hook
+  // `astro:page-load`, which fires on the first load and after every client-side navigation.
+  document.addEventListener("astro:page-load", initTagFilter);
+</script>

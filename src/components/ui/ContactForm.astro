@@ -1,0 +1,204 @@
+---
+/**
+ * Contact form. Server-rendered HTML + a small script, no framework.
+ * (This used to be a React island: ~60 KB of gzipped JS for three inputs.)
+ *
+ * Flow: fill all fields → send_message() reveals two delivery options →
+ * "email" (Web3Forms, or a mailto: fallback) or "notification" (a push to my phone
+ * via ntfy.sh, sent through our own /api/notify function so the topic stays secret).
+ */
+interface Props {
+  contactEmail: string;
+  web3FormsKey: string;
+}
+
+const { contactEmail, web3FormsKey } = Astro.props;
+---
+
+<div class="contact-react-root" data-contact data-email={contactEmail} data-web3={web3FormsKey}>
+  <form novalidate data-step="input">
+    <!-- Honeypot: invisible to people, irresistible to spam bots. -->
+    <input class="cf-honeypot" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+    <div class="cf-fields">
+      <div class="cf-row">
+        <label class="cf-label" for="cf-identity">identity</label>
+        <input class="cf-input" id="cf-identity" name="identity" type="text" placeholder="name or email" required autocomplete="name" />
+      </div>
+      <div class="cf-row">
+        <label class="cf-label" for="cf-subject">subject</label>
+        <input class="cf-input" id="cf-subject" name="subject" type="text" placeholder=" " required />
+      </div>
+      <div class="cf-row">
+        <label class="cf-label" for="cf-message">message</label>
+        <textarea class="cf-input cf-textarea" id="cf-message" name="message" placeholder="say what's on your mind..." rows="6" required></textarea>
+      </div>
+    </div>
+
+    <div class="cf-action-wrap">
+      <button class="cf-btn cf-btn-primary" type="submit" data-send disabled>
+        <span>send_message()</span>
+        <span class="cf-arrow" aria-hidden="true">-&gt;</span>
+      </button>
+
+      <div class="cf-options-row" data-options hidden>
+        <button type="button" class="cf-btn cf-btn-option" data-via="email" style="--delay-in:0ms;--delay-out:70ms">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>
+          <span data-label>email</span>
+        </button>
+        <button type="button" class="cf-btn cf-btn-option" data-via="notification" style="--delay-in:70ms;--delay-out:0ms">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg>
+          <span data-label>notification</span>
+        </button>
+      </div>
+
+      <div class="cf-sent" data-sent hidden>
+        <span class="cf-sent-check" aria-hidden="true">✓</span>
+        <span>message_sent.</span>
+        <button type="button" class="cf-reset" data-reset>reset</button>
+      </div>
+    </div>
+    <p class="cf-err" data-error role="alert" style="margin-top:0.5rem" hidden></p>
+  </form>
+</div>
+
+<script>
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const OUT_MS = 320; // pop-out animation (200ms) + 70ms stagger + margin
+
+  function initContactForm() {
+    const root = document.querySelector<HTMLElement>("[data-contact]");
+    const form = root?.querySelector("form");
+    if (!root || !form) return;
+
+    const { email: contactEmail = "", web3 = "" } = root.dataset;
+    const honeypot = form.querySelector<HTMLInputElement>(".cf-honeypot")!;
+    const fields = Array.from(form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>(".cf-fields .cf-input"));
+    const [identity, subject, message] = fields;
+    const send = form.querySelector<HTMLButtonElement>("[data-send]")!;
+    const options = form.querySelector<HTMLElement>("[data-options]")!;
+    const optionButtons = Array.from(options.querySelectorAll<HTMLButtonElement>("button"));
+    const sent = form.querySelector<HTMLElement>("[data-sent]")!;
+    const error = form.querySelector<HTMLElement>("[data-error]")!;
+
+    const allFilled = () => fields.every((f) => f.value.trim());
+    const setError = (text: string) => {
+      error.textContent = text;
+      error.hidden = !text;
+    };
+    const setStep = (step: "input" | "options" | "sent") => {
+      form.dataset.step = step;
+      for (const f of fields) f.disabled = step !== "input";
+      send.hidden = step === "sent";
+      sent.hidden = step !== "sent";
+      send.disabled = step === "input" && !allFilled();
+    };
+
+    const showOptions = () => {
+      options.dataset.phase = "in";
+      options.hidden = false;
+      setStep("options");
+    };
+    const hideOptions = (then: () => void) => {
+      options.dataset.phase = "out";
+      setTimeout(() => {
+        options.hidden = true;
+        then();
+      }, OUT_MS);
+    };
+
+    const setSending = (button: HTMLButtonElement | null) => {
+      for (const b of optionButtons) {
+        b.disabled = button !== null;
+        const label = b.querySelector("[data-label]")!;
+        label.textContent = b === button ? "sending..." : (b.dataset.via ?? "");
+      }
+    };
+
+    form.addEventListener("input", () => {
+      if (form.dataset.step === "input") send.disabled = !allFilled();
+      setError("");
+    });
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (form.dataset.step === "options") {
+        // Pressing send again collapses the options and returns to editing.
+        setError("");
+        hideOptions(() => setStep("input"));
+      } else if (allFilled()) {
+        showOptions();
+      }
+    });
+
+    const deliver = async (button: HTMLButtonElement, request: () => Promise<void>, fallbackHint: string) => {
+      setSending(button);
+      setError("");
+      try {
+        await request();
+        hideOptions(() => setStep("sent"));
+      } catch {
+        setError(`failed to send. please try ${fallbackHint} instead.`);
+      } finally {
+        setSending(null);
+      }
+    };
+
+    options.addEventListener("click", (event) => {
+      const button = (event.target as Element).closest<HTMLButtonElement>("button[data-via]");
+      if (!button || button.disabled) return;
+      const who = identity.value.trim();
+
+      if (button.dataset.via === "email") {
+        if (!EMAIL_RE.test(who)) {
+          setError("identity must be a valid email address to use this option.");
+          return;
+        }
+        void deliver(
+          button,
+          async () => {
+            if (!web3) {
+              // No Web3Forms key configured: hand off to the visitor's mail client.
+              const body = encodeURIComponent(`${message.value}\n\nFrom: ${who}`);
+              window.open(`mailto:${contactEmail}?subject=${encodeURIComponent(subject.value)}&body=${body}`);
+              return;
+            }
+            const res = await fetch("https://api.web3forms.com/submit", {
+              method: "POST",
+              headers: { "Content-Type": "application/json", Accept: "application/json" },
+              body: JSON.stringify({
+                access_key: web3,
+                subject: subject.value,
+                message: `${message.value}\n\nFrom: ${who}`,
+                from_name: who,
+                email: who,
+              }),
+            });
+            if (!res.ok) throw new Error(`status ${res.status}`);
+          },
+          "notification",
+        );
+      } else {
+        void deliver(
+          button,
+          async () => {
+            const res = await fetch("/api/notify", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ from: who, subject: subject.value, message: message.value, website: honeypot.value }),
+            });
+            if (!res.ok) throw new Error(`status ${res.status}`);
+          },
+          "email",
+        );
+      }
+    });
+
+    form.querySelector("[data-reset]")!.addEventListener("click", () => {
+      form.reset();
+      setError("");
+      setStep("input");
+    });
+  }
+
+  document.addEventListener("astro:page-load", initContactForm);
+</script>

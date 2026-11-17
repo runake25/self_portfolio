@@ -26,5 +26,6 @@ CONTENT_GUIDE.md
 
 # wrangler local cache (never commit)
 .wrangler
+.dev.vars
 
 

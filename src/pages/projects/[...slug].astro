@@ -1,5 +1,7 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
+import "katex/dist/katex.min.css";
+import "@/styles/article.css";
 import { entryHref, entrySlugFromId } from "@/utilities/content";
 import { getCollection, render } from "astro:content";
 
@@ -36,8 +38,10 @@ const nextPage = nextEntry
   prevPage={prevPage}
   nextPage={nextPage}
   noSketch={true}
+  reading
 >
   <article class="article-page">
+    <div class="read-progress" aria-hidden="true"></div>
     <a href="/projects" class="article-back">← Back</a>
     <header class="article-header">
       <p class="section-label">topic</p>

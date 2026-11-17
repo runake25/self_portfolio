@@ -1,0 +1,227 @@
+/* Contact form.
+   Imported only by the pages that need it, so other pages never download it. */
+
+/* ── React ContactForm component ── */
+.contact-react-root {
+  max-width: 38rem;
+}
+
+.cf-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  margin-bottom: 1.4rem;
+}
+
+.cf-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.cf-label {
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.cf-input {
+  width: 100%;
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  padding: 0.55rem 0.75rem;
+  outline: none;
+  transition: border-color var(--ease-soft), background-color var(--ease-soft), opacity 0.2s;
+  resize: none;
+}
+
+.cf-input::placeholder {
+  color: var(--text-faint);
+  opacity: 0.7;
+}
+
+.cf-input:focus {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+  background: color-mix(in srgb, var(--surface-hover) 90%, transparent);
+}
+
+.cf-input:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.cf-textarea {
+  min-height: 9rem;
+  resize: vertical;
+}
+
+/* Sliding action area */
+.cf-action-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  min-height: 3.2rem;
+}
+
+/* Options row pops in horizontally to the right */
+.cf-options-row {
+  display: flex;
+  flex-direction: row;
+  gap: 0.45rem;
+  align-items: center;
+}
+
+.cf-btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+@keyframes cf-pop-in {
+  0% {
+    opacity: 0;
+    transform: translateX(-10px) scale(0.9);
+  }
+  65% {
+    opacity: 1;
+    transform: translateX(3px) scale(1.03);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+
+@keyframes cf-pop-out {
+  0% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-8px) scale(0.92);
+  }
+}
+
+
+/* Buttons */
+.cf-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.48rem 0.9rem;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  transition: border-color var(--ease-soft), color var(--ease-soft), transform 80ms ease, opacity 80ms ease;
+  white-space: nowrap;
+}
+
+.cf-btn:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--accent) 60%, var(--border));
+  color: var(--text-primary);
+}
+
+.cf-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.cf-btn-primary {
+  color: var(--text-primary);
+}
+
+.cf-btn-primary:disabled {
+  opacity: 0.35;
+}
+
+.cf-arrow {
+  color: var(--text-faint);
+}
+
+.cf-btn:hover:not(:disabled) .cf-arrow {
+  color: var(--text-primary);
+}
+
+.cf-btn-ghost {
+  border-color: transparent;
+  color: var(--text-faint);
+  padding-left: 0.3rem;
+  padding-right: 0.3rem;
+}
+
+.cf-btn-ghost:hover:not(:disabled) {
+  border-color: transparent;
+  color: var(--text-secondary);
+}
+
+.cf-err {
+  font-size: 0.73rem;
+  color: #e05555;
+  font-family: var(--font-mono);
+  margin: 0;
+}
+
+.cf-sent {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.cf-sent-check {
+  color: var(--success, #38d39f);
+  font-size: 1rem;
+}
+
+.cf-reset {
+  font-size: 0.68rem;
+  color: var(--text-faint);
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  padding: 0;
+}
+
+.cf-reset:hover {
+  color: var(--text-secondary);
+}
+
+/* Option buttons pop in/out; the per-button stagger comes from --delay-in/--delay-out. */
+.cf-options-row[data-phase="in"] .cf-btn-option {
+  animation: cf-pop-in 280ms cubic-bezier(0.22, 0.61, 0.36, 1) var(--delay-in, 0ms) both;
+}
+
+.cf-options-row[data-phase="out"] .cf-btn-option {
+  animation: cf-pop-out 200ms cubic-bezier(0.4, 0, 1, 1) var(--delay-out, 0ms) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cf-options-row .cf-btn-option {
+    animation-duration: 1ms !important;
+  }
+}
+
+.cf-honeypot {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}

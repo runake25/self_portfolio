@@ -22,6 +22,7 @@ const { href, title, poster, director, releasedYear, genre = [], priority = fals
       alt={`${title} poster`}
       width={500}
       height={750}
+      format="avif"
       loading={priority ? "eager" : "lazy"}
       fetchpriority={priority ? "high" : "auto"}
       decoding="async"

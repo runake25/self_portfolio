@@ -11,24 +11,20 @@ interface Props {
   genre?: string[];
   description?: string;
   priority?: boolean;
-  url?: string;
+  url: string;
 }
 
-const {
-  musicId, title, artist, coverArt, releaseYear,
-  genre = [], description, priority = false, url
-} = Astro.props;
+const { musicId, title, artist, coverArt, releaseYear, genre = [], description, priority = false, url } = Astro.props;
 
 const byline = [artist, releaseYear].filter(Boolean).join(" · ");
 ---
 
-<button
-  type="button"
-  class="music-album-card"
-  data-music-id={musicId}
-  data-music-url={url}
-  aria-haspopup="dialog"
->
+<!--
+  A real link to the album page. On wide screens the music page intercepts plain
+  left-clicks and opens the album in a dialog instead; middle-click, ctrl/cmd-click,
+  phones, and no-JS all just follow the link.
+-->
+<a href={url} class="music-album-card" data-music-id={musicId}>
   <div class="music-album-art-wrap">
     {coverArt ? (
       <Image
@@ -39,7 +35,6 @@ const byline = [artist, releaseYear].filter(Boolean).join(" · ");
         height={400}
         format="avif"
         loading={priority ? "eager" : "lazy"}
-        fetchpriority={priority ? "high" : "auto"}
         decoding="async"
       />
     ) : (
@@ -59,5 +54,4 @@ const byline = [artist, releaseYear].filter(Boolean).join(" · ");
       </div>
     )}
   </div>
-</button>
-
+</a>

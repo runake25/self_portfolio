@@ -1,5 +1,7 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
+import "katex/dist/katex.min.css";
+import "@/styles/article.css";
 import { entryHref, entrySlugFromId } from "@/utilities/content";
 import { tagAccentEntry } from "@/utilities/tagColors";
 import { getCollection, render } from "astro:content";
@@ -45,9 +47,12 @@ const nextPage = nextEntry
   description={entry.data.description}
   prevPage={prevPage}
   nextPage={nextPage}
+  ogType="article"
   noSketch={true}
+  reading
 >
   <article class="article-page">
+    <div class="read-progress" aria-hidden="true"></div>
     <a href="/thoughts" class="article-back">← Back</a>
     <header class="article-header">
       {topicAccent

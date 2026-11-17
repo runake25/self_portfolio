@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
+import "@/styles/article.css";
 import { entryHref, entrySlugFromId } from "@/utilities/content";
 import { getCollection, render } from "astro:content";
 
@@ -28,17 +29,20 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
 });
 
 const prevPage = prevEntry
-  ? { label: "Older thought", title: prevEntry.data.title, url: entryHref("movies", prevEntry.id) }
+  ? { label: "Older review", title: prevEntry.data.title, url: entryHref("movies", prevEntry.id) }
   : null;
 
 const nextPage = nextEntry
-  ? { label: "Newer thought", title: nextEntry.data.title, url: entryHref("movies", nextEntry.id) }
+  ? { label: "Newer review", title: nextEntry.data.title, url: entryHref("movies", nextEntry.id) }
   : null;
 ---
 
 <BaseLayout
-  title={`${entry.data.title} | Thoughts`}
+  title={`${entry.data.title} | Movies`}
   description={entry.data.description}
+  prevPage={prevPage}
+  nextPage={nextPage}
+  ogType="article"
   noSketch={true}
   bgCapture={entry.data.capture}
   bgPoster={entry.data.capture ? undefined : entry.data.poster}

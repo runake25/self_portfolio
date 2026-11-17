@@ -1,0 +1,274 @@
+/* Long-form reading layout: articles, prose, callouts.
+   Imported only by the pages that need it, so other pages never download it. */
+
+/* ── Article / Medium-style reading layout ── */
+.article-page {
+  max-width: 660px;
+  margin: 0 auto;
+  padding-bottom: 3rem;
+  position: relative;
+  isolation: isolate;
+}
+
+.article-back {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  text-decoration: none;
+  margin-bottom: 1.75rem;
+  transition: color 0.12s;
+}
+
+.article-back:hover {
+  color: var(--text-primary);
+}
+
+.article-header {
+  margin-bottom: 2.5rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.article-header h1 {
+  font-size: 2.15rem;
+  line-height: 1.25;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin: 0.75rem 0 1rem;
+}
+
+@media (min-width: 640px) {
+  .article-header h1 {
+    font-size: 2.6rem;
+  }
+}
+
+.article-header .lead {
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  margin-top: 1rem;
+  max-width: 52ch;
+}
+
+/* ── Prose — article body ── */
+.prose {
+  color: var(--text-secondary);
+  font-size: 1.0625rem;
+  line-height: 1.72;
+  font-family: var(--font-ui);
+}
+
+.prose :where(p) {
+  margin-bottom: 1.5em;
+}
+
+.prose :where(h2) {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-top: 2.5em;
+  margin-bottom: 0.75em;
+  letter-spacing: -0.01em;
+  font-family: var(--font-ui);
+}
+
+.prose :where(h3) {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-top: 2em;
+  margin-bottom: 0.5em;
+  font-family: var(--font-ui);
+}
+
+.prose :where(h1, h4) {
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-weight: 700;
+}
+
+.prose :where(li) {
+  color: var(--text-secondary);
+  margin-bottom: 0.35em;
+}
+
+.prose :where(strong) {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.prose :where(blockquote) {
+  border-left: 3px solid var(--accent);
+  padding-left: 1.25rem;
+  font-style: italic;
+  color: var(--text-secondary);
+  margin: 1.75em 0;
+  border-top: none;
+  border-right: none;
+  border-bottom: none;
+}
+
+.prose :where(code):not(pre code) {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background: var(--surface);
+  padding: 0.18em 0.45em;
+  border-radius: 3px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.prose :where(code):not(pre code)::before,
+.prose :where(code):not(pre code)::after {
+  content: none;
+}
+
+.prose :where(pre) {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1.25rem;
+  overflow-x: auto;
+  margin: 1.75em 0;
+  font-family: var(--font-mono);
+  font-size: 0.855rem;
+  line-height: 1.65;
+}
+
+.prose :where(pre code) {
+  background: none;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+  font-weight: normal;
+}
+
+.prose :where(hr) {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2.75em 0;
+}
+
+.prose :where(a) {
+  color: var(--accent-strong);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+
+.prose :where(a:hover) {
+  opacity: 0.75;
+}
+
+.prose :where(table) {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  margin: 1.75em 0;
+}
+
+.prose :where(th) {
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-bottom: 2px solid var(--border);
+  padding: 0.5rem 0.75rem;
+}
+
+.prose :where(td) {
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 0.75rem;
+}
+
+.prose :where(img) {
+  border-radius: 6px;
+  max-width: 100%;
+}
+
+/* Display math (KaTeX) can be wider than the 660px article column on small screens */
+.prose :where(.katex-display) {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.25rem 0;
+}
+
+/* ── Prose callouts ── */
+.note, .tip, .warn {
+  padding: 0.9rem 1.1rem;
+  border-left: 3px solid;
+  margin: 1.75em 0;
+  font-size: 0.88rem;
+  line-height: 1.65;
+  border-radius: 0 4px 4px 0;
+}
+
+.note {
+  border-color: #4fa3e0;
+  background: color-mix(in srgb, #4fa3e0 8%, var(--bg-elevated));
+  color: var(--text-secondary);
+}
+
+.tip {
+  border-color: #34d399;
+  background: color-mix(in srgb, #34d399 8%, var(--bg-elevated));
+  color: var(--text-secondary);
+}
+
+.warn {
+  border-color: #ef4444;
+  background: color-mix(in srgb, #ef4444 8%, var(--bg-elevated));
+  color: var(--text-secondary);
+}
+
+.note strong, .tip strong, .warn strong {
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-right: 0.35rem;
+  color: var(--text-primary);
+}
+
+.note p, .tip p, .warn p {
+  margin: 0;
+}
+
+/* ── Reading progress ─────────────────────────────────────────────────────────
+   A CSS scroll-driven animation: the bar's scaleX is tied directly to how far
+   the nearest scroll container has scrolled. No scroll listener, no JS, and it
+   runs on the compositor. Browsers without support just don't show the bar. */
+.read-progress {
+  display: none;
+}
+
+@supports (animation-timeline: scroll()) {
+  .read-progress {
+    display: block;
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    height: 2px;
+    margin-bottom: -2px;
+    background: var(--accent);
+    transform-origin: 0 50%;
+    transform: scaleX(0);
+    /* Longhands on purpose: given the `animation` shorthand, the CSS minifier folds the
+       timeline into it, which Chrome rejects, and the bar never moves. */
+    animation-name: read-progress;
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+    animation-timeline: scroll(nearest block);
+  }
+}
+
+@keyframes read-progress {
+  to {
+    transform: scaleX(1);
+  }
+}

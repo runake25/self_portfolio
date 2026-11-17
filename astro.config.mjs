@@ -13,6 +13,14 @@ export default defineConfig({
     site: process.env.SITE_URL ?? "https://example.pages.dev",
     output: "static",
 
+    // Fetch a page in the background as soon as its link is hovered or focused,
+    // so the click feels instant. (Replaces the <script type="speculationrules">
+    // tag, which the ClientRouter's fetch-based navigation doesn't benefit from.)
+    prefetch: {
+        prefetchAll: true,
+        defaultStrategy: "hover",
+    },
+
     image: {
         domains: ["image.tmdb.org", "coverartarchive.org"],
     },

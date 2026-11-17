@@ -1,0 +1,52 @@
+/* Tag filter pills on the Thoughts index. */
+.tag-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.tag-filter-btn {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.3rem 0.65rem;
+  cursor: pointer;
+}
+
+.tag-filter-btn span {
+  color: var(--text-faint);
+}
+
+.tag-filter-btn:hover,
+.tag-filter-btn[aria-pressed="true"] {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 60%, var(--border));
+}
+
+.tag-filter-btn[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+/* The browser's default `hidden` can be overridden by display rules, so make it explicit. */
+[data-tags][hidden] {
+  display: none;
+}
+
+.rss-link {
+  margin-left: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.rss-link:hover {
+  color: var(--accent);
+}

@@ -1,17 +1,17 @@
 ---
 import MusicAlbumCard from "@/components/content/MusicAlbumCard.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
+import "@/styles/article.css";
+import "@/styles/music.css";
 import { Image } from "astro:assets";
 import { getCollection, render } from "astro:content";
 import { entryHref } from "@/utilities/content";
 
-const entries = (await getCollection("music")).sort(
-    (a, b) => b.data.entryDate.valueOf() - a.data.entryDate.valueOf(),
-);
+const entries = (await getCollection("music")).sort((a, b) => b.data.entryDate.valueOf() - a.data.entryDate.valueOf());
 const rendered = await Promise.all(entries.map((e) => render(e)));
 ---
 
-<BaseLayout title="Music | Brian" description="Music I love.">
+<BaseLayout title="Music | Brian" description="Albums and artists that stuck with me.">
   <section class="space-y-8">
     <p class="section-label">Explore · Music</p>
     <div class="flex items-end justify-between gap-3 flex-wrap">
@@ -29,6 +29,16 @@ const rendered = await Promise.all(entries.map((e) => render(e)));
       )}
     </div>
 
+    <!-- Hidden until /api/now-playing returns a track (see script below). -->
+    <a class="now-playing" data-now-playing hidden href="#" target="_blank" rel="noreferrer noopener">
+      <span class="np-bars" aria-hidden="true"><i></i><i></i><i></i></span>
+      <img class="np-art" alt="" width="34" height="34" loading="lazy" decoding="async" hidden />
+      <span class="np-text">
+        <span class="np-label"></span>
+        <span class="np-track"></span>
+      </span>
+    </a>
+
     {entries.length === 0 ? (
       <p style="color:var(--text-faint)">No entries yet. Add your first album in src/content/music.</p>
     ) : (
@@ -42,7 +52,7 @@ const rendered = await Promise.all(entries.map((e) => render(e)));
             releaseYear={entry.data.releaseYear}
             genre={entry.data.genre}
             description={entry.data.description}
-            priority={true}
+            priority={i < 4}
             url={entryHref("music", entry.id)}
           />
         ))}
@@ -50,181 +60,164 @@ const rendered = await Promise.all(entries.map((e) => render(e)));
     )}
   </section>
 
-  <!-- Shared backdrop -->
-  <div id="music-backdrop" class="music-backdrop" aria-hidden="true"></div>
-
-  <!-- One modal per album (hidden, populated at build time) -->
+  <!--
+    Native <dialog> elements: showModal() gives us the top layer, a ::backdrop,
+    Escape-to-close, a focus trap, and focus returning to the card on close.
+  -->
   {entries.map((entry, i) => {
     const { Content } = rendered[i];
     return (
-    <div
-      id={`music-modal-${entry.id}`}
-      class="music-modal"
-      role="dialog"
-      aria-modal="true"
-      aria-label={entry.data.title}
-      hidden
-    >
-      <button class="music-modal-close" aria-label="Close" type="button">✕</button>
-      <div class="music-modal-inner">
-        <div class="music-modal-art-wrap">
-          {entry.data.coverArt ? (
-            <Image
-              src={entry.data.coverArt}
-              alt={`${entry.data.title}${entry.data.artist ? ` by ${entry.data.artist}` : ""} album cover`}
-              width={500}
-              height={500}
-              format="avif"
-              loading="lazy"
-              decoding="async"
-              class="music-modal-art"
-            />
-          ) : (
-            <div class="music-modal-art-placeholder">♪</div>
-          )}
-        </div>
-        <div class="music-modal-info">
-          <h2 class="music-modal-title">{entry.data.title}</h2>
-          {entry.data.artist && (
-            <p class="music-modal-artist">{entry.data.artist}</p>
-          )}
-          <div class="music-modal-year-genre">
-            {entry.data.releaseYear && <span>{entry.data.releaseYear}</span>}
-            {entry.data.genre && entry.data.genre.length > 0 && (
-              <span class="music-modal-genres">
-                {entry.data.genre.map((g) => <span class="music-genre-tag">{g}</span>)}
-              </span>
+      <dialog id={`music-modal-${entry.id}`} class="music-modal" aria-label={entry.data.title}>
+        <form method="dialog">
+          <button class="music-modal-close" aria-label="Close" type="submit">✕</button>
+        </form>
+        <div class="music-modal-inner">
+          <div class="music-modal-art-wrap">
+            {entry.data.coverArt ? (
+              <Image
+                src={entry.data.coverArt}
+                alt={`${entry.data.title}${entry.data.artist ? ` by ${entry.data.artist}` : ""} album cover`}
+                width={400}
+                height={400}
+                format="avif"
+                loading="lazy"
+                decoding="async"
+                class="music-modal-art"
+              />
+            ) : (
+              <div class="music-modal-art-placeholder">♪</div>
             )}
           </div>
-          {entry.data.description && (
-            <p class="music-modal-description">{entry.data.description}</p>
-          )}
-          {entry.data.keyTracks && entry.data.keyTracks.length > 0 && (
-            <div class="music-modal-tracks">
-              <p class="music-modal-tracks-label">key tracks</p>
-              <ul>
-                {entry.data.keyTracks.map((track) => <li>{track}</li>)}
-              </ul>
+          <div class="music-modal-info">
+            <h2 class="music-modal-title">{entry.data.title}</h2>
+            {entry.data.artist && <p class="music-modal-artist">{entry.data.artist}</p>}
+            <div class="music-modal-year-genre">
+              {entry.data.releaseYear && <span>{entry.data.releaseYear}</span>}
+              {entry.data.genre && entry.data.genre.length > 0 && (
+                <span class="music-modal-genres">
+                  {entry.data.genre.map((g) => <span class="music-genre-tag">{g}</span>)}
+                </span>
+              )}
             </div>
-          )}
-          <div class="music-modal-prose prose">
-            <Content />
+            {entry.data.description && <p class="music-modal-description">{entry.data.description}</p>}
+            {entry.data.keyTracks && entry.data.keyTracks.length > 0 && (
+              <div class="music-modal-tracks">
+                <p class="music-modal-tracks-label">key tracks</p>
+                <ul>
+                  {entry.data.keyTracks.map((track) => <li>{track}</li>)}
+                </ul>
+              </div>
+            )}
+            <div class="music-modal-prose prose">
+              <Content />
+            </div>
+            <a class="music-modal-link" href={entryHref("music", entry.id)}>open full page →</a>
           </div>
         </div>
-      </div>
-    </div>
+      </dialog>
     );
   })}
-
 </BaseLayout>
 
-<script is:inline>
-  function __initMusicPage() {
-    var pickBtn = document.getElementById("music-pick-btn");
-    var grid    = document.getElementById("music-grid");
-    if (!pickBtn || !grid) return; // not on the music index page
+<script>
+  import { bindPickOne } from "@/scripts/pickOne";
 
-    // Abort and replace previous listener group each visit
-    if (window.__musicAbort) window.__musicAbort.abort();
-    window.__musicAbort = new AbortController();
-    var sig = window.__musicAbort.signal;
+  const wide = window.matchMedia("(min-width: 941px)");
 
-    var _activeModalId = null;
+  // Delegated + bound once; a no-op on pages without album cards.
+  // Capture phase: Astro's ClientRouter also handles link clicks on document, and
+  // it skips clicks that were already preventDefault()-ed. Capturing guarantees
+  // we decide first whether this click opens the dialog instead of navigating.
+  document.addEventListener("click", (event) => {
+    const target = event.target as Element;
 
-    function _openModal(id) {
-      // On mobile, navigate to the detail page instead of showing a popup
-      if (window.innerWidth <= 940) {
-        var card = grid.querySelector('button.music-album-card[data-music-id="' + id + '"]');
-        if (card && card.dataset.musicUrl) {
-          window.location.href = card.dataset.musicUrl;
-          return;
-        }
-      }
-      var modal    = document.getElementById("music-modal-" + id);
-      var backdrop = document.getElementById("music-backdrop");
-      if (!modal || !backdrop) return;
-      _activeModalId = id;
-      modal.removeAttribute("hidden");
-      backdrop.removeAttribute("hidden");
-      document.body.style.overflow = "hidden";
-      requestAnimationFrame(function () {
-        requestAnimationFrame(function () {
-          backdrop.classList.add("is-active");
-          modal.classList.add("is-active");
-        });
-      });
-      var closeBtn = modal.querySelector(".music-modal-close");
-      if (closeBtn) closeBtn.focus();
+    // Clicking the dim backdrop closes the dialog (the click lands on <dialog> itself).
+    if (target instanceof HTMLDialogElement && target.classList.contains("music-modal")) {
+      target.close();
+      return;
     }
 
-    function _closeModal() {
-      if (!_activeModalId) return;
-      var modal    = document.getElementById("music-modal-" + _activeModalId);
-      var backdrop = document.getElementById("music-backdrop");
-      _activeModalId = null;
-      if (modal)    modal.classList.remove("is-active");
-      if (backdrop) backdrop.classList.remove("is-active");
-      document.body.style.overflow = "";
-      setTimeout(function () {
-        if (modal)    modal.setAttribute("hidden", "");
-        if (backdrop) backdrop.setAttribute("hidden", "");
-      }, 280);
+    const card = target.closest<HTMLAnchorElement>("a.music-album-card[data-music-id]");
+    if (!card || !wide.matches) return;
+    const mouse = event as MouseEvent;
+    if (mouse.button !== 0 || mouse.metaKey || mouse.ctrlKey || mouse.shiftKey || mouse.altKey) return;
+
+    const dialog = document.getElementById(`music-modal-${card.dataset.musicId}`) as HTMLDialogElement | null;
+    if (!dialog) return;
+    event.preventDefault();
+    dialog.showModal();
+  }, { capture: true });
+
+  bindPickOne({ buttonId: "music-pick-btn", cardSelector: "#music-grid .music-album-card", laps: 4, baseDelay: 35, slowdown: 480, curve: 2.8 });
+
+  // "Now playing" widget. Runs on every client-side navigation (ClientRouter swaps
+  // the DOM, so we hook astro:page-load) and does nothing if the widget isn't on the page.
+  type NowPlaying = {
+    configured: boolean;
+    track?: {
+      title: string;
+      artist: string;
+      album?: string;
+      url: string;
+      image: string | null;
+      playingNow: boolean;
+      playedAt: number | null;
+    } | null;
+  };
+
+  function relativeTime(ms: number): string {
+    const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+    const seconds = Math.round((ms - Date.now()) / 1000); // negative = in the past
+    const units: [Intl.RelativeTimeFormatUnit, number][] = [
+      ["day", 86400],
+      ["hour", 3600],
+      ["minute", 60],
+    ];
+    for (const [unit, size] of units) {
+      if (Math.abs(seconds) >= size) return rtf.format(Math.round(seconds / size), unit);
     }
-
-    document.addEventListener("click", function (e) {
-      var card = e.target.closest("button.music-album-card[data-music-id]");
-      if (card) { _openModal(card.dataset.musicId); return; }
-      if (e.target.id === "music-backdrop") { _closeModal(); return; }
-      if (e.target.closest(".music-modal-close")) { _closeModal(); return; }
-      var hl = grid.querySelector(".pick-highlight");
-      if (hl && !hl.contains(e.target)) hl.classList.remove("pick-highlight");
-    }, { signal: sig });
-
-    document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape" && _activeModalId) _closeModal();
-    }, { signal: sig });
-
-    // ── Pick One ─────────────────────────────────────────────────────────────
-    var pickCards = Array.from(grid.querySelectorAll("button.music-album-card"));
-    if (pickCards.length < 2) return;
-
-    var running = false;
-    function clearPicks() {
-      pickCards.forEach(function (c) { c.classList.remove("pick-scanning", "pick-highlight"); });
-    }
-
-    pickBtn.addEventListener("click", function () {
-      if (running) return;
-      running = true;
-      pickBtn.disabled = true;
-      pickBtn.textContent = "scanning...";
-      clearPicks();
-      var total       = pickCards.length;
-      var targetIndex = Math.floor(Math.random() * total);
-      var totalSteps  = 4 * total + targetIndex + 1;
-      var step = 0, prevIdx = -1;
-      function scan() {
-        if (prevIdx >= 0) pickCards[prevIdx].classList.remove("pick-scanning");
-        var idx = step % total;
-        pickCards[idx].classList.add("pick-scanning");
-        prevIdx = idx; step++;
-        if (step < totalSteps) {
-          setTimeout(scan, 35 + Math.pow(step / totalSteps, 2.8) * 480);
-        } else {
-          pickCards[prevIdx].classList.remove("pick-scanning");
-          var winner = pickCards[targetIndex];
-          winner.classList.add("pick-highlight");
-          winner.scrollIntoView({ behavior: "smooth", block: "nearest" });
-          pickBtn.textContent = "◎ pick one";
-          pickBtn.disabled = false;
-          running = false;
-        }
-      }
-      scan();
-    }, { signal: sig });
+    return rtf.format(Math.min(seconds, 0), "second");
   }
 
-  document.addEventListener("astro:page-load", __initMusicPage);
+  async function initNowPlaying() {
+    const el = document.querySelector<HTMLAnchorElement>("[data-now-playing]");
+    if (!el) return;
+    try {
+      const res = await fetch("/api/now-playing", { headers: { accept: "application/json" } });
+      if (!res.ok) return;
+      const data = (await res.json()) as NowPlaying;
+      const track = data.configured ? data.track : null;
+      if (!track || !el.isConnected) return;
+
+      const label = el.querySelector<HTMLElement>(".np-label");
+      const text = el.querySelector<HTMLElement>(".np-track");
+      const art = el.querySelector<HTMLImageElement>(".np-art");
+      if (!label || !text) return;
+
+      label.textContent = track.playingNow
+        ? "now playing"
+        : track.playedAt
+          ? `last played · ${relativeTime(track.playedAt)}`
+          : "last played";
+      text.textContent = `${track.title} — ${track.artist}`;
+      if (track.url) el.href = track.url;
+
+      if (art) {
+        if (track.image) {
+          art.src = track.image;
+          art.hidden = false;
+        } else {
+          art.hidden = true;
+        }
+      }
+
+      if (track.playingNow) el.setAttribute("data-live", "");
+      else el.removeAttribute("data-live");
+      el.hidden = false;
+    } catch {
+      // Endpoint missing (local dev / static preview) or network error: stay hidden.
+    }
+  }
+
+  document.addEventListener("astro:page-load", initNowPlaying);
 </script>
-
-

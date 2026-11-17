@@ -17,16 +17,9 @@ const projects = defineCollection({
   }),
 });
 
-const tech = defineCollection({
-  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/tech" }),
-  schema: z.object({
-    title: z.string(),
-    publishedDate: z.date(),
-    description: z.string().optional(),
-    tags: z.array(z.string()).optional(),
-    draft: z.boolean().default(false),
-  }),
-});
+// A `tech` collection used to be defined here, but no page used it and its folder
+// only holds a template, so every build printed a warning. Re-add it (and a page
+// for it) together with the first tech post.
 
 const movies = defineCollection({
   loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/movies" }),
@@ -73,7 +66,6 @@ const music = defineCollection({
 
 export const collections = {
   projects,
-  tech,
   movies,
   thoughts,
   music,
